@@ -123,3 +123,46 @@
     opacity: 0.85;
     margin-bottom: 15px;
 }
+.island-map-container {
+    text-align: center;
+}
+
+.island-map {
+    width: 100%;
+    max-width: 900px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 229, 255, 0.4);
+}
+
+.island-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 25px;
+    margin-top: 20px;
+}
+
+.island-card {
+    background: rgba(0, 0, 0, 0.45);
+    border-left: 4px solid #00E5FF;
+    padding: 20px;
+    border-radius: 6px;
+    box-shadow: 0 0 12px rgba(0, 229, 255, 0.25);
+    transition: 0.3s;
+}
+
+.island-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0 18px rgba(0, 229, 255, 0.45);
+}
+
+.island-card h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 30px;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+}
+
+.island-card p {
+    opacity: 0.85;
+    margin-bottom: 15px;
+}
