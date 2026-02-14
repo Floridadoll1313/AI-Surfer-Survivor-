@@ -289,4 +289,16 @@
 
 .founder-card p {
     opacity: 0.85;
+} /* GLOBAL FADE-IN ANIMATION */
+.fade-in {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 1.2s ease forwards;
+}
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
