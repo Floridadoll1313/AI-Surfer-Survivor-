@@ -4,13 +4,11 @@
   "description": "Ocean Tide Drop AI Surfer Survivor website",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "dev": "...",
+    "build": "vite build"
   },
   "dependencies": {
     "express": "^4.18.2"
-  }"scripts": {
-  "dev": "...",
-  "build": "vite build"
-}
-
+  }
 }
