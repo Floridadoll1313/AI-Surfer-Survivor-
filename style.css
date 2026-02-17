@@ -1,133 +1,162 @@
 /* ============================
-   GLOBAL STYLES & ANIMATIONS
+   RESET & BASE STYLES 
    ============================ */
-
-/* Global Fade-in on load */
-.fade-in {
-    opacity: 0;
-    transform: translateY(20px);
-    animation: fadeInUp 1.2s ease forwards;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-@keyframes fadeInUp {
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Neon glow pulse */
-.glow-pulse {
-    animation: glowPulse 2.5s ease-in-out infinite;
-}
-
-@keyframes glowPulse {
-    0% { box-shadow: 0 0 8px rgba(0, 229, 255, 0.4); }
-    50% { box-shadow: 0 0 18px rgba(0, 229, 255, 0.9); }
-    100% { box-shadow: 0 0 8px rgba(0, 229, 255, 0.4); }
-}
-
-/* Floating hover effect */
-.float-hover {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.float-hover:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 0 20px rgba(0, 229, 255, 0.4);
-}
-
-/* Hero title shine sweep */
-.hero-content h1 {
-    position: relative;
-    overflow: hidden;
-}
-
-.hero-content h1::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(120deg, transparent, rgba(255,255,255,0.4), transparent);
-    animation: sweep 3s ease-in-out infinite;
-}
-
-@keyframes sweep {
-    0% { left: -100%; }
-    50% { left: 100%; }
-    100% { left: 100%; }
-}
-
-/* Cursor trail styling */
-.cursor-trail {
-    position: absolute;
-    width: 12px;
-    height: 12px;
-    background: rgba(0, 229, 255, 0.7);
-    border-radius: 50%;
-    pointer-events: none;
-    transform: translate(-50%, -50%);
-    animation: trailFade 0.4s linear forwards;
-}
-
-@keyframes trailFade {
-    to {
-        opacity: 0;
-        transform: translate(-50%, -50%) scale(2);
-    }
+body {
+    background-color: #0a0e14; /* DEEP DARK BACKGROUND */
+    color: #ffffff;
+    font-family: 'Montserrat', sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden;
 }
 
 /* ============================
-   GRID SYSTEMS (Cards)
+   NAVIGATION BAR
    ============================ */
-
-.challenge-grid, .community-grid, .free-grid, .home-grid, .island-grid, .members-grid, .progression-grid, .founders-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 25px;
-    margin-top: 20px;
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 5%;
+    background: rgba(10, 14, 20, 0.95);
+    border-bottom: 1px solid rgba(0, 229, 255, 0.3);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
 
-/* Base Card Styling */
-.challenge-card, .community-card, .free-card, .home-card, .island-card, .members-card, .progression-card, .founder-card {
-    background: rgba(0, 0, 0, 0.45);
-    padding: 20px;
-    border-radius: 8px;
-    transition: 0.3s;
-    border-left: 4px solid #00E5FF; /* Default Neon Cyan */
-    box-shadow: 0 0 12px rgba(0, 229, 255, 0.25);
-}
-
-.challenge-card:hover, .community-card:hover, .free-card:hover, .home-card:hover, .island-card:hover, .members-card:hover, .progression-card:hover, .founder-card:hover {
-    transform: translateY(-5px);
-}
-
-/* Specific Card Colors */
-.community-card, .xp-card { border-color: #FFB84D; box-shadow: 0 0 12px rgba(255, 184, 77, 0.25); }
-.free-card, .founder-card { border-color: #00C2BA; box-shadow: 0 0 12px rgba(0, 194, 186, 0.25); }
-.members-card { border-color: #FF7A00; box-shadow: 0 0 12px rgba(255, 122, 0, 0.25); }
-
-/* Typography */
-h3 {
+.navbar .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 30px;
-    letter-spacing: 2px;
-    margin-bottom: 10px;
+    font-size: 24px;
+    color: #00E5FF;
 }
 
-p {
-    opacity: 0.85;
-    margin-bottom: 15px;
+.navbar .logo img {
+    height: 40px;
 }
 
-/* Founders Specific */
-.founder-photo {
-    width: 100%;
-    max-width: 220px;
-    height: auto;
+.navbar nav a {
+    color: #ffffff;
+    text-decoration: none;
+    margin-left: 20px;
+    font-weight: 400;
+    transition: 0.3s;
+    font-size: 14px;
+    text-transform: uppercase;
+}
+
+.navbar nav a:hover, .navbar nav a.active {
+    color: #00E5FF;
+    text-shadow: 0 0 10px rgba(0, 229, 255, 0.7);
+}
+
+/* ============================
+   HERO SECTION
+   ============================ */
+.hero {
+    height: 60vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+}
+
+.hero::after {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.6); /* Darkens the hero image */
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+}
+
+.hero-content h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 70px;
+    letter-spacing: 4px;
+    color: #00E5FF;
+    text-shadow: 0 0 20px rgba(0, 229, 255, 0.5);
+}
+
+/* ============================
+   CONTENT & GRIDS
+   ============================ */
+.content {
+    padding: 60px 10% 100px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 40px;
+    margin-bottom: 20px;
+    color: #00E5FF;
+}
+
+.island-grid, .challenge-grid, .founders-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    margin-top: 40px;
+}
+
+/* CARDS */
+.island-card, .challenge-card, .founder-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(0, 229, 255, 0.2);
+    border-left: 5px solid #00E5FF;
+    padding: 30px;
     border-radius: 8px;
-    margin-bottom: 15px;
-    box-shadow: 0 0 12px rgba(0, 229, 255, 0.4);
+    transition: 0.3s ease;
+}
+
+.island-card:hover, .challenge-card:hover, .founder-card:hover {
+    transform: translateY(-10px);
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 10px 30px rgba(0, 229, 255, 0.2);
+}
+
+/* BUTTONS */
+.cta-button {
+    display: inline-block;
+    padding: 12px 30px;
+    background: #00E5FF;
+    color: #0a0e14;
+    text-decoration: none;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    border-radius: 4px;
+    margin-top: 15px;
+    transition: 0.3s;
+}
+
+.cta-button:hover {
+    background: #ffffff;
+    box-shadow: 0 0 20px #00E5FF;
+}
+
+/* FOOTER */
+footer {
+    text-align: center;
+    padding: 40px;
+    background: #05070a;
+    border-top: 1px solid rgba(0, 229, 255, 0.1);
+    font-size: 14px;
+    opacity: 0.6;
 }
