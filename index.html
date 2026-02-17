@@ -1,28 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
-<head><link rel="stylesheet" href="/styles.css">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ocean Tide Drop — AI Surfer Survivor</title><head>
-  <meta charset="UTF-8">
-  <title>Ocean Tide Drop</title>
-  <link rel="stylesheet" href="/styles.css">
-</head>
+    <title>Ocean Tide Drop — AI Surfer Survivor</title>
+    
     <link rel="stylesheet" href="style.css">
+    
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
-
 <body>
 
-    <!-- FIXED NAVIGATION BAR -->
     <header class="navbar">
         <div class="logo">
             <img src="images/logo.png" alt="Ocean Tide Drop Logo">
             <span>OCEAN TIDE DROP</span>
         </div>
-
         <nav>
-            <a href="index.html">Home</a>
+            <a href="index.html" class="active">Home</a>
             <a href="island.html">Island</a>
             <a href="progression.html">Progression</a>
             <a href="challenges.html">Challenges</a>
@@ -33,7 +28,6 @@
         </nav>
     </header>
 
-    <!-- HERO SECTION -->
     <section class="hero">
         <div class="hero-content">
             <h1>AI SURFER • SURVIVOR</h1>
@@ -42,17 +36,12 @@
         </div>
     </section>
 
-    <!-- MAIN CONTENT -->
     <main class="content">
         <h2>Welcome to Ocean Tide Drop</h2>
         <p>
-            Step into a world where tribal survival meets neon‑lit AI mastery.  
-            This is your gateway to the Ocean Tide Drop universe — a hybrid realm of  
-            <strong>island challenges, holographic puzzles, progression systems, and lore‑rich ceremonies.🌺</strong>
+            Step into a world where tribal survival meets neon‑lit AI mastery. This is your gateway to the Ocean Tide Drop universe — a hybrid realm of <strong>island challenges, holographic puzzles, progression systems, and lore‑rich ceremonies.🌺</strong>
         </p>
-
         <br>
-
         <h3>Choose Your Path</h3>
         <ul>
             <li><strong>Explore the Island</strong> — discover zones, puzzles, and survival arenas.</li>
@@ -60,25 +49,23 @@
             <li><strong>Join the Community</strong> — connect with other survivors.</li>
             <li><strong>Meet the Founders</strong> — the real‑world creators behind the myth.</li>
         </ul>
-
         <br>
-
         <a class="cta-button" href="progression.html">Begin Your Journey</a>
     </main>
 
-    <!-- FOOTER -->
     <footer>
         <p>© 2026 Ocean Tide Drop — AI Surfer Survivor</p>
-    </footer><script>
-document.addEventListener("mousemove", function(e) {
-    const trail = document.createElement("div");
-    trail.className = "cursor-trail";
-    trail.style.left = e.pageX + "px";
-    trail.style.top = e.pageY + "px";
-    document.body.appendChild(trail);
-    setTimeout(() => trail.remove(), 400);
-});
-</script>
+    </footer>
 
+    <script>
+        document.addEventListener("mousemove", function(e) {
+            const trail = document.createElement("div");
+            trail.className = "cursor-trail";
+            trail.style.left = e.pageX + "px";
+            trail.style.top = e.pageY + "px";
+            document.body.appendChild(trail);
+            setTimeout(() => trail.remove(), 400);
+        });
+    </script>
 </body>
 </html>
