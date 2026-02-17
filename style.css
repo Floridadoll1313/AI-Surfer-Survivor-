@@ -1,0 +1,133 @@
+/* ============================
+   GLOBAL STYLES & ANIMATIONS
+   ============================ */
+
+/* Global Fade-in on load */
+.fade-in {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 1.2s ease forwards;
+}
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Neon glow pulse */
+.glow-pulse {
+    animation: glowPulse 2.5s ease-in-out infinite;
+}
+
+@keyframes glowPulse {
+    0% { box-shadow: 0 0 8px rgba(0, 229, 255, 0.4); }
+    50% { box-shadow: 0 0 18px rgba(0, 229, 255, 0.9); }
+    100% { box-shadow: 0 0 8px rgba(0, 229, 255, 0.4); }
+}
+
+/* Floating hover effect */
+.float-hover {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.float-hover:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 0 20px rgba(0, 229, 255, 0.4);
+}
+
+/* Hero title shine sweep */
+.hero-content h1 {
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-content h1::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(120deg, transparent, rgba(255,255,255,0.4), transparent);
+    animation: sweep 3s ease-in-out infinite;
+}
+
+@keyframes sweep {
+    0% { left: -100%; }
+    50% { left: 100%; }
+    100% { left: 100%; }
+}
+
+/* Cursor trail styling */
+.cursor-trail {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: rgba(0, 229, 255, 0.7);
+    border-radius: 50%;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    animation: trailFade 0.4s linear forwards;
+}
+
+@keyframes trailFade {
+    to {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(2);
+    }
+}
+
+/* ============================
+   GRID SYSTEMS (Cards)
+   ============================ */
+
+.challenge-grid, .community-grid, .free-grid, .home-grid, .island-grid, .members-grid, .progression-grid, .founders-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 25px;
+    margin-top: 20px;
+}
+
+/* Base Card Styling */
+.challenge-card, .community-card, .free-card, .home-card, .island-card, .members-card, .progression-card, .founder-card {
+    background: rgba(0, 0, 0, 0.45);
+    padding: 20px;
+    border-radius: 8px;
+    transition: 0.3s;
+    border-left: 4px solid #00E5FF; /* Default Neon Cyan */
+    box-shadow: 0 0 12px rgba(0, 229, 255, 0.25);
+}
+
+.challenge-card:hover, .community-card:hover, .free-card:hover, .home-card:hover, .island-card:hover, .members-card:hover, .progression-card:hover, .founder-card:hover {
+    transform: translateY(-5px);
+}
+
+/* Specific Card Colors */
+.community-card, .xp-card { border-color: #FFB84D; box-shadow: 0 0 12px rgba(255, 184, 77, 0.25); }
+.free-card, .founder-card { border-color: #00C2BA; box-shadow: 0 0 12px rgba(0, 194, 186, 0.25); }
+.members-card { border-color: #FF7A00; box-shadow: 0 0 12px rgba(255, 122, 0, 0.25); }
+
+/* Typography */
+h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 30px;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+}
+
+p {
+    opacity: 0.85;
+    margin-bottom: 15px;
+}
+
+/* Founders Specific */
+.founder-photo {
+    width: 100%;
+    max-width: 220px;
+    height: auto;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    box-shadow: 0 0 12px rgba(0, 229, 255, 0.4);
+}
