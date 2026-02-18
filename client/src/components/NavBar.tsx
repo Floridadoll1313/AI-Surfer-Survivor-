@@ -127,6 +127,7 @@ export default function NavBar() {
             >
               Home
             </Link>
+
             <Link
               to="/world"
               className={
