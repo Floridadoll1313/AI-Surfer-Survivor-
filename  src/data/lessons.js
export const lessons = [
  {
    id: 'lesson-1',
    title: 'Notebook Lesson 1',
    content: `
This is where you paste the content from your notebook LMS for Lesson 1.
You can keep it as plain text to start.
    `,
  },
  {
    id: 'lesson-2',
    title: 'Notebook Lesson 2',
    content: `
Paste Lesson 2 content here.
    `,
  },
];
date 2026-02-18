@@ -5,14 +5,15 @@ export const lessons = [
     title: 'Notebook Lesson 1',
     content: `
 This is where you paste the content from your notebook LMS for Lesson 1.
-You can keep it as plain text to start.
+You can keep it as plain text to start and refine later.
     `,
   },
   {
     id: 'lesson-2',
     title: 'Notebook Lesson 2',
     content: `
-Paste Lesson 2 content here.
+Paste the content for Lesson 2 here.
+You can copy from your notebook LMS and adjust formatting as needed.
     `,
   },
 ];
