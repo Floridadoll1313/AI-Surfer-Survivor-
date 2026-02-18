@@ -276,8 +276,7 @@ export default function SurvivorWorld() {
           color: #ffddb3;
         }
 
-        .world-challenge-list {
-          display: grid;
+        .world-challenge display: grid;
           grid-template-columns: minmax(0, 1fr);
           gap: 14px;
           margin-top: 10px;
@@ -390,10 +389,24 @@ export default function SurvivorWorld() {
                     <span className="world-dot" /> Physical Trials
                   </span>
                   <span>
-                    <span className="world-dot" style={{ background: "#35c9ff", boxShadow: "0 0 8px rgba(53,201,255,0.9)" }} /> Digital Layer
+                    <span
+                      className="world-dot"
+                      style={{
+                        background: "#35c9ff",
+                        boxShadow: "0 0 8px rgba(53,201,255,0.9)",
+                      }}
+                    />{" "}
+                    Digital Layer
                   </span>
                   <span>
-                    <span className="world-dot" style={{ background: "#9b6bff", boxShadow: "0 0 8px rgba(155,107,255,0.9)" }} /> Ritual Path
+                    <span
+                      className="world-dot"
+                      style={{
+                        background: "#9b6bff",
+                        boxShadow: "0 0 8px rgba(155,107,255,0.9)",
+                      }}
+                    />{" "}
+                    Ritual Path
                   </span>
                 </div>
               </div>
