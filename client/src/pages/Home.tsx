@@ -1,98 +1,64 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React from 'react';
+import { Link } from 'react-router-dom';
 
 export default function Home() {
   return (
-    <>
+    <div className="home-container">
       <style>{`
-        .home-root {
-          min-height: calc(100vh - 120px);
+        .home-container {
           display: flex;
+          flex-direction: column;
           align-items: center;
           justify-content: center;
-          padding: 40px 20px;
-        }
-
-        .home-shell {
+          min-height: 80vh;
           text-align: center;
-          max-width: 640px;
+          padding: 20px;
         }
 
-        .home-title {
-          font-size: 2.6rem;
-          letter-spacing: 0.18em;
+        .hero-title {
+          font-size: clamp(2.5rem, 8vw, 5rem);
+          font-weight: 900;
           text-transform: uppercase;
-          color: #35c9ff;
-          text-shadow:
-            0 0 18px rgba(53, 201, 255, 0.9),
-            0 0 40px rgba(0, 180, 255, 0.7);
+          background: linear-gradient(to bottom, #fff 20%, #00c8ff 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
           margin-bottom: 10px;
         }
 
-        .home-subtitle {
-          font-size: 0.95rem;
+        .hero-subtitle {
+          font-size: 1.2rem;
+          color: #ff8c2f;
+          letter-spacing: 4px;
+          margin-bottom: 40px;
           text-transform: uppercase;
-          letter-spacing: 0.28em;
-          color: #ffddb3;
-          text-shadow: 0 0 10px rgba(255, 159, 64, 0.7);
-          margin-bottom: 26px;
         }
 
-        .home-tagline {
-          font-size: 0.95rem;
-          opacity: 0.85;
-          margin-bottom: 30px;
-        }
-
-        .home-actions {
-          display: flex;
-          justify-content: center;
-          gap: 14px;
-          flex-wrap: wrap;
-        }
-
-        .home-link-card {
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          padding: 12px 22px;
-          border-radius: 999px;
-          border: 1px solid rgba(78, 203, 255, 0.7);
-          background: radial-gradient(circle at top left, rgba(53, 201, 255, 0.2), rgba(0, 0, 0, 0.9));
-          color: #e6f7ff;
+        .cta-button {
+          padding: 18px 48px;
+          background: transparent;
+          border: 2px solid #00c8ff;
+          color: #00c8ff;
+          font-weight: bold;
           text-decoration: none;
-          text-transform: uppercase;
-          letter-spacing: 0.2em;
-          font-size: 0.75rem;
-          box-shadow:
-            0 0 24px rgba(53, 201, 255, 0.7),
-            0 0 60px rgba(0, 0, 0, 0.9);
-          transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+          border-radius: 4px;
+          transition: 0.3s;
+          box-shadow: 0 0 15px rgba(0, 200, 255, 0.4);
         }
 
-        .home-link-card:hover {
-          transform: translateY(-4px);
-          box-shadow:
-            0 0 32px rgba(53, 201, 255, 0.9),
-            0 0 80px rgba(0, 0, 0, 1);
-          background: radial-gradient(circle at top left, rgba(255, 159, 64, 0.25), rgba(0, 0, 0, 0.95));
+        .cta-button:hover {
+          background: #00c8ff;
+          color: #000;
+          box-shadow: 0 0 30px #00c8ff;
+          transform: translateY(-3px);
         }
       `}</style>
 
-      <div className="home-root">
-        <div className="home-shell">
-          <h1 className="home-title">Ocean Tide Drop</h1>
-          <div className="home-subtitle">AI Surfer Console</div>
-          <p className="home-tagline">
-            Step into the Survivor World — one island, four trials, and a living digital surf that remembers every move.
-          </p>
-          <div className="home-actions">
-            <Link to="/world" className="home-link-card">
-              Enter Survivor World
-            </Link>
-          </div>
-        </div>
-      </div>
-    </>
+      <h1 className="hero-title">AI SURFER</h1>
+      <p className="hero-subtitle">Survive the Digital Tide</p>
+      
+      <Link to="/challenges" className="cta-button">
+        ENTER THE ARENA
+      </Link>
+    </div>
   );
 }
