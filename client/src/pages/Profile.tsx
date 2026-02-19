@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 const Profile = () => {
   const navigate = useNavigate();
+  const [showConfirm, setShowConfirm] = useState(false);
   
   // --- PLAYER DATA ---
   const [stats, setStats] = useState({
@@ -13,7 +14,7 @@ const Profile = () => {
     totalRuns: Number(localStorage.getItem('total_runs_completed')) || 0
   });
 
-  // Calculate Rank Title based on XP
+  // Calculate Rank Title
   const getRank = (xp: number) => {
     if (xp >= 50000) return { title: 'SYSTEM_ARCHITECT', color: '#ff00ff' };
     if (xp >= 25000) return { title: 'ELITE_SURFER', color: '#35c9ff' };
@@ -22,6 +23,12 @@ const Profile = () => {
   };
 
   const rankInfo = getRank(stats.wallet);
+
+  // --- WIPE LOGIC ---
+  const handleReset = () => {
+    localStorage.clear(); // Wipes everything
+    window.location.reload(); // Refresh to show 0s
+  };
 
   return (
     <div style={{ padding: '40px', maxWidth: '800px', margin: '0 auto', fontFamily: 'monospace', color: '#64ffda', backgroundColor: '#0a192f', minHeight: '100vh' }}>
@@ -79,13 +86,30 @@ const Profile = () => {
             </div>
           </div>
         </section>
-
       </div>
 
-      <footer style={{ marginTop: '50px', padding: '20px', border: '1px dashed #233554', textAlign: 'center' }}>
-        <p style={{ margin: 0, fontSize: '0.7rem', color: '#4e566d' }}>
-          DEVICE_ID: {Math.random().toString(36).substr(2, 9).toUpperCase()} // SESSION_ENCRYPTED_TRUE
-        </p>
+      {/* DANGEROUS AREA */}
+      <footer style={{ marginTop: '50px', padding: '30px', border: '1px dashed #ff5f5f', textAlign: 'center' }}>
+        {!showConfirm ? (
+          <button 
+            onClick={() => setShowConfirm(true)}
+            style={{ background: 'transparent', color: '#ff5f5f', border: '1px solid #ff5f5f', padding: '10px 20px', cursor: 'pointer', fontFamily: 'monospace' }}
+          >
+            INITIATE_FACTORY_RESET
+          </button>
+        ) : (
+          <div>
+            <p style={{ color: '#ff5f5f', fontSize: '0.8rem', marginBottom: '15px' }}>WARNING: THIS WILL PERMANENTLY ERASE ALL PROGRESS. CONTINUE?</p>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '20px' }}>
+              <button onClick={handleReset} style={{ background: '#ff5f5f', color: '#0a192f', border: 'none', padding: '10px 20px', fontWeight: 'bold', cursor: 'pointer' }}>
+                YES_ERASE_ALL
+              </button>
+              <button onClick={() => setShowConfirm(false)} style={{ background: '#8892b0', color: '#0a192f', border: 'none', padding: '10px 20px', fontWeight: 'bold', cursor: 'pointer' }}>
+                CANCEL
+              </button>
+            </div>
+          </div>
+        )}
       </footer>
     </div>
   );
