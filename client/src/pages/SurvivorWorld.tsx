@@ -10,28 +10,23 @@ const SurvivorWorld = () => {
   const { speedBonus } = getLevelInfo(selectedAvatar);
   const currentSkill = SKILLS[selectedAvatar] || SKILLS.runner;
 
-  // --- PERSISTENT COSMETICS ---
-  const [unlockedIcons, setUnlockedIcons] = useState<string[]>(
-    JSON.parse(localStorage.getItem('survivor_cosmetics') || '[]')
-  );
-
-  // --- THEME & AVATARS ---
+  // --- THEME & PERSISTENT COSMETICS ---
+  const [unlockedIcons] = useState<string[]>(JSON.parse(localStorage.getItem('survivor_cosmetics') || '[]'));
   const isWeekend = [0, 6].includes(new Date().getDay());
   const THEME_COLOR = isWeekend ? '#ffcc00' : '#64ffda';
-  
-  // Use unlocked icon if available, otherwise default
-  const getAvatarIcon = () => {
-    if (unlockedIcons.includes('ELITE_CROWN')) return '👑';
-    const defaults: Record<string, string> = { ghost: '◈', runner: '❖', void: '⬢', surfer: '🌀' };
-    return defaults[selectedAvatar];
-  };
 
-  // --- DAILY CHALLENGE STATE ---
-  const today = new Date().toDateString();
-  const [dailyGoal] = useState(500); 
-  const [challengeComplete, setChallengeComplete] = useState(
-    localStorage.getItem('daily_challenge_done') === today
-  );
+  // --- WEATHER SYSTEM ---
+  const weatherTypes = ['CLEAR', 'NEON_FOG', 'DATA_RAIN', 'SOLAR_FLARE'] as const;
+  const [weather, setWeather] = useState<typeof weatherTypes[number]>('CLEAR');
+
+  useEffect(() => {
+    const weatherInterval = setInterval(() => {
+      const nextWeather = weatherTypes[Math.floor(Math.random() * weatherTypes.length)];
+      setWeather(nextWeather);
+      addLog(`WEATHER_UPDATE: ${nextWeather}`);
+    }, 15000); // Changes every 15 seconds
+    return () => clearInterval(weatherInterval);
+  }, []);
 
   // --- SESSION STATE ---
   const [playerPosition, setPlayerPosition] = useState({ x: 0, y: 0 });
@@ -39,47 +34,45 @@ const SurvivorWorld = () => {
   const [enemyPosition, setEnemyPosition] = useState({ x: 9, y: 9 });
   const [score, setScore] = useState(0);
   const [isGameOver, setIsGameOver] = useState(false);
-  const [logs, setLogs] = useState<string[]>(['> SYSTEM_REBOOT_SUCCESS']);
+  const [logs, setLogs] = useState<string[]>(['> SIMULATION_LOADED']);
 
   const addLog = (msg: string) => setLogs(prev => [`> ${msg}`, ...prev].slice(0, 5));
 
-  // --- CHALLENGE LOGIC ---
-  useEffect(() => {
-    if (score >= dailyGoal && !challengeComplete) {
-      setChallengeComplete(true);
-      const newCosmetics = [...unlockedIcons, 'ELITE_CROWN'];
-      setUnlockedIcons(newCosmetics);
-      localStorage.setItem('survivor_cosmetics', JSON.stringify(newCosmetics));
-      localStorage.setItem('daily_challenge_done', today);
-      addLog('!!! DAILY_CHALLENGE_MET: CROWN_ICON_UNLOCKED !!!');
-      playSound('questComplete');
-    }
-  }, [score, dailyGoal, challengeComplete, unlockedIcons, today]);
-
-  // --- MOVEMENT ---
+  // --- MOVEMENT LOGIC (Weather Affected) ---
   const handleMove = useCallback((dx: number, dy: number) => {
     if (isGameOver) return;
+
+    // DATA_RAIN Slowdown: 20% chance to skip a move input to simulate "heavy" air
+    if (weather === 'DATA_RAIN' && Math.random() < 0.2) return;
+
     setPlayerPosition(prev => {
-      const newX = Math.max(0, Math.min(9, prev.x + dx));
-      const newY = Math.max(0, Math.min(9, prev.y + dy));
+      let nextX = Math.max(0, Math.min(9, prev.x + dx));
+      let nextY = Math.max(0, Math.min(9, prev.y + dy));
+
+      // SOLAR_FLARE Glitch: Small chance to jump an extra tile
+      if (weather === 'SOLAR_FLARE' && Math.random() < 0.1) {
+        nextX = Math.max(0, Math.min(9, nextX + dx));
+        nextY = Math.max(0, Math.min(9, nextY + dy));
+      }
       
-      const fragIdx = fragments.findIndex(f => f.x === newX && f.y === newY);
+      const fragIdx = fragments.findIndex(f => f.x === nextX && f.y === nextY);
       if (fragIdx !== -1) {
-        setScore(s => s + 10);
+        const points = weather === 'SOLAR_FLARE' ? 20 : 10; // Double points during flares
+        setScore(s => s + points);
         setFragments(f => f.filter((_, i) => i !== fragIdx));
         playSound('collect');
       }
 
-      if (newX === enemyPosition.x && newY === enemyPosition.y) {
+      if (nextX === enemyPosition.x && nextY === enemyPosition.y) {
         setIsGameOver(true);
-        addLog('CRITICAL_ERROR: CORE_BREACH');
       }
-      return { x: newX, y: newY };
+      return { x: nextX, y: nextY };
     });
-  }, [fragments, enemyPosition, isGameOver]);
+  }, [fragments, enemyPosition, isGameOver, weather]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) e.preventDefault();
       if (e.key === 'ArrowUp') handleMove(0, -1);
       if (e.key === 'ArrowDown') handleMove(0, 1);
       if (e.key === 'ArrowLeft') handleMove(-1, 0);
@@ -90,33 +83,47 @@ const SurvivorWorld = () => {
   }, [handleMove]);
 
   return (
-    <div className="survivor-world" style={{ borderColor: THEME_COLOR }}>
+    <div className={`survivor-world weather-${weather}`} style={{ borderColor: THEME_COLOR }}>
       <style>{`
-        .daily-box { background: rgba(0,0,0,0.4); padding: 8px; border: 1px solid ${challengeComplete ? THEME_COLOR : '#555'}; margin-bottom: 10px; font-size: 0.7rem; }
-        .reward-tag { color: ${THEME_COLOR}; font-weight: bold; }
+        .weather-display { font-size: 0.7rem; letter-spacing: 2px; color: ${THEME_COLOR}; margin-bottom: 5px; opacity: 0.8; }
+        .weather-NEON_FOG .cell { filter: blur(1.5px); opacity: 0.4; }
+        .weather-NEON_FOG .cell:has(.avatar-icon) { filter: none; opacity: 1; }
+        /* Visibility radius in fog */
+        .weather-NEON_FOG .cell { transition: opacity 0.3s; }
+        
+        .weather-DATA_RAIN::before {
+          content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+          background: repeating-linear-gradient(transparent, transparent 20px, rgba(100, 255, 218, 0.05) 20px, rgba(100, 255, 218, 0.05) 40px);
+          animation: rain 0.5s linear infinite; pointer-events: none; z-index: 5;
+        }
+        @keyframes rain { from { transform: translateY(-40px); } to { transform: translateY(0); } }
+
+        .weather-SOLAR_FLARE { animation: flicker 0.2s infinite; }
+        @keyframes flicker { 0% { opacity: 1; } 50% { opacity: 0.9; } 100% { opacity: 1; } }
       `}</style>
 
-      <div className="daily-box">
-        <div>DAILY_CHALLENGE: Reach {dailyGoal} pts</div>
-        <div className="reward-tag">
-          {challengeComplete ? '✓ STATUS: REWARD_CLAIMED (👑 ICON)' : `PROGRESS: ${score}/${dailyGoal}`}
-        </div>
-      </div>
-
+      <div className="weather-display">ATMOSPHERE: {weather}</div>
+      
       <div className="game-header">
         <div className="stat">SCORE: {score}</div>
-        <div className="stat">AVATAR: {getAvatarIcon()}</div>
+        <div className="stat">{weather === 'SOLAR_FLARE' ? 'x2 MULTIPLIER' : ''}</div>
       </div>
 
       <div className="grid-container">
         {[...Array(100)].map((_, i) => {
           const x = i % 10; const y = Math.floor(i / 10);
           const isPlayer = playerPosition.x === x && playerPosition.y === y;
+          const isEnemy = enemyPosition.x === x && enemyPosition.y === y;
+          
+          // Fog visibility logic: only show cells within 2 units of player
+          const dist = Math.abs(x - playerPosition.x) + Math.abs(y - playerPosition.y);
+          const isVisible = weather !== 'NEON_FOG' || dist <= 2;
+
           return (
-            <div key={i} className="cell">
-              {isPlayer && <span style={{ color: THEME_COLOR, fontSize: '1.2rem' }}>{getAvatarIcon()}</span>}
-              {enemyPosition.x === x && enemyPosition.y === y && <span>⚡</span>}
-              {fragments.some(f => f.x === x && f.y === y) && <span>✦</span>}
+            <div key={i} className="cell" style={{ opacity: isVisible ? 1 : 0.1 }}>
+              {isPlayer && <span style={{ color: THEME_COLOR }}>{unlockedIcons.includes('ELITE_CROWN') ? '👑' : '❖'}</span>}
+              {isEnemy && isVisible && <span className="enemy-icon">⚡</span>}
+              {fragments.some(f => f.x === x && f.y === y) && isVisible && <span>✦</span>}
             </div>
           );
         })}
@@ -126,8 +133,8 @@ const SurvivorWorld = () => {
 
       {isGameOver && (
         <div className="overlay">
-          <h2>SIMULATION_ENDED</h2>
-          <button onClick={() => window.location.reload()}>RE-SYNC</button>
+          <h2>CONNECTION_LOST</h2>
+          <button onClick={() => window.location.reload()}>RE-INITIALIZE</button>
         </div>
       )}
     </div>
