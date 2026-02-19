@@ -6,6 +6,7 @@ import Layout from './components/Layout';
 
 const Home = () => {
   const [showPass, setShowPass] = useState(false);
+
   useEffect(() => {
     const timer = setTimeout(() => setShowPass(true), 1500);
     return () => clearTimeout(timer);
@@ -22,8 +23,9 @@ const Home = () => {
       {showPass && (
         <div style={{
           position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
-          backgroundColor: 'rgba(0,0,0,0.85)', zIndex: 2000, display: 'flex',
-          justifyContent: 'center', alignItems: 'center', backdropFilter: 'blur(8px)'
+          backgroundColor: 'rgba(0,0,0,0.85)', zIndex: 2000,
+          display: 'flex', justifyContent: 'center', alignItems: 'center',
+          backdropFilter: 'blur(8px)'
         }}>
           <div style={{
             background: '#0a192f', padding: '40px', borderRadius: '20px',
@@ -31,14 +33,18 @@ const Home = () => {
           }}>
             <h2 style={{ color: '#35c9ff', fontSize: '2rem' }}>FOUNDER'S PASS</h2>
             <p style={{ color: '#ffffff', marginBottom: '25px' }}>Access to the Realm is granted.</p>
-            <button onClick={() => setShowPass(false)} style={{
-                background: '#35c9ff', color: '#020817', border: 'none',
-                padding: '12px 30px', borderRadius: '5px', fontWeight: 'bold', cursor: 'pointer'
-            }}>Accept Credentials</button>
+            <button 
+              onClick={() => setShowPass(false)} 
+              style={{ background: '#35c9ff', color: '#020817', border: 'none', padding: '12px 30px', borderRadius: '5px', fontWeight: 'bold', cursor: 'pointer' }}
+            >
+              Accept Credentials
+            </button>
           </div>
         </div>
       )}
+
       <h1 style={{ textAlign: 'center', fontSize: '3.5rem', color: '#ffffff' }}>OCEAN TIDE DROP</h1>
+      
       <div style={{ maxWidth: '700px', margin: '40px auto' }}>
         <h2 style={{ color: '#ffffff', borderBottom: '1px solid #35c9ff' }}>SURVIVAL LOGS</h2>
         {logs.map(log => (
@@ -65,6 +71,64 @@ const Equipment = () => {
   };
 
   return (
-    <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+    <div style={{ maxWidth: '900px', margin: '40px auto', padding: '0 20px' }}>
       <h1 style={{ color: '#35c9ff', fontSize: '2.5rem' }}>SURVIVAL GEAR</h1>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(2
+      <div style={{ 
+        display: 'grid', 
+        gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', 
+        gap: '20px', 
+        marginTop: '30px' 
+      }}>
+        {items.map((item, index) => (
+          <div key={index} style={{ 
+            background: '#112240', 
+            padding: '20px', 
+            borderRadius: '12px', 
+            border: '1px solid #35c9ff', 
+            display: 'flex', 
+            flexDirection: 'column', 
+            justifyContent: 'space-between' 
+          }}>
+            <div>
+              <h3 style={{ color: '#35c9ff', margin: '0 0 10px 0' }}>{item.name}</h3>
+              <p style={{ color: '#8892b0', fontSize: '0.9rem' }}>{item.desc}</p>
+              <span style={{ fontSize: '0.8rem', color: '#64ffda', textTransform: 'uppercase' }}>{item.rarity}</span>
+            </div>
+            <button 
+              onClick={() => collectItem(item.boost)}
+              style={{ 
+                marginTop: '20px', 
+                background: 'transparent', 
+                border: '1px solid #35c9ff', 
+                color: '#35c9ff', 
+                padding: '10px', 
+                cursor: 'pointer', 
+                borderRadius: '4px',
+                transition: '0.3s'
+              }}
+            >
+              Equip (+{item.boost}%)
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// --- MAIN APP ROUTER ---
+
+const App = () => {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Home />} />
+          <Route path="equipment" element={<Equipment />} />
+        </Route>
+      </Routes>
+    </Router>
+  );
+};
+
+export default App;
