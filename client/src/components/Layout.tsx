@@ -9,26 +9,17 @@ export default function Layout() {
       <style>{`
         body {
           margin: 0;
-          padding: 0;
-          background: radial-gradient(circle at top, #06213a 0%, #020818 55%, #000000 100%);
-          color: #e6f7ff;
-          font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+          background: #020817; 
+          color: #ffffff; /* Pure white for maximum readability */
+          font-family: sans-serif;
         }
-
-        .otd-shell {
-          min-height: 100vh;
-          display: flex;
-          flex-direction: column;
-        }
-
-        .otd-main {
-          flex: 1;
-        }
+        .otd-shell { min-height: 100vh; display: flex; flex-direction: column; }
+        .otd-main { flex: 1; padding: 40px 20px; }
       `}</style>
       <div className="otd-shell">
         <NavBar />
         <main className="otd-main">
-          <Outlet />
+          <Outlet /> {/* This is the "window" where your pages will appear */}
         </main>
         <SiteFooter />
       </div>
