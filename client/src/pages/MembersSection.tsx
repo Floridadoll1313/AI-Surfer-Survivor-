@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 const MemberSection = () => {
@@ -15,9 +15,9 @@ const MemberSection = () => {
   ];
 
   const playUnlockSound = () => {
-    const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2521/2521-preview.mp3'); // Sci-fi chime
+    const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2521/2521-preview.mp3');
     audio.volume = 0.5;
-    audio.play();
+    audio.play().catch(() => console.log("Audio play blocked by browser"));
   };
 
   const handleLevelUp = () => {
@@ -26,19 +26,29 @@ const MemberSection = () => {
       setMastery(newMastery);
       setSurvival(prev => Math.min(prev + 2, 100));
       localStorage.setItem('survivorMastery', newMastery.toString());
-      
-      // Rotate Tip
       setSentryTip(tips[Math.floor(Math.random() * tips.length)]);
-
-      // Check for God Tier Sound Effect
-      if (newMastery === 100) {
-        playUnlockSound();
-      }
+      if (newMastery === 100) playUnlockSound();
     }
   };
 
+  const shareStats = () => {
+    const status = mastery >= 100 ? "GOD TIER 🏆" : "ELITE TIER 🏄‍♂️";
+    const asciiArt = `
+<<< AI SURFER ID >>>
+----------------------------
+SURVIVOR: #1313
+STATUS: ${status}
+MASTERY: ${mastery}%
+REALM: Sector 7
+----------------------------
+[otdaisurfer.surf]
+    `;
+    navigator.clipboard.writeText(asciiArt);
+    alert("Stats copied to clipboard! Ready to share in the realm.");
+  };
+
   return (
-    <div className="max-w-6xl mx-auto space-y-8">
+    <div className="max-w-6xl mx-auto space-y-8 pb-20">
       
       {/* --- SURVIVOR ID CARD --- */}
       <div className="relative overflow-hidden bg-gradient-to-r from-slate-900 to-cyan-950 p-1 rounded-2xl shadow-2xl">
@@ -66,7 +76,7 @@ const MemberSection = () => {
                   <span>{mastery}%</span>
                 </div>
                 <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
-                  <div className={`h-full transition-all duration-1000 ${mastery >= 100 ? 'bg-yellow-400 shadow-[0_0_15px_rgba(250,204,21,1)]' : 'bg-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.8)]'}`} style={{ width: `${mastery}%` }}></div>
+                  <div className={`h-full transition-all duration-1000 ${mastery >= 100 ? 'bg-yellow-400' : 'bg-cyan-500'}`} style={{ width: `${mastery}%` }}></div>
                 </div>
               </div>
               <div className="space-y-1">
@@ -84,38 +94,52 @@ const MemberSection = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Main Intel Section */}
         <div className="lg:col-span-2 space-y-6">
           <div className="bg-slate-900/50 border border-cyan-500/20 p-8 rounded-3xl">
-            <h3 className="text-2xl font-bold text-white mb-4">Exclusive Member Intel</h3>
+            <h3 className="text-2xl font-bold text-white mb-4">Training Terminal</h3>
             <p className="text-gray-400 leading-relaxed mb-8">
-              Current clearance allows full access to the AI Mastery Blueprint. Hit 100% to decrypt the final archive.
+              Every sync increases your standing. Reach 100% to decrypt the Final Archive in the Vault.
             </p>
-            <button 
-              onClick={handleLevelUp}
-              className={`group relative px-8 py-4 font-black rounded-xl transition-all overflow-hidden ${mastery >= 100 ? 'bg-yellow-500 text-black' : 'bg-cyan-500 text-black'}`}
-            >
-              <span className="relative z-10 uppercase">{mastery >= 100 ? 'Mastery Maxed' : 'Complete Training'}</span>
-              <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform"></div>
-            </button>
+            
+            <div className="flex flex-col sm:flex-row gap-4">
+              <button 
+                onClick={handleLevelUp}
+                className={`flex-1 py-4 font-black rounded-xl transition-all ${mastery >= 100 ? 'bg-yellow-500 text-black' : 'bg-cyan-500 text-black hover:bg-white'}`}
+              >
+                {mastery >= 100 ? 'MASTERY MAXED' : 'COMPLETE DAILY TRAINING'}
+              </button>
+              <button 
+                onClick={shareStats}
+                className="flex-1 py-4 bg-transparent border border-white/20 hover:border-white text-white font-bold rounded-xl transition-all"
+              >
+                📊 SHARE STATS
+              </button>
+            </div>
+          </div>
+
+          {/* Lore Section */}
+          <div className="bg-black/20 p-8 rounded-3xl border border-white/5">
+            <h4 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">Founder's Log // Entry 001</h4>
+            <p className="text-sm text-gray-500 italic leading-relaxed">
+              "We didn't build the Never Ending Realm to escape reality. We built it to survive the coming AI waves. 
+              The surfer isn't just a metaphor—it's the only way to move through infinite data without drowning."
+            </p>
           </div>
         </div>
 
-        {/* Sidebar */}
         <div className="space-y-6">
-          <div className="bg-cyan-950/20 border border-cyan-400/30 p-6 rounded-3xl relative">
-            <h4 className="font-bold text-cyan-400 text-sm uppercase tracking-widest mb-4">Sentry-Bot v.1</h4>
+          <div className="bg-cyan-950/20 border border-cyan-400/30 p-6 rounded-3xl">
+            <h4 className="font-bold text-cyan-400 text-sm uppercase mb-4 tracking-tighter">Sentry-Bot v.1</h4>
             <p className="text-sm text-cyan-100 italic">"{sentryTip}"</p>
           </div>
 
-          <div className="bg-slate-900/50 border border-white/5 p-6 rounded-3xl text-sm text-gray-400">
-            <h4 className="font-bold text-white mb-3 text-xs uppercase tracking-widest">Active Challenges</h4>
-            <ul className="space-y-3">
+          <div className="bg-slate-900/50 border border-white/5 p-6 rounded-3xl">
+            <h4 className="font-bold text-white mb-3 text-xs uppercase">Challenges</h4>
+            <ul className="space-y-3 text-sm">
               <li className="flex gap-2 text-gray-400"><span>✅</span> Neural Mapping</li>
-              <li className="flex gap-2 text-gray-400"><span>✅</span> Deploy AI Sentry</li>
-              <li className={`flex gap-2 transition-all p-2 rounded ${mastery >= 100 ? 'text-yellow-400 font-bold bg-yellow-400/10 border border-yellow-500/50' : 'opacity-30'}`}>
+              <li className={`flex gap-2 ${mastery >= 100 ? 'text-yellow-400 font-bold' : 'opacity-30'}`}>
                 <span>{mastery >= 100 ? '🔓' : '🔒'}</span>
-                <Link to="/the-vault" className="hover:underline italic">The Vault Intel</Link>
+                <Link to="/the-vault" className="hover:underline">The Vault</Link>
               </li>
             </ul>
           </div>
