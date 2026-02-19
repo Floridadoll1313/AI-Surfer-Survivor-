@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { Outlet } from "react-router-dom";
 import NavBar from "./NavBar";
 import SiteFooter from "./SiteFooter";
 
 export default function Layout() {
+  const [progress, setProgress] = useState(45); // Start at 45%
+
   return (
     <>
       <style>{`
@@ -17,15 +19,20 @@ export default function Layout() {
         }
         .hud-label { font-size: 0.75rem; text-transform: uppercase; color: #35c9ff; font-weight: 800; display: block; margin-bottom: 10px; }
         .bar-outer { width: 100%; height: 10px; background: #061426; border-radius: 5px; overflow: hidden; }
-        .bar-inner { width: 45%; height: 100%; background: #35c9ff; }
+        .bar-inner { height: 100%; background: #35c9ff; transition: width 0.5s ease-in-out; }
       `}</style>
       <div className="otd-shell">
         <NavBar />
         <div className="progress-hud">
-          <span className="hud-label">Sync Progress: 45%</span>
-          <div className="bar-outer"><div className="bar-inner"></div></div>
+          <span className="hud-label">Sync Progress: {progress}%</span>
+          <div className="bar-outer">
+            <div className="bar-inner" style={{ width: `${progress}%` }}></div>
+          </div>
         </div>
-        <main className="otd-main"><Outlet /></main>
+        <main className="otd-main">
+          {/* We pass the setProgress function to all child pages */}
+          <Outlet context={{ progress, setProgress }} />
+        </main>
         <SiteFooter />
       </div>
     </>
