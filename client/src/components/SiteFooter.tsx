@@ -1,64 +1,50 @@
-import React from "react";
+import React from 'react';
 
-export default function SiteFooter() {
+const SiteFooter = () => {
+  const handleReset = () => {
+    if (window.confirm("WARNING: This will wipe all survival progress and biometric data. Proceed?")) {
+      localStorage.removeItem('survivor_progress');
+      // Refresh the page to reset the state in Layout.tsx
+      window.location.reload();
+    }
+  };
+
   return (
-    <>
-      <style>{`
-        .otd-footer {
-          border-top: 1px solid rgba(78, 203, 255, 0.3);
-          background: radial-gradient(circle at top, rgba(2, 8, 24, 0.96), rgba(0, 0, 0, 1));
-          padding: 10px 18px 14px;
-          box-shadow: 0 -10px 24px rgba(0, 0, 0, 0.9);
-        }
+    <footer style={{
+      padding: '40px 20px',
+      marginTop: '50px',
+      borderTop: '1px solid rgba(53, 201, 255, 0.1)',
+      textAlign: 'center',
+      background: 'rgba(2, 12, 27, 0.8)'
+    }}>
+      <div style={{ marginBottom: '20px' }}>
+        <p style={{ color: '#8892b0', fontSize: '0.9rem' }}>
+          &copy; 2026 AI SURFER SURVIVOR | SECTOR ALPHA TERMINAL
+        </p>
+      </div>
 
-        .otd-footer-inner {
-          max-width: 1200px;
-          margin: 0 auto;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          gap: 10px;
-          font-size: 0.7rem;
-          opacity: 0.85;
-        }
-
-        .otd-footer-pill {
-          display: inline-flex;
-          align-items: center;
-          gap: 6px;
-          padding: 4px 10px;
-          border-radius: 999px;
-          border: 1px solid rgba(255, 255, 255, 0.2);
-          background: rgba(0, 0, 0, 0.6);
-          text-transform: uppercase;
-          letter-spacing: 0.18em;
-        }
-
-        .otd-footer-dot {
-          width: 8px;
-          height: 8px;
-          border-radius: 50%;
-          background: #35c9ff;
-          box-shadow: 0 0 10px rgba(53, 201, 255, 0.9);
-        }
-
-        @media (max-width: 640px) {
-          .otd-footer-inner {
-            flex-direction: column;
-            align-items: flex-start;
-          }
-        }
-      `}</style>
-
-      <footer className="otd-footer">
-        <div className="otd-footer-inner">
-          <div className="otd-footer-pill">
-            <span className="otd-footer-dot" />
-            <span>Choose your tools as you do</span>
-          </div>
-          <div>© {new Date().getFullYear()} Ocean Tide Drop · AI Surfer Survivor</div>
-        </div>
-      </footer>
-    </>
+      {/* EMERGENCY RESET BUTTON */}
+      <button 
+        onClick={handleReset}
+        style={{
+          background: 'transparent',
+          border: '1px solid #ff4d4d',
+          color: '#ff4d4d',
+          padding: '8px 16px',
+          fontSize: '0.7rem',
+          borderRadius: '4px',
+          cursor: 'pointer',
+          textTransform: 'uppercase',
+          letterSpacing: '1px',
+          transition: 'all 0.3s ease'
+        }}
+        onMouseOver={(e) => e.currentTarget.style.background = 'rgba(255, 77, 77, 0.1)'}
+        onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
+      >
+        Wipe Neural Data (Reset)
+      </button>
+    </footer>
   );
-}
+};
+
+export default SiteFooter;
