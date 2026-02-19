@@ -1,23 +1,33 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
+import './NavBar.css';
 
-export default function NavBar() {
+/**
+ * NavBar Component
+ * Features futuristic terminal-style buttons with active state highlighting.
+ */
+const NavBar = () => {
   return (
-    <nav style={{
-      display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-      padding: '25px 50px', background: '#0a192f', borderBottom: '1px solid rgba(53, 201, 255, 0.2)'
-    }}>
-      <div style={{ fontSize: '1.6rem', fontWeight: '900', color: '#35c9ff', textTransform: 'uppercase' }}>
-        AI SURFER
+    <nav className="terminal-nav">
+      <div className="nav-logo">
+        <span className="logo-icon">◈</span> TERMINAL_OS
       </div>
-      <div style={{ display: 'flex', gap: '30px' }}>
-        <Link to="/" style={linkStyle}>Console</Link>
-        <Link to="/world" style={linkStyle}>Map</Link>
-        <Link to="/challenges" style={linkStyle}>Trials</Link>
-        <Link to="/equipment" style={linkStyle}>Inventory</Link>
+      <div className="nav-links">
+        <NavLink to="/" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>
+          [ HOME ]
+        </NavLink>
+        <NavLink to="/map" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>
+          [ NAV_MAP ]
+        </NavLink>
+        <NavLink to="/equipment" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>
+          [ GEAR ]
+        </NavLink>
+        <NavLink to="/leaderboard" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>
+          [ RANKINGS ]
+        </NavLink>
       </div>
     </nav>
   );
-}
+};
 
-const linkStyle = { color: '#ffffff', textDecoration: 'none', fontSize: '0.8rem', textTransform: 'uppercase' as const, fontWeight: '700' };
+export default NavBar;
