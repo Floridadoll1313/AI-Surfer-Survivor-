@@ -1,82 +1,68 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 
-export default function LessonList() {
-  const lessons = [
-    { id: 1, title: "The AI Mastery Guide", category: "Basics", time: "5 min" },
-    { id: 2, title: "Ocean Tide Protocols", category: "Survival", time: "10 min" },
-    { id: 3, title: "Navigating the Realm", category: "Mapping", time: "8 min" },
-    { id: 4, title: "Digital Surf Mechanics", category: "Advanced", time: "15 min" },
-  ];
+export default function LessonPage() {
+  const { id } = useParams();
+
+  // This is a placeholder for your content. In a real app, you might fetch this from a file or database.
+  const lessonData: Record<string, { title: string; content: string }> = {
+    "1": { 
+      title: "The AI Mastery Guide", 
+      content: "Welcome to the digital wilderness. To master the island, you must first understand the AI pulse..." 
+    },
+    "2": { 
+      title: "Ocean Tide Protocols", 
+      content: "The tide is not just water; it is a stream of data. Survival requires synchronizing your biometric frequency..." 
+    }
+  };
+
+  const currentLesson = lessonData[id || "1"] || { title: "File Not Found", content: "Signal lost..." };
 
   return (
-    <div className="lessons-root">
+    <div className="lesson-page-root">
       <style>{`
-        .lessons-root {
+        .lesson-page-root {
           padding: 60px 20px;
-          max-width: 900px;
+          max-width: 800px;
           margin: 0 auto;
+          line-height: 1.6;
         }
-        .lessons-title {
-          font-size: 2.5rem;
+        .back-link {
           color: #35c9ff;
-          text-transform: uppercase;
-          letter-spacing: 3px;
-          margin-bottom: 40px;
-          text-align: center;
-        }
-        .lesson-item {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          background: rgba(255, 255, 255, 0.03);
-          border: 1px solid rgba(78, 203, 255, 0.2);
-          margin-bottom: 15px;
-          padding: 20px;
-          border-radius: 8px;
-          transition: 0.3s;
           text-decoration: none;
-          color: inherit;
-        }
-        .lesson-item:hover {
-          background: rgba(53, 201, 255, 0.1);
-          border-color: #35c9ff;
-          transform: translateX(10px);
-        }
-        .lesson-info h3 {
-          margin: 0;
-          color: #e6f7ff;
-        }
-        .lesson-meta {
-          font-size: 0.75rem;
-          color: #ff9f40;
-          text-transform: uppercase;
-          margin-top: 5px;
+          font-size: 0.9rem;
           display: block;
+          margin-bottom: 30px;
         }
-        .lesson-stats {
-          text-align: right;
-          font-size: 0.8rem;
-          opacity: 0.6;
+        .lesson-header {
+          border-bottom: 1px solid rgba(78, 203, 255, 0.3);
+          padding-bottom: 20px;
+          margin-bottom: 30px;
+        }
+        .lesson-title {
+          font-size: 2.2rem;
+          color: #e6f7ff;
+          text-transform: uppercase;
+          letter-spacing: 2px;
+        }
+        .lesson-content {
+          font-size: 1.1rem;
+          color: rgba(230, 247, 255, 0.8);
+          white-space: pre-wrap;
         }
       `}</style>
 
-      <h1 className="lessons-title">AI Mastery Library</h1>
-      
-      <div className="lessons-container">
-        {lessons.map((lesson) => (
-          <Link to={`/lessons/${lesson.id}`} key={lesson.id} className="lesson-item">
-            <div className="lesson-info">
-              <span className="lesson-meta">{lesson.category}</span>
-              <h3>{lesson.title}</h3>
-            </div>
-            <div className="lesson-stats">
-              <div>{lesson.time}</div>
-              <div style={{color: '#35c9ff'}}>READ FILE ></div>
-            </div>
-          </Link>
-        ))}
-      </div>
+      <Link to="/lessons" className="back-link">
+        {"< BACK TO LIBRARY"}
+      </Link>
+
+      <header className="lesson-header">
+        <h1 className="lesson-title">{currentLesson.title}</h1>
+      </header>
+
+      <article className="lesson-content">
+        {currentLesson.content}
+      </article>
     </div>
   );
 }
