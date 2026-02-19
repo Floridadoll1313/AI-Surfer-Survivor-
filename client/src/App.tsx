@@ -13,12 +13,12 @@ const Home = () => {
 
   const logs = [
     { id: 1, date: "2026.02.19", msg: "Sector Alpha synchronization stable." },
-    { id: 2, date: "2026.02.18", msg: "New Trial: 'The Sailing Ship' now active." },
-    { id: 3, date: "2026.02.15", msg: "Warning: Digital tide levels rising in Hub." }
+    { id: 2, date: "2026.02.18", msg: "Pulse Animation module integrated." },
+    { id: 3, date: "2026.02.15", msg: "Warning: Digital tide levels rising." }
   ];
 
   return (
-    <div style={{ padding: '40px 20px', position: 'relative' }}>
+    <div style={{ padding: '40px 20px' }}>
       {showPass && (
         <div style={{
           position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
@@ -52,25 +52,19 @@ const Home = () => {
 };
 
 const Equipment = () => {
-  // Access the HUD update function from Layout
   const { setProgress } = useOutletContext<{ setProgress: React.Dispatch<React.SetStateAction<number>> }>();
 
   const items = [
-    { name: "Biometric Link", desc: "Syncs your pulse to the Realm.", rarity: "Essential", boost: 10 },
-    { name: "Digital Compass", desc: "Points toward stable nodes.", rarity: "Common", boost: 5 }
+    { name: "Biometric Link", desc: "Syncs your pulse to the Realm.", rarity: "Essential", boost: 25 },
+    { name: "Digital Compass", desc: "Points toward stable nodes.", rarity: "Common", boost: 15 },
+    { name: "Neural Overdrive", desc: "Instantly boosts sync levels.", rarity: "Rare", boost: 50 }
   ];
 
   const collectItem = (boost: number) => {
     setProgress(prev => Math.min(prev + boost, 100));
-    alert(`System calibrated. Sync increased by ${boost}%`);
   };
 
   return (
     <div style={{ maxWidth: '900px', margin: '0 auto' }}>
       <h1 style={{ color: '#35c9ff', fontSize: '2.5rem' }}>SURVIVAL GEAR</h1>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '20px', marginTop: '30px' }}>
-        {items.map((item, i) => (
-          <div key={i} style={{ background: '#0a192f', border: '1px solid rgba(53, 201, 255, 0.3)', padding: '20px', borderRadius: '10px' }}>
-            <div style={{ color: '#ff9f40', fontSize: '0.7rem', textTransform: 'uppercase' }}>{item.rarity}</div>
-            <h3 style={{ color: '#ffffff' }}>{item.name}</h3>
-            <p style={{
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(2
