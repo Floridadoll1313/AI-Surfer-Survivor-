@@ -6,7 +6,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 // Page Imports
 import Home from './pages/Home';
 import Members from './pages/Members';
-import Lessons from './pages/Lessons'; // New Import
+import Lessons from './pages/Lessons'; 
 import Profile from './pages/Profile';
 import SurvivorWorld from './pages/SurvivorWorld';
 import Achievements from './pages/Achievements';
@@ -20,17 +20,14 @@ function App() {
           <Routes>
             {/* Public Routes */}
             <Route path="/" element={<Home />} />
+            
+            {/* We removed ProtectedRoute from Lessons so you can actually see it! */}
+            <Route path="/lessons" element={<Lessons />} />
 
             {/* Protected Member Routes */}
             <Route path="/members" element={
               <ProtectedRoute>
                 <Members />
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/lessons" element={
-              <ProtectedRoute>
-                <Lessons />
               </ProtectedRoute>
             } />
 
