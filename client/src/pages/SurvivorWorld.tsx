@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAvatar } from '../context/AvatarContext';
 import { getLevelInfo } from '../data/leveling';
 import { playSound } from '../utils/audio';
@@ -7,12 +7,11 @@ import { generateCyberCard } from '../utils/sharing';
 
 const SurvivorWorld = () => {
   const { selectedAvatar } = useAvatar();
-  const { speedBonus } = getLevelInfo(selectedAvatar);
-  
-  // --- TIME LOOP (CHRONOS) STATE ---
-  const [history, setHistory] = useState<{ p: {x:number, y:number}, e: {x:number, y:number} }[]>([]);
-  const [rewindAvailable, setRewindAvailable] = useState(true);
-  const [isRewinding, setIsRewinding] = useState(false);
+  const THEME_COLOR = '#64ffda';
+
+  // --- HAZARD STATE ---
+  const [lasers, setLasers] = useState<{ axis: 'x' | 'y', pos: number, active: boolean }[]>([]);
+  const [voids, setVoids] = useState<{ x: number, y: number }[]>([]);
 
   // --- SESSION STATE ---
   const [playerPosition, setPlayerPosition] = useState({ x: 0, y: 0 });
@@ -20,72 +19,73 @@ const SurvivorWorld = () => {
   const [fragments, setFragments] = useState<{ x: number, y: number }[]>([]);
   const [score, setScore] = useState(0);
   const [isGameOver, setIsGameOver] = useState(false);
-  const [logs, setLogs] = useState<string[]>(['> TEMPORAL_DRIVE_ONLINE']);
+  const [logs, setLogs] = useState<string[]>(['> HAZARD_PROTOCOLS_LOADED']);
 
-  const THEME_COLOR = '#64ffda';
   const addLog = (msg: string) => setLogs(prev => [`> ${msg}`, ...prev].slice(0, 5));
 
-  // --- HISTORY BUFFER (Records every 500ms) ---
+  // --- HAZARD GENERATOR ---
   useEffect(() => {
-    if (isGameOver || isRewinding) return;
-    const recordInterval = setInterval(() => {
-      setHistory(prev => {
-        const newHistory = [...prev, { p: playerPosition, e: enemyPosition }];
-        return newHistory.slice(-6); // Store last 3 seconds (6 frames * 0.5s)
-      });
-    }, 500);
-    return () => clearInterval(recordInterval);
-  }, [playerPosition, enemyPosition, isGameOver, isRewinding]);
+    if (isGameOver || score < 100) return;
 
-  // --- TIME LOOP TRIGGER ---
-  const triggerTimeLoop = useCallback(() => {
-    if (!rewindAvailable || history.length === 0 || isGameOver) return;
-    
-    setIsRewinding(true);
-    setRewindAvailable(false);
-    addLog('CHRONOS_REVERSE_INITIATED');
-    playSound('rewind'); // Assuming this exists in your audio utils
+    const hazardTimer = setInterval(() => {
+      const roll = Math.random();
+      
+      if (roll > 0.7) {
+        // Spawn Laser Warning
+        const newLaser = { axis: Math.random() > 0.5 ? 'x' : 'y' as 'x' | 'y', pos: Math.floor(Math.random() * 10), active: false };
+        setLasers(prev => [...prev, newLaser]);
+        addLog('WARNING: LASER_GRID_CALIBRATING');
 
-    // Visual rewind effect
-    let frame = history.length - 1;
-    const rewindEffect = setInterval(() => {
-      if (frame < 0) {
-        clearInterval(rewindEffect);
-        setIsRewinding(false);
-        setHistory([]);
-        addLog('TEMPORAL_STABILITY_RESTORED');
-      } else {
-        setPlayerPosition(history[frame].p);
-        setEnemyPosition(history[frame].e);
-        frame--;
+        // Activate Laser after 1.5s
+        setTimeout(() => {
+          setLasers(prev => prev.map(l => l.pos === newLaser.pos && l.axis === newLaser.axis ? { ...l, active: true } : l));
+          // Clear Laser after 2s
+          setTimeout(() => {
+            setLasers(prev => prev.filter(l => l !== newLaser));
+          }, 2000);
+        }, 15000);
+      } else if (roll < 0.2) {
+        // Create Data Void
+        const newVoid = { x: Math.floor(Math.random() * 10), y: Math.floor(Math.random() * 10) };
+        setVoids(prev => [...prev, newVoid]);
+        addLog('CRITICAL: TILE_COLLAPSE');
+        setTimeout(() => setVoids(prev => prev.filter(v => v !== newVoid)), 4000);
       }
-    }, 100);
-  }, [history, rewindAvailable, isGameOver]);
+    }, 5000);
+
+    return () => clearInterval(hazardTimer);
+  }, [score, isGameOver]);
+
+  // --- COLLISION CHECK (HAZARDS) ---
+  useEffect(() => {
+    const hitLaser = lasers.some(l => l.active && (l.axis === 'x' ? playerPosition.x === l.pos : playerPosition.y === l.pos));
+    if (hitLaser) {
+      setIsGameOver(true);
+      addLog('TERMINATED: LASER_CONTACT');
+    }
+  }, [playerPosition, lasers]);
 
   // --- MOVEMENT ---
   const handleMove = useCallback((dx: number, dy: number) => {
-    if (isGameOver || isRewinding) return;
+    if (isGameOver) return;
     setPlayerPosition(prev => {
       const nextX = Math.max(0, Math.min(9, prev.x + dx));
       const nextY = Math.max(0, Math.min(9, prev.y + dy));
       
+      // Blocked by Data Void
+      if (voids.some(v => v.x === nextX && v.y === nextY)) return prev;
+
       const fragIdx = fragments.findIndex(f => f.x === nextX && f.y === nextY);
       if (fragIdx !== -1) {
         setScore(s => s + 10);
         setFragments(f => f.filter((_, i) => i !== fragIdx));
-        // Gaining 100 points recharges the Time Loop
-        if (score > 0 && (score + 10) % 100 === 0) {
-          setRewindAvailable(true);
-          addLog('TIME_LOOP_RECHARGED');
-        }
+        playSound('collect');
       }
 
-      if (nextX === enemyPosition.x && nextY === enemyPosition.y) {
-        setIsGameOver(true);
-      }
+      if (nextX === enemyPosition.x && nextY === enemyPosition.y) setIsGameOver(true);
       return { x: nextX, y: nextY };
     });
-  }, [fragments, enemyPosition, isGameOver, isRewinding, score]);
+  }, [fragments, enemyPosition, isGameOver, voids]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -93,41 +93,39 @@ const SurvivorWorld = () => {
       if (e.key === 'ArrowDown') handleMove(0, 1);
       if (e.key === 'ArrowLeft') handleMove(-1, 0);
       if (e.key === 'ArrowRight') handleMove(1, 0);
-      if (e.key.toLowerCase() === 'r') triggerTimeLoop();
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleMove, triggerTimeLoop]);
+  }, [handleMove]);
 
   return (
     <div className="survivor-world" style={{ borderColor: THEME_COLOR }}>
       <style>{`
-        .chronos-bar { width: 100%; height: 4px; background: #222; margin-top: 5px; }
-        .chronos-fill { height: 100%; transition: width 0.5s; background: ${rewindAvailable ? '#ff00ff' : '#444'}; box-shadow: ${rewindAvailable ? '0 0 10px #ff00ff' : 'none'}; }
-        .rewind-glitch { animation: scanline 0.1s infinite; filter: hue-rotate(90deg) brightness(1.5); }
-        @keyframes scanline { 0% { opacity: 0.8; } 50% { opacity: 1; } 100% { opacity: 0.8; } }
+        .laser-warning { background: rgba(255, 0, 0, 0.2) !important; border: 1px solid red; }
+        .laser-active { background: rgba(255, 0, 0, 0.8) !important; box-shadow: 0 0 20px red; z-index: 5; }
+        .data-void { background: #000 !important; border: 1px solid #333; transform: scale(0.8); }
       `}</style>
 
       <div className="game-header">
         <div className="stat">SCORE: {score}</div>
-        <div className="stat" style={{ color: rewindAvailable ? '#ff00ff' : '#555' }}>
-          TIME_DRIVE: {rewindAvailable ? 'READY [R]' : 'CHARGING'}
-        </div>
-      </div>
-      <div className="chronos-bar">
-        <div className="chronos-fill" style={{ width: rewindAvailable ? '100%' : '0%' }} />
+        <div className="stat" style={{ color: '#ff4444' }}>{lasers.length > 0 ? '!!! HAZARD_ACTIVE !!!' : 'STABLE'}</div>
       </div>
 
-      <div className={`grid-container ${isRewinding ? 'rewind-glitch' : ''}`}>
+      <div className="grid-container">
         {[...Array(100)].map((_, i) => {
           const x = i % 10; const y = Math.floor(i / 10);
           const isPlayer = playerPosition.x === x && playerPosition.y === y;
           const isEnemy = enemyPosition.x === x && enemyPosition.y === y;
+          const isVoid = voids.some(v => v.x === x && v.y === y);
+          
+          const laser = lasers.find(l => (l.axis === 'x' ? x === l.pos : y === l.pos));
+          const laserClass = laser ? (laser.active ? 'laser-active' : 'laser-warning') : '';
+
           return (
-            <div key={i} className="cell">
+            <div key={i} className={`cell ${laserClass} ${isVoid ? 'data-void' : ''}`}>
               {isPlayer && <span style={{ color: THEME_COLOR }}>❖</span>}
-              {isEnemy && <span>⚡</span>}
-              {fragments.some(f => f.x === x && f.y === y) && <span>✦</span>}
+              {isEnemy && !isVoid && <span>⚡</span>}
+              {fragments.some(f => f.x === x && f.y === y) && !isVoid && <span>✦</span>}
             </div>
           );
         })}
@@ -137,9 +135,8 @@ const SurvivorWorld = () => {
 
       {isGameOver && (
         <div className="overlay">
-          <h2>TIMELINE_TERMINATED</h2>
-          <p>Final Score: {score}</p>
-          <button onClick={() => window.location.reload()}>RE-SYNC</button>
+          <h2>INTEGRITY_COMPROMISED</h2>
+          <button onClick={() => window.location.reload()}>RE-INITIALIZE</button>
         </div>
       )}
     </div>
