@@ -1,36 +1,22 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Layout from './components/Layout';
-import NavBar from './components/NavBar';
-import SiteFooter from './components/SiteFooter';
-
-// Page Imports
-import Home from './pages/Home';
-import MapPage from './pages/MapPage';
-import FloundersPage from './pages/FloundersPage'; 
-
-// KEEP THESE COMMENTED OUT until you create the files in the /pages folder!
-// import Challenges from './pages/Challenges'; 
-// import Gear from './pages/Gear';
+import { AvatarProvider } from './context/AvatarContext';
+import AvatarSelector from './pages/AvatarSelector';
+// Import your other components/pages here
 
 function App() {
   return (
-    <Router>
-      <div className="app-container">
-        <NavBar />
-        <Layout>
+    <AvatarProvider>
+      <Router>
+        <div className="min-h-screen bg-[#0a192f]">
+          {/* If you have a Header, place it here and it will now update automatically */}
           <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/map" element={<MapPage />} />
-            <Route path="/founders" element={<FloundersPage />} />
-            
-            {/* This handles any links that don't have pages yet */}
-            <Route path="*" element={<div style={{color: '#00ff00', padding: '20px'}}>[ SIGNAL_LOST: Component Under Construction ]</div>} />
+            <Route path="/avatar" element={<AvatarSelector />} />
+            {/* Add your other routes here */}
           </Routes>
-        </Layout>
-        <SiteFooter />
-      </div>
-    </Router>
+        </div>
+      </Router>
+    </AvatarProvider>
   );
 }
 
