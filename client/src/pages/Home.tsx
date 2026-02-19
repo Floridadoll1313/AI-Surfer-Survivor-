@@ -35,7 +35,6 @@ const Home = () => {
     setInputMsg('');
   };
 
-  // --- NEW: EXPORT LOGS TO .TXT ---
   const downloadLogs = () => {
     if (userLogs.length === 0) {
       alert("NO USER DATA FOUND TO EXPORT.");
@@ -108,7 +107,6 @@ const Home = () => {
           <h2 style={{ color: '#ffffff', fontSize: '1.2rem', margin: 0, fontFamily: 'monospace' }}>
             &gt; RECENT_SURVIVAL_LOGS
           </h2>
-          {/* EXPORT BUTTON */}
           <button 
             onClick={downloadLogs}
             style={{
