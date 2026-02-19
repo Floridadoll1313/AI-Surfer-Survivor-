@@ -5,6 +5,7 @@ import MemberSection from './pages/MemberSection';
 import Login from './pages/Login';
 import Leaderboard from './pages/Leaderboard';
 import TheVault from './pages/TheVault';
+import LoreArchive from './pages/LoreArchive';
 
 // --- NEURAL RAIN EFFECT ---
 const NeuralRain = ({ color }: { color: string }) => {
@@ -62,11 +63,16 @@ function App() {
   const themeBg = godMode ? 'bg-yellow-500' : 'bg-cyan-500';
   const themeBorder = godMode ? 'border-yellow-500/50' : 'border-cyan-500/20';
 
+  const tickerMessages = godMode 
+    ? "SYSTEM STATUS: ASCENDED // ALL NODES SYNCHRONIZED // WELCOME HOME, LEGEND // OMEGA PROTOCOL ACTIVE // NO DATA LEAKS DETECTED..."
+    : "SCANNING SECTOR 7... NEW SURVIVOR DETECTED IN INNER REEF... WARNING: NEURAL STORMS APPROACHING... UPDATE 1.3.13 LIVE... STAY SYNCHED...";
+
   return (
     <Router>
-      <div className="min-h-screen bg-[#0a192f] text-white relative overflow-x-hidden">
+      <div className="min-h-screen bg-[#0a192f] text-white relative flex flex-col overflow-x-hidden">
         {godMode && <NeuralRain color={themeColor} />}
 
+        {/* --- HEADER --- */}
         <header className={`sticky top-0 z-50 w-full border-b ${themeBorder} bg-[#0a192f]/90 backdrop-blur-md transition-all`}>
           <div className="container mx-auto px-6 py-4 flex justify-between items-center">
             <Link to="/" className="flex items-center gap-3 relative z-10">
@@ -78,9 +84,9 @@ function App() {
               </h1>
             </Link>
             
-            {/* Desktop Nav */}
             <nav className="hidden md:flex gap-6 text-sm font-medium items-center relative z-10">
               <Link to="/leaderboard" className="text-gray-400 hover:text-white uppercase text-[10px] tracking-widest">Rankings</Link>
+              <Link to="/lore" className="text-gray-400 hover:text-white uppercase text-[10px] tracking-widest">Lore</Link>
               {isAuth && (
                 <>
                   <Link to="/members" className={`${tailwindColor} font-bold`}>LOUNGE</Link>
@@ -94,16 +100,35 @@ function App() {
               )}
             </nav>
 
-            {/* Mobile Toggle */}
             <button className="md:hidden text-cyan-400" onClick={() => setMenuOpen(!menuOpen)}>
               {menuOpen ? '✕' : '☰'}
             </button>
           </div>
+        </header>
 
-          {/* Mobile Menu Dropdown */}
-          {menuOpen && (
-            <div className="md:hidden bg-[#0a192f] border-b border-cyan-500/20 p-6 flex flex-col gap-4 animate-in slide-in-from-top duration-300">
-              <Link to="/leaderboard" onClick={() => setMenuOpen(false)} className="text-gray-400">Rankings</Link>
-              {isAuth && (
-                <>
-                  <Link
+        {/* --- MAIN CONTENT --- */}
+        <main className="container mx-auto px-6 py-8 relative z-10 flex-grow">
+          <Routes>
+            <Route path="/" element={<Lessons />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/leaderboard" element={<Leaderboard />} />
+            <Route path="/the-vault" element={<TheVault />} />
+            <Route path="/lore" element={<LoreArchive />} />
+            <Route path="/members" element={isAuth ? <MemberSection /> : <Navigate to="/login" />} />
+          </Routes>
+        </main>
+
+        {/* --- NEURAL FEEDBACK TICKER --- */}
+        <footer className={`w-full border-t ${themeBorder} bg-[#0a192f] py-2 overflow-hidden relative z-50`}>
+          <div className="whitespace-nowrap flex">
+            <div className={`inline-block animate-marquee font-mono text-[10px] uppercase tracking-[0.2em] ${tailwindColor}`}>
+              {tickerMessages} &nbsp;&nbsp;&nbsp;&nbsp; {tickerMessages}
+            </div>
+          </div>
+        </footer>
+      </div>
+    </Router>
+  );
+}
+
+export default App;
