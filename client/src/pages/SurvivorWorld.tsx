@@ -34,11 +34,12 @@ const SurvivorWorld = () => {
 
   // --- DIFFICULTY & SAFE ZONE ---
   const [difficultyLevel, setDifficultyLevel] = useState(1);
+  const [energy, setEnergy] = useState(100);
   const enemySpeed = Math.max(300, 1000 - (difficultyLevel * 100));
   
-  const isPlayerInSafeZone = 
-    playerPosition.x >= 4 && playerPosition.x <= 5 && 
-    playerPosition.y >= 4 && playerPosition.y <= 5;
+  const isSafeRect = playerPosition.x >= 4 && playerPosition.x <= 5 && 
+                     playerPosition.y >= 4 && playerPosition.y <= 5;
+  const isPlayerInSafeZone = isSafeRect && energy > 0;
 
   // --- ABILITY STATE ---
   const [abilityActive, setAbilityActive] = useState(false);
@@ -47,13 +48,27 @@ const SurvivorWorld = () => {
 
   const addLog = (msg: string) => setLogs(prev => [`> ${msg}`, ...prev].slice(0, 6));
 
+  // --- SAFE ZONE ENERGY DRAIN ---
+  useEffect(() => {
+    if (isGameOver) return;
+    const timer = setInterval(() => {
+      if (isSafeRect && energy > 0) {
+        setEnergy(prev => {
+          const next = Math.max(0, prev - 5);
+          if (next === 0) addLog('WARNING: SAFE_ZONE_DEPLETED');
+          return next;
+        });
+      }
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [isSafeRect, energy, isGameOver]);
+
   // --- GAME LOGIC: SPAWNING ---
   const spawnFragment = useCallback(() => {
     const newFrag = {
       x: Math.floor(Math.random() * 10),
       y: Math.floor(Math.random() * 10)
     };
-    // Don't spawn fragments in the Safe Zone
     if (newFrag.x >= 4 && newFrag.x <= 5 && newFrag.y >= 4 && newFrag.y <= 5) {
       spawnFragment();
       return;
@@ -114,9 +129,10 @@ const SurvivorWorld = () => {
         setScore(s => s + (10 * newCombo));
         setCombo(newCombo);
         setLastCollectTime(now);
+        setEnergy(prevE => Math.min(100, prevE + 25)); // Recharge energy on collect
         setFragments(prevFrags => prevFrags.filter((_, i) => i !== hitIndex));
         playSound('collect');
-        addLog(`DATA_FRAGMENT_RECOVERED (x${newCombo})`);
+        addLog(`DATA_RECOVERED (x${newCombo}) +ENERGY`);
       }
       return { x: newX, y: newY };
     });
@@ -127,7 +143,7 @@ const SurvivorWorld = () => {
     setAbilityActive(true);
     setOnCooldown(true);
     setCooldownPercent(100);
-    addLog(`ABILITY_ACTIVATED: ${currentSkill.name.toUpperCase()}`);
+    addLog(`ABILITY: ${currentSkill.name.toUpperCase()}`);
     setTimeout(() => setAbilityActive(false), 3000);
     const cdInterval = setInterval(() => {
       setCooldownPercent(prev => {
@@ -179,7 +195,9 @@ const SurvivorWorld = () => {
           align-items: center; justify-content: center; z-index: 10;
           text-align: center; backdrop-filter: blur(6px);
         }
-        .safe-zone-cell { border: 1px dashed ${THEME_COLOR}55 !important; background: ${THEME_COLOR}11; }
+        .safe-zone-cell { border: 1px dashed ${energy > 0 ? THEME_COLOR : '#ff4444'}55 !important; background: ${energy > 0 ? THEME_COLOR : '#ff4444'}11; }
+        .energy-bar-container { width: 100%; height: 4px; background: #222; margin: 10px 0; border-radius: 2px; overflow: hidden; }
+        .energy-fill { height: 100%; background: ${THEME_COLOR}; transition: width 0.3s ease; }
         .in-safe-zone { filter: drop-shadow(0 0 5px ${THEME_COLOR}); }
       `}</style>
 
@@ -187,10 +205,14 @@ const SurvivorWorld = () => {
         <div className="stat-group">
           <div className="stat">SCORE: {score.toString().padStart(5, '0')}</div>
           <div className="difficulty-tag" style={{ color: isPlayerInSafeZone ? THEME_COLOR : '#ff4444' }}>
-            {isPlayerInSafeZone ? 'STATUS: CLOAKED' : `LVL_${difficultyLevel} SPEED: ${enemySpeed}ms`}
+            {isPlayerInSafeZone ? 'STATUS: CLOAKED' : energy <= 0 && isSafeRect ? 'SYSTEM_FAIL: NO_ENERGY' : `LVL_${difficultyLevel} SPEED: ${enemySpeed}ms`}
           </div>
         </div>
         <div className="stat">BEST: {highScore.toString().padStart(5, '0')}</div>
+      </div>
+
+      <div className="energy-bar-container">
+        <div className="energy-fill" style={{ width: `${energy}%`, backgroundColor: energy < 30 ? '#ff4444' : THEME_COLOR }} />
       </div>
 
       <div className="grid-container">
