@@ -11,8 +11,7 @@ export default function Layout() {
           margin: 0;
           background: #020817; 
           color: #ffffff; 
-          font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-          -webkit-font-smoothing: antialiased;
+          font-family: 'Inter', -apple-system, sans-serif;
         }
 
         .otd-shell { 
@@ -23,86 +22,62 @@ export default function Layout() {
 
         .otd-main { 
           flex: 1; 
-          padding: 40px 20px; 
+          padding: 60px 20px; 
           max-width: 1200px; 
           margin: 0 auto; 
           width: 100%;
           box-sizing: border-box;
         }
 
-        /* Trial Progress Bar HUD */
         .progress-hud {
           position: fixed;
-          top: 90px;
+          top: 100px;
           right: 30px;
           width: 220px;
-          background: rgba(10, 25, 47, 0.9);
+          background: rgba(10, 25, 47, 0.95);
           border: 1px solid #35c9ff;
           padding: 15px;
           border-radius: 8px;
-          box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
           z-index: 1000;
-        }
-
-        .progress-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 10px;
+          box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
         }
 
         .progress-title {
           font-size: 0.7rem;
           text-transform: uppercase;
-          letter-spacing: 1.5px;
+          letter-spacing: 1px;
           color: #35c9ff;
-          font-weight: bold;
+          margin-bottom: 10px;
+          display: block;
         }
 
-        .progress-percent {
-          font-size: 0.75rem;
-          color: #ffffff;
-          font-family: monospace;
-        }
-
-        .progress-bar-container {
+        .bar-container {
           width: 100%;
           height: 8px;
           background: #061426;
           border-radius: 4px;
-          overflow: hidden;
           border: 1px solid rgba(53, 201, 255, 0.2);
+          overflow: hidden;
         }
 
-        .progress-bar-fill {
-          width: 45%; /* This represents current progress */
+        .bar-fill {
+          width: 45%; 
           height: 100%;
           background: linear-gradient(90deg, #35c9ff, #4ef3ff);
-          box-shadow: 0 0 10px rgba(53, 201, 255, 0.6);
-        }
-
-        .progress-status {
-          margin-top: 8px;
-          font-size: 0.65rem;
-          color: #ff9f40;
-          text-transform: uppercase;
-          text-align: right;
         }
       `}</style>
 
       <div className="otd-shell">
         <NavBar />
 
-        {/* Persistent Trial Progress HUD */}
         <div className="progress-hud">
-          <div className="progress-header">
-            <span className="progress-title">Trial Sync</span>
-            <span className="progress-percent">45%</span>
+          <span className="progress-title">Trial Sync: 45%</span>
+          <div className="bar-container">
+            <div className="bar-fill"></div>
           </div>
-          <div className="progress-bar-container">
-            <div className="progress-bar-fill"></div>
+          <div style={{ fontSize: '0.6rem', marginTop: '8px', color: '#ff9f40' }}>
+            STATUS: SECTOR ALPHA ACTIVE
           </div>
-          <div className="progress-status">Sector Alpha: Active</div>
         </div>
 
         <main className="otd-main">
