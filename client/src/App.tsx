@@ -1,22 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
 
-// Import All Components
-import Lessons from './pages/Lessons'; 
-import MemberSection from './pages/MemberSection';
-import Login from './pages/Login';
-import Leaderboard from './pages/Leaderboard';
-import TheVault from './pages/TheVault';
-import LoreArchive from './pages/LoreArchive';
+// --- SUB-COMPONENTS (Defined here to prevent "File Not Found" Build Errors) ---
 
-// --- BACKGROUND: NEURAL RAIN ---
-const NeuralRain = ({ color }: { color: string }) => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+// 1. NEURAL RAIN BACKGROUND
+const NeuralRain = ({ color }) => {
+  const canvasRef = useRef(null);
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    if (!ctx) return;
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
     const columns = Math.floor(canvas.width / 20);
@@ -39,91 +32,96 @@ const NeuralRain = ({ color }: { color: string }) => {
   return <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none z-0 opacity-20" />;
 };
 
-function App() {
-  // Direct Check for Production Stability
-  const [isAuth, setIsAuth] = useState(localStorage.getItem('isMember') === 'true');
+// 2. LOGIN PAGE (Password: surfer1313)
+const Login = () => {
+  const [key, setKey] = useState('');
+  const handleEntry = (e) => {
+    e.preventDefault();
+    if (key === 'surfer1313') {
+      localStorage.setItem('isMember', 'true');
+      window.location.href = '/members';
+    } else { alert('ACCESS DENIED'); }
+  };
+  return (
+    <div className="max-w-md mx-auto mt-20 p-10 bg-slate-900 border border-cyan-500/30 rounded-3xl text-center">
+      <h2 className="text-2xl font-black mb-6 uppercase italic">Sector 7 Entry</h2>
+      <form onSubmit={handleEntry} className="space-y-4">
+        <input type="password" value={key} onChange={(e)=>setKey(e.target.value)} className="w-full bg-black border border-white/10 p-4 rounded-xl text-center text-cyan-400 font-mono" placeholder="ACCESS KEY" />
+        <button className="w-full py-4 bg-white text-black font-black rounded-xl hover:bg-cyan-400 transition-all">DECRYPT</button>
+      </form>
+    </div>
+  );
+};
+
+// 3. MEMBER LOUNGE
+const MemberSection = () => {
   const [mastery, setMastery] = useState(Number(localStorage.getItem('survivorMastery')) || 0);
+  const up = () => {
+    const n = Math.min(mastery + 10, 100);
+    setMastery(n);
+    localStorage.setItem('survivorMastery', n.toString());
+  };
+  return (
+    <div className="max-w-2xl mx-auto p-10 bg-slate-900/50 border border-white/10 rounded-3xl">
+      <h2 className="text-3xl font-black mb-6 italic uppercase">Survivor Dashboard</h2>
+      <div className="w-full bg-white/5 h-4 rounded-full mb-6">
+        <div className="bg-cyan-500 h-full shadow-[0_0_15px_#22d3ee] transition-all" style={{width: `${mastery}%`}}></div>
+      </div>
+      <button onClick={up} className="w-full py-4 bg-cyan-500 text-black font-black rounded-xl">NEURAL SYNC (+10%)</button>
+      {mastery >= 100 && <p className="mt-6 text-yellow-400 font-black animate-pulse text-center">GOD MODE UNLOCKED</p>}
+    </div>
+  );
+};
+
+// --- MAIN APPLICATION ---
+export default function App() {
+  const [isAuth, setIsAuth] = useState(localStorage.getItem('isMember') === 'true');
   const [godMode, setGodMode] = useState(false);
+  const mastery = Number(localStorage.getItem('survivorMastery')) || 0;
 
   useEffect(() => {
-    const sync = () => {
-      setIsAuth(localStorage.getItem('isMember') === 'true');
-      setMastery(Number(localStorage.getItem('survivorMastery')) || 0);
-    };
-    const interval = setInterval(sync, 1000); // Constant sync for Render
-    return () => clearInterval(interval);
+    const i = setInterval(() => setIsAuth(localStorage.getItem('isMember') === 'true'), 1000);
+    return () => clearInterval(i);
   }, []);
 
-  const themeColor = godMode ? '#facc15' : '#22d3ee';
-  const tailwindColor = godMode ? 'text-yellow-400' : 'text-cyan-400';
-  const themeBorder = godMode ? 'border-yellow-500/50' : 'border-cyan-500/20';
+  const color = godMode ? '#facc15' : '#22d3ee';
 
   return (
     <Router>
-      <div className="min-h-screen bg-[#0a192f] text-white flex flex-col relative overflow-x-hidden">
-        {godMode && <NeuralRain color={themeColor} />}
+      <div className="min-h-screen bg-[#0a192f] text-white flex flex-col relative overflow-hidden">
+        <NeuralRain color={color} />
         
-        {/* --- HEADER --- */}
-        <header className={`sticky top-0 z-50 border-b ${themeBorder} bg-[#0a192f]/90 backdrop-blur-md`}>
-          <div className="container mx-auto px-6 py-4 flex justify-between items-center">
-            <Link to="/" className="flex items-center gap-3 z-10">
-              <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${godMode ? 'bg-yellow-500 shadow-[0_0_15px_#facc15]' : 'bg-cyan-500 shadow-[0_0_15px_#22d3ee]'}`}>🌊</div>
-              <h1 className="text-xl font-black italic">AI SURFER <span className={tailwindColor}>{godMode ? 'LEGEND' : 'SURVIVOR'}</span></h1>
-            </Link>
-            <nav className="hidden md:flex gap-6 text-[10px] font-black uppercase tracking-widest z-10">
-              <Link to="/leaderboard" className="hover:text-white transition-colors">Rankings</Link>
-              <Link to="/lore" className="hover:text-white transition-colors">Lore</Link>
-              {isAuth && (
+        <header className="p-6 border-b border-white/5 bg-[#0a192f]/80 backdrop-blur-md z-50">
+          <div className="container mx-auto flex justify-between items-center">
+            <Link to="/" className="text-xl font-black italic">AI SURFER <span style={{color}}>{godMode ? 'LEGEND' : 'SURVIVOR'}</span></Link>
+            <nav className="flex gap-6 text-[10px] font-black uppercase tracking-widest">
+              <Link to="/">Home</Link>
+              {isAuth ? (
                 <>
-                  <Link to="/members" className={tailwindColor}>Lounge</Link>
-                  {mastery >= 100 && (
-                    <button onClick={() => setGodMode(!godMode)} className="animate-pulse px-2 border border-current rounded-full">
-                      {godMode ? 'GOD MODE: ON' : 'ACTIVATE GOD'}
-                    </button>
-                  )}
+                  <Link to="/members">Lounge</Link>
+                  {mastery >= 100 && <button onClick={() => setGodMode(!godMode)} className="text-yellow-400 underline">GOD MODE</button>}
                   <button onClick={() => {localStorage.clear(); window.location.href='/';}} className="text-red-500">EXIT</button>
                 </>
-              )}
-              {!isAuth && <Link to="/login" className="bg-white text-black px-3 py-1 rounded font-bold">LOGIN</Link>}
+              ) : <Link to="/login">Entry</Link>}
             </nav>
           </div>
         </header>
 
-        {/* --- PAGE ENGINE --- */}
-        <main className="flex-grow container mx-auto px-6 py-12 z-10">
+        <main className="flex-grow container mx-auto p-6 z-10">
           <Routes>
-            <Route path="/" element={<Lessons />} />
-            <Route path="/leaderboard" element={<Leaderboard />} />
-            <Route path="/lore" element={<LoreArchive />} />
-            <Route path="/the-vault" element={<TheVault />} />
+            <Route path="/" element={<div className="text-center mt-20"><h1 className="text-6xl font-black italic mb-4 uppercase">Sector 7</h1><p className="text-gray-400 font-mono tracking-widest">OTDAISURFER.SURF // NEURAL REALM</p></div>} />
             <Route path="/login" element={<Login />} />
-            
-            {/* PROTECTED ROUTE: Direct Storage Check */}
-            <Route 
-              path="/members" 
-              element={
-                localStorage.getItem('isMember') === 'true' 
-                ? <MemberSection /> 
-                : <Navigate to="/login" replace />
-              } 
-            />
-            
-            <Route path="*" element={<Navigate to="/" replace />} />
+            <Route path="/members" element={isAuth ? <MemberSection /> : <Navigate to="/login" />} />
           </Routes>
         </main>
 
-        {/* --- FOOTER TICKER --- */}
-        <footer className={`border-t ${themeBorder} py-2 bg-[#0a192f] z-50`}>
-          <div className="ticker-wrapper overflow-hidden">
-            <div className={`ticker-content font-mono text-[10px] tracking-[0.4em] ${tailwindColor}`}>
-              SYSTEM STATUS: {isAuth ? 'VERIFIED' : 'SCANNING'} // SECTOR 7 // OTDAISURFER.SURF // NO DATA LEAKS DETECTED // 
-              SYSTEM STATUS: {isAuth ? 'VERIFIED' : 'SCANNING'} // SECTOR 7 // OTDAISURFER.SURF // NO DATA LEAKS DETECTED // 
-            </div>
+        <footer className="p-2 border-t border-white/5 bg-black text-[10px] font-mono overflow-hidden whitespace-nowrap z-50">
+          <div className="animate-ticker inline-block uppercase tracking-[0.5em]" style={{color}}>
+            OTDAISURFER.SURF // SYSTEM ONLINE // NO DATA LEAKS // SURVIVOR #1313 // SECTOR 7 // 
+            OTDAISURFER.SURF // SYSTEM ONLINE // NO DATA LEAKS // SURVIVOR #1313 // SECTOR 7 // 
           </div>
         </footer>
       </div>
     </Router>
   );
 }
-
-export default App;
