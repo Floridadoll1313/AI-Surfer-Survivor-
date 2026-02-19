@@ -1,3 +1,4 @@
+/* Container styling */
 .terminal-nav {
   display: flex;
   justify-content: space-between;
@@ -7,11 +8,14 @@
   border-bottom: 1px solid rgba(53, 201, 255, 0.3);
 }
 
+/* Logo styling with flicker effect */
 .nav-logo {
   color: #35c9ff;
   font-weight: bold;
   font-family: 'Courier New', Courier, monospace;
   letter-spacing: 2px;
+  display: flex;
+  align-items: center;
 }
 
 .logo-icon {
@@ -19,34 +23,48 @@
   animation: flicker 3s infinite;
 }
 
+/* Navigation Links */
 .nav-links {
   display: flex;
-  gap: 20px;
+  gap: 15px;
 }
 
 .nav-item {
   text-decoration: none;
   color: #8892b0;
   font-family: 'Courier New', Courier, monospace;
-  font-size: 0.9rem;
-  padding: 8px 15px;
+  font-size: 0.85rem;
+  padding: 8px 12px;
   border: 1px solid transparent;
   transition: all 0.3s ease;
+  letter-spacing: 1px;
 }
 
 .nav-item:hover {
   color: #35c9ff;
   text-shadow: 0 0 8px #35c9ff;
+  background: rgba(53, 201, 255, 0.05);
 }
 
+/* The Active State (Green Glow) */
 .nav-item.active {
   color: #64ffda;
   border: 1px solid #64ffda;
   background: rgba(100, 255, 218, 0.1);
-  box-shadow: inset 0 0 10px rgba(100, 255, 218, 0.2);
+  box-shadow: inset 0 0 10px rgba(100, 255, 218, 0.2), 0 0 10px rgba(100, 255, 218, 0.2);
 }
 
+/* Sci-fi flicker animation */
 @keyframes flicker {
   0%, 19.999%, 22%, 62.999%, 64%, 64.999%, 70%, 100% { opacity: 1; }
   20%, 21.999%, 63%, 63.999%, 65%, 69.999% { opacity: 0.4; }
+}
+
+/* Responsive adjustment for small screens */
+@media (max-width: 768px) {
+  .terminal-nav {
+    flex-direction: column;
+    gap: 15px;
+    padding: 15px;
+  }
 }
