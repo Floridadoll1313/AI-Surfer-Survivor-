@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-// Fixed the path to go into the double-src folder
-import Lessons from './src/pages/Lessons'; 
+// This updated path fixes the "Could not resolve" error
+import Lessons from './pages/Lessons'; 
 
 function App() {
   return (
