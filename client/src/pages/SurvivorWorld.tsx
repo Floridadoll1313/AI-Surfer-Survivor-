@@ -32,14 +32,18 @@ const SurvivorWorld = () => {
   const [logs, setLogs] = useState<string[]>(['> SIMULATION_LOADED']);
   const [copyFeedback, setCopyFeedback] = useState('SHARE_SCORE');
 
-  // --- TUTORIAL & ABILITY STATE ---
+  // --- DIFFICULTY SCALING ---
+  const [difficultyLevel, setDifficultyLevel] = useState(1);
+  const enemySpeed = Math.max(300, 1000 - (difficultyLevel * 100)); // Gets faster every level
+
+  // --- ABILITY STATE ---
   const [abilityActive, setAbilityActive] = useState(false);
   const [onCooldown, setOnCooldown] = useState(false);
   const [cooldownPercent, setCooldownPercent] = useState(0);
 
   const addLog = (msg: string) => setLogs(prev => [`> ${msg}`, ...prev].slice(0, 6));
 
-  // --- GAME LOGIC ---
+  // --- GAME LOGIC: SPAWNING ---
   const spawnFragment = useCallback(() => {
     const newFrag = {
       x: Math.floor(Math.random() * 10),
@@ -55,6 +59,38 @@ const SurvivorWorld = () => {
     }
   }, [fragments, spawnFragment, isGameOver]);
 
+  // --- DIFFICULTY UPDATE ---
+  useEffect(() => {
+    const newLevel = Math.floor(score / 100) + 1;
+    if (newLevel > difficultyLevel) {
+      setDifficultyLevel(newLevel);
+      addLog(`DIFFICULTY_INCREASED: LEVEL_${newLevel}`);
+      playSound('levelUp'); 
+    }
+  }, [score, difficultyLevel]);
+
+  // --- ENEMY AUTO-MOVE (Chase Logic) ---
+  useEffect(() => {
+    if (isGameOver) return;
+
+    const moveEnemy = setInterval(() => {
+      setEnemyPosition(ep => {
+        const edx = playerPosition.x > ep.x ? 1 : playerPosition.x < ep.x ? -1 : 0;
+        const edy = playerPosition.y > ep.y ? 1 : playerPosition.y < ep.y ? -1 : 0;
+        const nextE = { x: ep.x + edx, y: ep.y + edy };
+
+        if (nextE.x === playerPosition.x && nextE.y === playerPosition.y && !abilityActive) {
+          setIsGameOver(true);
+          playSound('death');
+          addLog('CRITICAL_FAILURE: CONNECTION_LOST');
+        }
+        return nextE;
+      });
+    }, enemySpeed);
+
+    return () => clearInterval(moveEnemy);
+  }, [playerPosition, enemySpeed, isGameOver, abilityActive]);
+
   const handleMove = useCallback((dx: number, dy: number) => {
     if (isGameOver) return;
 
@@ -66,32 +102,17 @@ const SurvivorWorld = () => {
       if (hitIndex !== -1) {
         const now = Date.now();
         const newCombo = (now - lastCollectTime < 2000) ? combo + 1 : 1;
-        const points = 10 * newCombo;
         
-        setScore(s => s + points);
+        setScore(s => s + (10 * newCombo));
         setCombo(newCombo);
         setLastCollectTime(now);
         setFragments(prevFrags => prevFrags.filter((_, i) => i !== hitIndex));
         playSound('collect');
         addLog(`DATA_FRAGMENT_RECOVERED (x${newCombo})`);
       }
-
-      setEnemyPosition(ep => {
-        const edx = newX > ep.x ? 1 : newX < ep.x ? -1 : 0;
-        const edy = newY > ep.y ? 1 : newY < ep.y ? -1 : 0;
-        const nextE = { x: ep.x + edx, y: ep.y + edy };
-
-        if (nextE.x === newX && nextE.y === newY && !abilityActive) {
-          setIsGameOver(true);
-          playSound('death');
-          addLog('CRITICAL_FAILURE: CONNECTION_LOST');
-        }
-        return nextE;
-      });
-
       return { x: newX, y: newY };
     });
-  }, [fragments, isGameOver, lastCollectTime, combo, abilityActive]);
+  }, [fragments, isGameOver, lastCollectTime, combo]);
 
   const triggerAbility = useCallback(() => {
     if (onCooldown || isGameOver) return;
@@ -115,16 +136,14 @@ const SurvivorWorld = () => {
     }, 200);
   }, [onCooldown, isGameOver, currentSkill.name]);
 
-  // --- HIGH SCORE PERSISTENCE ---
+  // --- PERSISTENCE & KEYBOARD ---
   useEffect(() => {
     if (isGameOver && score > highScore) {
       setHighScore(score);
       localStorage.setItem('survivor_highscore', score.toString());
-      addLog('NEW_PERSONAL_BEST_RECORDS_UPDATED');
     }
   }, [isGameOver, score, highScore]);
 
-  // --- KEYBOARD SUPPORT ---
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       switch(e.key) {
@@ -153,30 +172,24 @@ const SurvivorWorld = () => {
           position: absolute;
           top: 0; left: 0; right: 0; bottom: 0;
           background: rgba(0, 0, 0, 0.9);
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          z-index: 10;
-          text-align: center;
-          backdrop-filter: blur(6px);
+          display: flex; flex-direction: column;
+          align-items: center; justify-content: center;
+          z-index: 10; text-align: center; backdrop-filter: blur(6px);
         }
-        .overlay h2 { color: #ff4444; margin-bottom: 5px; text-shadow: 0 0 10px #ff0000; }
-        .overlay .high-score-msg { color: #ffcc00; font-size: 0.8rem; margin-bottom: 15px; }
+        .overlay h2 { color: #ff4444; text-shadow: 0 0 10px #ff0000; }
         .overlay button {
-          margin: 5px;
-          padding: 10px 20px;
-          background: transparent;
-          color: ${THEME_COLOR};
-          border: 1px solid ${THEME_COLOR};
-          cursor: pointer;
-          min-width: 140px;
+          margin: 5px; padding: 10px 20px; background: transparent;
+          color: ${THEME_COLOR}; border: 1px solid ${THEME_COLOR};
+          cursor: pointer; min-width: 140px;
         }
-        .overlay button:hover { background: ${THEME_COLOR}33; }
+        .difficulty-tag { font-size: 0.7rem; color: #ff4444; margin-top: 5px; }
       `}</style>
 
       <div className="game-header">
-        <div className="stat">SCORE: {score.toString().padStart(5, '0')}</div>
+        <div className="stat-group">
+          <div className="stat">SCORE: {score.toString().padStart(5, '0')}</div>
+          <div className="difficulty-tag">LVL_{difficultyLevel} SPEED: {enemySpeed}ms</div>
+        </div>
         <div className="stat">BEST: {highScore.toString().padStart(5, '0')}</div>
       </div>
 
@@ -221,9 +234,8 @@ const SurvivorWorld = () => {
       {isGameOver && (
         <div className="overlay">
           <h2>SYSTEM_HALTED</h2>
-          {score >= highScore && score > 0 && <p className="high-score-msg">★ NEW RECORD LOCALIZED ★</p>}
+          {score >= highScore && score > 0 && <p style={{color: '#ffcc00'}}>★ NEW RECORD ★</p>}
           <p>FINAL_SCORE: {score}</p>
-          <p style={{ fontSize: '0.8rem', opacity: 0.7 }}>BEST_SESSION: {highScore}</p>
           <button onClick={() => window.location.reload()}>REBOOT</button>
           <button onClick={shareStats}>{copyFeedback}</button>
         </div>
