@@ -10,10 +10,11 @@ export default function NavBar() {
       <div style={{ fontSize: '1.6rem', fontWeight: '900', color: '#35c9ff', textTransform: 'uppercase' }}>
         AI SURFER
       </div>
-      <div style={{ display: 'flex', gap: '40px' }}>
+      <div style={{ display: 'flex', gap: '30px' }}>
         <Link to="/" style={linkStyle}>Console</Link>
-        <Link to="/world" style={linkStyle}>The Island</Link>
+        <Link to="/world" style={linkStyle}>Map</Link>
         <Link to="/challenges" style={linkStyle}>Trials</Link>
+        <Link to="/equipment" style={linkStyle}>Inventory</Link>
       </div>
     </nav>
   );
