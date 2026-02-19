@@ -4,10 +4,15 @@ import Layout from './components/Layout';
 
 // --- PAGE COMPONENTS ---
 
+/**
+ * Home Component
+ * Features: Founder's Pass credential check and Survival Logs display.
+ */
 const Home = () => {
   const [showPass, setShowPass] = useState(false);
 
   useEffect(() => {
+    // Simulates a credential check delay
     const timer = setTimeout(() => setShowPass(true), 1500);
     return () => clearTimeout(timer);
   }, []);
@@ -43,13 +48,15 @@ const Home = () => {
         </div>
       )}
 
-      <h1 style={{ textAlign: 'center', fontSize: '3.5rem', color: '#ffffff' }}>OCEAN TIDE DROP</h1>
+      <h1 style={{ textAlign: 'center', fontSize: '3.5rem', color: '#ffffff', textShadow: '0 0 20px #35c9ff' }}>
+        OCEAN TIDE DROP
+      </h1>
       
       <div style={{ maxWidth: '700px', margin: '40px auto' }}>
-        <h2 style={{ color: '#ffffff', borderBottom: '1px solid #35c9ff' }}>SURVIVAL LOGS</h2>
+        <h2 style={{ color: '#ffffff', borderBottom: '1px solid #35c9ff', paddingBottom: '10px' }}>SURVIVAL LOGS</h2>
         {logs.map(log => (
           <div key={log.id} style={{ background: 'rgba(53, 201, 255, 0.05)', padding: '15px', marginBottom: '10px', borderLeft: '3px solid #35c9ff', color: '#ffffff' }}>
-            <span style={{ color: '#35c9ff' }}>[{log.date}]</span> {log.msg}
+            <span style={{ color: '#35c9ff', fontWeight: 'bold' }}>[{log.date}]</span> {log.msg}
           </div>
         ))}
       </div>
@@ -57,7 +64,12 @@ const Home = () => {
   );
 };
 
+/**
+ * Equipment Component
+ * Features: Grid of gear that updates the global progress state.
+ */
 const Equipment = () => {
+  // Accesses the setProgress function provided by the Layout's Outlet context
   const { setProgress } = useOutletContext<{ setProgress: React.Dispatch<React.SetStateAction<number>> }>();
 
   const items = [
@@ -82,53 +94,20 @@ const Equipment = () => {
         {items.map((item, index) => (
           <div key={index} style={{ 
             background: '#112240', 
-            padding: '20px', 
+            padding: '25px', 
             borderRadius: '12px', 
             border: '1px solid #35c9ff', 
             display: 'flex', 
             flexDirection: 'column', 
-            justifyContent: 'space-between' 
+            justifyContent: 'space-between',
+            boxShadow: '0 10px 30px -15px rgba(2,12,27,0.7)'
           }}>
             <div>
               <h3 style={{ color: '#35c9ff', margin: '0 0 10px 0' }}>{item.name}</h3>
-              <p style={{ color: '#8892b0', fontSize: '0.9rem' }}>{item.desc}</p>
-              <span style={{ fontSize: '0.8rem', color: '#64ffda', textTransform: 'uppercase' }}>{item.rarity}</span>
+              <p style={{ color: '#8892b0', fontSize: '0.9rem', lineHeight: '1.4' }}>{item.desc}</p>
+              <span style={{ fontSize: '0.75rem', color: '#64ffda', letterSpacing: '1px', textTransform: 'uppercase' }}>
+                {item.rarity}
+              </span>
             </div>
             <button 
               onClick={() => collectItem(item.boost)}
-              style={{ 
-                marginTop: '20px', 
-                background: 'transparent', 
-                border: '1px solid #35c9ff', 
-                color: '#35c9ff', 
-                padding: '10px', 
-                cursor: 'pointer', 
-                borderRadius: '4px',
-                transition: '0.3s'
-              }}
-            >
-              Equip (+{item.boost}%)
-            </button>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
-
-// --- MAIN APP ROUTER ---
-
-const App = () => {
-  return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Layout />}>
-          <Route index element={<Home />} />
-          <Route path="equipment" element={<Equipment />} />
-        </Route>
-      </Routes>
-    </Router>
-  );
-};
-
-export default App;
