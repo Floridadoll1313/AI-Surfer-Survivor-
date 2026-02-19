@@ -73,4 +73,92 @@ const Equipment = () => {
   };
 
   return (
-    <div style={{ maxWidth:
+    <div style={{ maxWidth: '900px', margin: '40px auto', padding: '0 20px' }}>
+      <h1 style={{ color: '#35c9ff', fontSize: '2.5rem' }}>SURVIVAL GEAR</h1>
+      <div style={{ 
+        display: 'grid', 
+        gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', 
+        gap: '20px', 
+        marginTop: '30px' 
+      }}>
+        {items.map((item, index) => (
+          <div key={index} style={{ 
+            background: '#112240', padding: '25px', borderRadius: '12px', border: '1px solid #35c9ff', 
+            display: 'flex', flexDirection: 'column', justifyContent: 'space-between' 
+          }}>
+            <div>
+              <h3 style={{ color: '#35c9ff', margin: '0 0 10px 0' }}>{item.name}</h3>
+              <p style={{ color: '#8892b0', fontSize: '0.9rem' }}>{item.desc}</p>
+              <span style={{ fontSize: '0.75rem', color: '#64ffda', textTransform: 'uppercase' }}>{item.rarity}</span>
+            </div>
+            <button 
+              onClick={() => collectItem(item.boost)}
+              style={{ marginTop: '20px', background: 'transparent', border: '1px solid #35c9ff', color: '#35c9ff', padding: '10px', cursor: 'pointer', borderRadius: '4px' }}
+            >
+              Equip (+{item.boost}%)
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+/**
+ * MapPage Component
+ * Features: Interactive island map with coordinate tracking.
+ */
+const MapPage = () => {
+  const [coords, setCoords] = useState({ x: 0, y: 0 });
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const bounds = e.currentTarget.getBoundingClientRect();
+    setCoords({
+      x: Math.floor(e.clientX - bounds.left),
+      y: Math.floor(e.clientY - bounds.top)
+    });
+  };
+
+  return (
+    <div style={{ padding: '40px', color: '#ffffff', textAlign: 'center' }}>
+      <h1 style={{ color: '#35c9ff', textShadow: '0 0 10px #35c9ff' }}>REALM NAVIGATION</h1>
+      <p style={{ color: '#8892b0' }}>Hover to scan coordinates | Select a sector to deploy</p>
+      
+      <div 
+        onMouseMove={handleMouseMove}
+        style={{ 
+          position: 'relative', 
+          margin: '20px auto', 
+          width: 'fit-content',
+          border: '2px solid #35c9ff',
+          borderRadius: '15px',
+          overflow: 'hidden',
+          cursor: 'crosshair'
+        }}
+      >
+        <img 
+          src="/AI Surfer Survivor Island Map.png" 
+          alt="Island Map" 
+          style={{ maxWidth: '100%', display: 'block', filter: 'brightness(0.8) contrast(1.2)' }}
+        />
+        
+        {/* Coordinate Overlay */}
+        <div style={{
+          position: 'absolute', bottom: '10px', right: '10px',
+          background: 'rgba(10, 25, 47, 0.8)', padding: '5px 15px',
+          borderRadius: '5px', border: '1px solid #35c9ff',
+          fontSize: '0.8rem', color: '#64ffda', fontFamily: 'monospace'
+        }}>
+          LOC: {coords.x}X / {coords.y}Y
+        </div>
+
+        {/* Example Clickable Sector Node */}
+        <div 
+          onClick={() => alert("Deploying to Sector 7...")}
+          style={{
+            position: 'absolute', top: '40%', left: '55%',
+            width: '20px', height: '20px', borderRadius: '50%',
+            border: '2px solid #64ffda', background: 'rgba(100, 255, 218, 0.2)',
+            cursor: 'pointer', animation: 'pulse 2s infinite'
+          }}
+          title="Sector
