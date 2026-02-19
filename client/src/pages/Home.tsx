@@ -1,130 +1,70 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { useAvatar } from '../context/AvatarContext';
 
-/**
- * Home Component
- * Features: Glitch Title, Automated System Logs, and User Submission Logs.
- */
 const Home = () => {
-  // 1. Initial State for Logs (combining system defaults with user-saved logs)
-  const [userLogs, setUserLogs] = useState<{ id: number, date: string, msg: string }[]>(() => {
-    const saved = localStorage.getItem('survivor_user_logs');
-    return saved ? JSON.parse(saved) : [];
-  });
-  
-  const [inputMsg, setInputMsg] = useState('');
+  const { selectedAvatar } = useAvatar();
 
-  const systemLogs = [
-    { id: 's1', date: "2026.02.19", msg: "Sector Alpha synchronization stable." },
-    { id: 's2', date: "2026.02.18", msg: "Pulse Animation module integrated." }
-  ];
-
-  // 2. Save logs to localStorage whenever they change
-  useEffect(() => {
-    localStorage.setItem('survivor_user_logs', JSON.stringify(userLogs));
-  }, [userLogs]);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!inputMsg.trim()) return;
-
-    const newLog = {
-      id: Date.now(),
-      date: new Date().toISOString().split('T')[0].replace(/-/g, '.'),
-      msg: inputMsg
-    };
-
-    setUserLogs([newLog, ...userLogs]);
-    setInputMsg('');
+  const avatarData: Record<string, { icon: string; label: string; description: string }> = {
+    ghost: { icon: '◈', label: 'NEURAL_GHOST', description: 'Invisibility within the data streams. Stealth-optimized.' },
+    runner: { icon: '❖', label: 'TIDE_RUNNER', description: 'High-velocity traversal across the digital surf.' },
+    void: { icon: '⬢', label: 'VOID_WALKER', description: 'Stable existence within non-space. Entropy resistant.' },
+    surfer: { icon: '🌀', label: 'AI_SURFER', description: 'The original architect of the wave. Balanced performance.' }
   };
 
+  const current = avatarData[selectedAvatar] || avatarData.ghost;
+
   return (
-    <div style={{ padding: '60px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      
-      {/* GLITCH TITLE */}
-      <div className="glitch-wrapper">
-        <h1 className="glitch-text" data-text="OCEAN TIDE DROP">OCEAN TIDE DROP</h1>
-      </div>
-      
-      <p style={{ color: '#8892b0', marginTop: '10px', fontSize: '1.1rem', letterSpacing: '2px', fontFamily: 'monospace' }}>
-        SYSTEM_STATUS: <span style={{ color: '#64ffda' }}>OPERATIONAL</span>
-      </p>
-
-      {/* NEW: LOG SUBMISSION TERMINAL */}
-      <div style={{ 
-        maxWidth: '800px', width: '100%', margin: '40px auto 0',
-        padding: '20px', background: 'rgba(2, 12, 27, 0.6)',
-        border: '1px solid #64ffda', borderRadius: '8px'
+    <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '40px 20px', fontFamily: 'monospace' }}>
+      <section style={{ 
+        border: '1px solid #35c9ff', 
+        padding: '40px', 
+        borderRadius: '8px', 
+        background: 'rgba(17, 34, 64, 0.5)',
+        textAlign: 'center' 
       }}>
-        <form onSubmit={handleSubmit} style={{ display: 'flex', gap: '10px' }}>
-          <span style={{ color: '#64ffda', fontFamily: 'monospace', paddingTop: '10px' }}>&gt;</span>
-          <input 
-            type="text"
-            value={inputMsg}
-            onChange={(e) => setInputMsg(e.target.value)}
-            placeholder="ENTER_SURVIVAL_LOG_ENTRY..."
-            style={{
-              flex: 1, background: 'transparent', border: 'none',
-              outline: 'none', color: '#64ffda', fontFamily: 'monospace',
-              fontSize: '1rem', padding: '10px'
-            }}
-          />
-          <button type="submit" style={{
-            background: '#64ffda', color: '#020c1b', border: 'none',
-            padding: '0 20px', cursor: 'pointer', fontFamily: 'monospace',
-            fontWeight: 'bold', borderRadius: '4px'
+        <div style={{ fontSize: '4rem', marginBottom: '20px', textShadow: '0 0 20px #64ffda' }}>
+          {current.icon}
+        </div>
+        <h1 style={{ color: '#64ffda', letterSpacing: '4px' }}>WELCOME, {current.label}</h1>
+        <p style={{ color: '#8892b0', fontSize: '1.1rem', maxWidth: '600px', margin: '0 auto 30px' }}>
+          {current.description}
+        </p>
+
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '20px' }}>
+          <Link to="/game" style={{
+            padding: '12px 30px',
+            backgroundColor: '#35c9ff',
+            color: '#0a192f',
+            textDecoration: 'none',
+            fontWeight: 'bold',
+            borderRadius: '4px'
           }}>
-            SUBMIT
-          </button>
-        </form>
+            ENTER_THE_GRID
+          </Link>
+          <Link to="/avatar" style={{
+            padding: '12px 30px',
+            border: '1px solid #35c9ff',
+            color: '#35c9ff',
+            textDecoration: 'none',
+            borderRadius: '4px'
+          }}>
+            RE_ENCRYPT_ID
+          </Link>
+        </div>
+      </section>
+
+      <div style={{ marginTop: '40px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+        <div style={{ border: '1px solid rgba(136, 146, 176, 0.3)', padding: '20px', borderRadius: '4px' }}>
+          <h3 style={{ color: '#35c9ff' }}>SYSTEM_STATUS</h3>
+          <p style={{ color: '#8892b0', fontSize: '0.9rem' }}>Power: STABLE</p>
+          <p style={{ color: '#8892b0', fontSize: '0.9rem' }}>Network: ENCRYPTED</p>
+        </div>
+        <div style={{ border: '1px solid rgba(136, 146, 176, 0.3)', padding: '20px', borderRadius: '4px' }}>
+          <h3 style={{ color: '#35c9ff' }}>MISSION_LOG</h3>
+          <p style={{ color: '#8892b0', fontSize: '0.9rem' }}>No active signals detected...</p>
+        </div>
       </div>
-
-      {/* DYNAMIC LOG FEED */}
-      <div style={{ 
-        maxWidth: '800px', width: '100%', margin: '30px auto',
-        padding: '30px', background: 'rgba(17, 34, 64, 0.4)',
-        borderRadius: '10px', border: '1px solid rgba(53, 201, 255, 0.2)'
-      }}>
-        <h2 style={{ color: '#ffffff', fontSize: '1.2rem', borderBottom: '1px solid #35c9ff', paddingBottom: '15px', marginBottom: '20px', fontFamily: 'monospace' }}>
-          &gt; RECENT_SURVIVAL_LOGS
-        </h2>
-        
-        {/* User Logs Appear First */}
-        {userLogs.map(log => (
-          <div key={log.id} style={{ background: 'rgba(100, 255, 218, 0.05)', padding: '15px', marginBottom: '10px', borderLeft: '4px solid #64ffda', color: '#ffffff', fontFamily: 'monospace' }}>
-            <span style={{ color: '#64ffda', fontWeight: 'bold', marginRight: '10px' }}>[{log.date}]</span> {log.msg}
-          </div>
-        ))}
-
-        {/* System Logs */}
-        {systemLogs.map(log => (
-          <div key={log.id} style={{ background: 'rgba(53, 201, 255, 0.03)', padding: '15px', marginBottom: '10px', borderLeft: '4px solid #35c9ff', color: '#ffffff', fontFamily: 'monospace' }}>
-            <span style={{ color: '#35c9ff', fontWeight: 'bold', marginRight: '10px' }}>[{log.date}]</span> {log.msg}
-          </div>
-        ))}
-      </div>
-
-      <style>{`
-        .glitch-wrapper { position: relative; }
-        .glitch-text {
-          font-size: 4rem; font-weight: 900; color: #ffffff;
-          text-transform: uppercase; position: relative;
-          text-shadow: 0 0 15px rgba(53, 201, 255, 0.6);
-        }
-        .glitch-text::before, .glitch-text::after {
-          content: attr(data-text); position: absolute;
-          top: 0; left: 0; width: 100%; height: 100%; opacity: 0.8;
-        }
-        .glitch-text::before { color: #35c9ff; z-index: -1; animation: glitch 3s cubic-bezier(.25, .46, .45, .94) both infinite; }
-        .glitch-text::after { color: #ff4d4d; z-index: -2; animation: glitch 3s cubic-bezier(.25, .46, .45, .94) reverse both infinite; }
-        @keyframes glitch {
-          0% { transform: translate(0); }
-          20% { transform: translate(-3px, 3px); }
-          40% { transform: translate(-3px, -3px); }
-          60% { transform: translate(3px, 3px); }
-          80% { transform: translate(3px, -3px); }
-          100% { transform: translate(0); }
-        }
-      `}</style>
     </div>
   );
 };
