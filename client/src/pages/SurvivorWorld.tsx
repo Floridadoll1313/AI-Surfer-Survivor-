@@ -26,28 +26,48 @@ const SurvivorWorld = () => {
   const [bossActive, setBossActive] = useState(false);
   const [timer, setTimer] = useState(60);
 
-  // --- REWARD LOGIC ---
+  const perkCosts = { magnetRange: 100, neuralShield: 250, dataEfficiency: 200 };
+
+  // --- SHOP LOGIC ---
+  const buyPerk = (perkName: keyof typeof perks) => {
+    const cost = perkCosts[perkName];
+    if (dataShards >= cost) {
+      const newShards = dataShards - cost;
+      const newLevel = perks[perkName] + 1;
+      setDataShards(newShards);
+      setPerks(prev => ({ ...prev, [perkName]: newLevel }));
+      localStorage.setItem('survivor_shards', newShards.toString());
+      localStorage.setItem(`perk_${perkName.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`)}`, newLevel.toString());
+      playSound('upgrade');
+    }
+  };
+
+  // --- END GAME & REWARDS ---
   useEffect(() => {
     if (isGameOver) {
       const earned = Math.floor(score / 10);
-      setDataShards(prev => {
-        const total = prev + earned;
-        localStorage.setItem('survivor_shards', total.toString());
-        return total;
-      });
+      const total = dataShards + earned;
+      setDataShards(total);
+      localStorage.setItem('survivor_shards', total.toString());
       if (score > highScore) {
         setHighScore(score);
         localStorage.setItem('survivor_high_score', score.toString());
       }
     }
-  }, [isGameOver, score, highScore]);
+  }, [isGameOver]);
 
-  // --- BOSS TRIGGER ---
+  // --- BOSS & FRAGMENT LOGIC ---
   useEffect(() => {
     if (score >= 1500 && !bossActive) setBossActive(true);
-  }, [score, bossActive]);
+    const spawner = setInterval(() => {
+        if (fragments.length < 10 && !isGameOver) {
+            setFragments(p => [...p, { x: Math.floor(Math.random() * 10), y: Math.floor(Math.random() * 10) }]);
+        }
+    }, modifiers.turbo ? 1500 : 3000);
+    return () => clearInterval(spawner);
+  }, [score, bossActive, fragments.length, isGameOver, modifiers.turbo]);
 
-  // --- MOVEMENT & PERKS ---
+  // --- MOVEMENT & COLLISION ---
   const handleMove = useCallback((dx: number, dy: number) => {
     if (isGameOver || showArchive) return;
     setPlayerPosition(prev => {
@@ -82,7 +102,7 @@ const SurvivorWorld = () => {
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       const keys: Record<string, [number, number]> = { ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowLeft: [-1, 0], ArrowRight: [1, 0] };
-      if (keys[e.key]) handleMove(...keys[e.key]);
+      if (keys[e.key]) { e.preventDefault(); handleMove(...keys[e.key]); }
       if (e.key.toLowerCase() === 'a') setShowArchive(p => !p);
     };
     window.addEventListener('keydown', onKeyDown);
@@ -92,26 +112,29 @@ const SurvivorWorld = () => {
   return (
     <div className={`survivor-world ${modifiers.hardcore ? 'hardcore-mode' : ''}`}>
       <style>{`
-        .survivor-world { background: #000; color: ${THEME_COLOR}; padding: 20px; position: relative; border: 2px solid #1a1a1a; }
-        .grid-container { display: grid; grid-template-columns: repeat(10, 40px); gap: 4px; }
-        .cell { width: 40px; height: 40px; border: 1px solid #111; display: flex; align-items: center; justify-content: center; }
+        .survivor-world { background: #000; color: ${THEME_COLOR}; padding: 20px; position: relative; border: 2px solid #1a1a1a; min-height: 550px; }
+        .grid-container { display: grid; grid-template-columns: repeat(10, 40px); gap: 4px; margin-top: 10px; }
+        .cell { width: 40px; height: 40px; border: 1px solid #111; display: flex; align-items: center; justify-content: center; position: relative; }
         .hardcore-mode { border-color: #ff0055; box-shadow: 0 0 15px #ff0055; }
-        .overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.9); z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.95); z-index: 100; display: flex; flex-direction: column; padding: 20px; }
+        .shop-item { border: 1px solid #222; padding: 10px; margin: 5px 0; display: flex; justify-content: space-between; }
+        .btn-ui { background: ${THEME_COLOR}; color: #000; border: none; padding: 5px 10px; cursor: pointer; font-family: monospace; }
       `}</style>
 
-      <div className="game-header" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
-        <button onClick={() => setShowArchive(true)}>UPGRADES [A]</button>
-        <div>SCORE: {Math.floor(score)} | SHARDS: {dataShards}</div>
+      <div className="game-header" style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <button className="btn-ui" onClick={() => setShowArchive(true)}>NEURAL_LAB [A]</button>
+        <div>SHARDS: <span style={{color: '#ffcc00'}}>{dataShards}</span> | SCORE: {Math.floor(score)}</div>
       </div>
 
       <div className="grid-container">
         {[...Array(100)].map((_, i) => {
           const x = i % 10, y = Math.floor(i / 10);
+          const isBoss = bossActive && x >= 4 && x <= 5 && y >= 4 && y <= 5;
           return (
-            <div key={i} className="cell">
+            <div key={i} className={`cell ${isBoss ? 'boss-cell' : ''}`}>
               {playerPosition.x === x && playerPosition.y === y && <span>❖</span>}
               {enemyPosition.x === x && enemyPosition.y === y && <span>⚡</span>}
-              {fragments.some(f => f.x === x && f.y === y) && <span>✦</span>}
+              {fragments.some(f => f.x === x && f.y === y) && <span style={{color: '#fff'}}>✦</span>}
             </div>
           );
         })}
@@ -119,16 +142,29 @@ const SurvivorWorld = () => {
 
       {showArchive && (
         <div className="overlay">
-          <h2>NEURAL_ARCHIVE</h2>
-          <div onClick={() => setModifiers(m => ({...m, hardcore: !m.hardcore}))}>HARDCORE: {modifiers.hardcore ? 'ON' : 'OFF'}</div>
-          <button onClick={() => setShowArchive(false)}>CLOSE</button>
+          <h2 style={{color: THEME_COLOR}}>NEURAL_ARCHIVE & SHOP</h2>
+          <div style={{margin: '10px 0'}}>
+            <button className="btn-ui" onClick={() => setModifiers(m => ({...m, hardcore: !m.hardcore}))}>
+               HARDCORE_PROTOCOL: {modifiers.hardcore ? 'ACTIVE (2x)' : 'OFF'}
+            </button>
+          </div>
+          <div className="shop-item">
+             <div>MAGNET_RANGE (LVL {perks.magnetRange})</div>
+             <button className="btn-ui" onClick={() => buyPerk('magnetRange')}>{perkCosts.magnetRange} S</button>
+          </div>
+          <div className="shop-item">
+             <div>NEURAL_SHIELD (LVL {perks.neuralShield})</div>
+             <button className="btn-ui" onClick={() => buyPerk('neuralShield')}>{perkCosts.neuralShield} S</button>
+          </div>
+          <button className="btn-ui" style={{marginTop: 'auto'}} onClick={() => setShowArchive(false)}>RESUME_SIMULATION</button>
         </div>
       )}
 
       {isGameOver && (
-        <div className="overlay">
+        <div className="overlay" style={{alignItems: 'center', justifyContent: 'center'}}>
           <h2 style={{color: '#ff0055'}}>CONNECTION_LOST</h2>
-          <button onClick={() => window.location.reload()}>RETRY</button>
+          <p>EARNED: {Math.floor(score/10)} SHARDS</p>
+          <button className="btn-ui" onClick={() => window.location.reload()}>REBOOT_SESSION</button>
         </div>
       )}
     </div>
