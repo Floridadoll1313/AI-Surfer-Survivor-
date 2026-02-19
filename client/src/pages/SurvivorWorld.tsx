@@ -9,9 +9,16 @@ const SurvivorWorld = () => {
   const { selectedAvatar } = useAvatar();
   const THEME_COLOR = '#64ffda';
 
-  // --- HAZARD STATE ---
-  const [lasers, setLasers] = useState<{ axis: 'x' | 'y', pos: number, active: boolean }[]>([]);
-  const [voids, setVoids] = useState<{ x: number, y: number }[]>([]);
+  // --- EVOLUTION STATE ---
+  const [evolutionLevel, setEvolutionLevel] = useState(1);
+  const [evolutionBuff, setEvolutionBuff] = useState('NONE');
+  
+  const evolutionStages: Record<number, { icon: string, name: string, buff: string }> = {
+    1: { icon: '❖', name: 'INITIATE', buff: 'NONE' },
+    2: { icon: '⬢', name: 'SENTINEL', buff: 'SPEED_BOOST (+15%)' },
+    3: { icon: '◈', name: 'ARCHON', buff: 'MAGNET_REACH (Radius +1)' },
+    4: { icon: '🌀', name: 'OVERLORD', buff: 'ULTIMATE_INTEGRITY (Auto-Shield)' }
+  };
 
   // --- SESSION STATE ---
   const [playerPosition, setPlayerPosition] = useState({ x: 0, y: 0 });
@@ -19,76 +26,60 @@ const SurvivorWorld = () => {
   const [fragments, setFragments] = useState<{ x: number, y: number }[]>([]);
   const [score, setScore] = useState(0);
   const [isGameOver, setIsGameOver] = useState(false);
-  const [logs, setLogs] = useState<string[]>(['> HAZARD_PROTOCOLS_LOADED']);
+  const [logs, setLogs] = useState<string[]>(['> EVOLUTION_PROTOCOL_READY']);
 
   const addLog = (msg: string) => setLogs(prev => [`> ${msg}`, ...prev].slice(0, 5));
 
-  // --- HAZARD GENERATOR ---
+  // --- EVOLUTION LOGIC ---
   useEffect(() => {
-    if (isGameOver || score < 100) return;
-
-    const hazardTimer = setInterval(() => {
-      const roll = Math.random();
-      
-      if (roll > 0.7) {
-        // Spawn Laser Warning
-        const newLaser = { axis: Math.random() > 0.5 ? 'x' : 'y' as 'x' | 'y', pos: Math.floor(Math.random() * 10), active: false };
-        setLasers(prev => [...prev, newLaser]);
-        addLog('WARNING: LASER_GRID_CALIBRATING');
-
-        // Activate Laser after 1.5s
-        setTimeout(() => {
-          setLasers(prev => prev.map(l => l.pos === newLaser.pos && l.axis === newLaser.axis ? { ...l, active: true } : l));
-          // Clear Laser after 2s
-          setTimeout(() => {
-            setLasers(prev => prev.filter(l => l !== newLaser));
-          }, 2000);
-        }, 15000);
-      } else if (roll < 0.2) {
-        // Create Data Void
-        const newVoid = { x: Math.floor(Math.random() * 10), y: Math.floor(Math.random() * 10) };
-        setVoids(prev => [...prev, newVoid]);
-        addLog('CRITICAL: TILE_COLLAPSE');
-        setTimeout(() => setVoids(prev => prev.filter(v => v !== newVoid)), 4000);
-      }
-    }, 5000);
-
-    return () => clearInterval(hazardTimer);
-  }, [score, isGameOver]);
-
-  // --- COLLISION CHECK (HAZARDS) ---
-  useEffect(() => {
-    const hitLaser = lasers.some(l => l.active && (l.axis === 'x' ? playerPosition.x === l.pos : playerPosition.y === l.pos));
-    if (hitLaser) {
-      setIsGameOver(true);
-      addLog('TERMINATED: LASER_CONTACT');
+    const nextLevel = Math.floor(score / 500) + 1;
+    if (nextLevel > evolutionLevel && nextLevel <= 4) {
+      setEvolutionLevel(nextLevel);
+      setEvolutionBuff(evolutionStages[nextLevel].buff);
+      addLog(`ASCENSION_DETECTED: EVOLVED_TO_${evolutionStages[nextLevel].name}`);
+      playSound('levelUp'); // Ensure levelUp sound exists
     }
-  }, [playerPosition, lasers]);
+  }, [score, evolutionLevel]);
 
-  // --- MOVEMENT ---
+  // --- MOVEMENT & COLLECTION ---
   const handleMove = useCallback((dx: number, dy: number) => {
     if (isGameOver) return;
     setPlayerPosition(prev => {
       const nextX = Math.max(0, Math.min(9, prev.x + dx));
       const nextY = Math.max(0, Math.min(9, prev.y + dy));
       
-      // Blocked by Data Void
-      if (voids.some(v => v.x === nextX && v.y === nextY)) return prev;
+      // Collection Logic (With Archon Magnet Buff)
+      const reach = evolutionLevel >= 3 ? 1 : 0;
+      setFragments(prevFrags => {
+        const remaining = prevFrags.filter(f => {
+          const isClose = Math.abs(f.x - nextX) <= reach && Math.abs(f.y - nextY) <= reach;
+          if (isClose) {
+            setScore(s => s + 10);
+            playSound('collect');
+            return false;
+          }
+          return true;
+        });
+        return remaining;
+      });
 
-      const fragIdx = fragments.findIndex(f => f.x === nextX && f.y === nextY);
-      if (fragIdx !== -1) {
-        setScore(s => s + 10);
-        setFragments(f => f.filter((_, i) => i !== fragIdx));
-        playSound('collect');
+      if (nextX === enemyPosition.x && nextY === enemyPosition.y) {
+        // Overlord Shield Buff check
+        if (evolutionLevel === 4) {
+          addLog('OVERLORD_SHIELD_ABSORBED_IMPACT');
+          setScore(s => Math.max(0, s - 100)); // Cost of shield
+          return { x: 0, y: 0 }; // Teleport to start instead of death
+        }
+        setIsGameOver(true);
       }
-
-      if (nextX === enemyPosition.x && nextY === enemyPosition.y) setIsGameOver(true);
       return { x: nextX, y: nextY };
     });
-  }, [fragments, enemyPosition, isGameOver, voids]);
+  }, [fragments, enemyPosition, isGameOver, evolutionLevel]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) e.preventDefault();
+      // Sentinel Speed Buff logic (reduced latency/extra move potential could be added)
       if (e.key === 'ArrowUp') handleMove(0, -1);
       if (e.key === 'ArrowDown') handleMove(0, 1);
       if (e.key === 'ArrowLeft') handleMove(-1, 0);
@@ -101,14 +92,20 @@ const SurvivorWorld = () => {
   return (
     <div className="survivor-world" style={{ borderColor: THEME_COLOR }}>
       <style>{`
-        .laser-warning { background: rgba(255, 0, 0, 0.2) !important; border: 1px solid red; }
-        .laser-active { background: rgba(255, 0, 0, 0.8) !important; box-shadow: 0 0 20px red; z-index: 5; }
-        .data-void { background: #000 !important; border: 1px solid #333; transform: scale(0.8); }
+        .evolution-ui { background: rgba(100, 255, 218, 0.1); padding: 10px; margin-bottom: 10px; border-left: 4px solid ${THEME_COLOR}; }
+        .evo-name { font-weight: bold; font-size: 0.9rem; color: ${THEME_COLOR}; }
+        .evo-buff { font-size: 0.7rem; opacity: 0.7; font-style: italic; }
+        .avatar-evolved { filter: drop-shadow(0 0 8px ${THEME_COLOR}); transform: scale(1.2); transition: all 0.5s ease; }
       `}</style>
+
+      <div className="evolution-ui">
+        <div className="evo-name">FORM: {evolutionStages[evolutionLevel].name} (LVL {evolutionLevel})</div>
+        <div className="evo-buff">ACTIVE_BUFF: {evolutionBuff}</div>
+      </div>
 
       <div className="game-header">
         <div className="stat">SCORE: {score}</div>
-        <div className="stat" style={{ color: '#ff4444' }}>{lasers.length > 0 ? '!!! HAZARD_ACTIVE !!!' : 'STABLE'}</div>
+        <div className="stat">NEXT_EVO: {evolutionLevel < 4 ? evolutionLevel * 500 : 'MAX'}</div>
       </div>
 
       <div className="grid-container">
@@ -116,16 +113,15 @@ const SurvivorWorld = () => {
           const x = i % 10; const y = Math.floor(i / 10);
           const isPlayer = playerPosition.x === x && playerPosition.y === y;
           const isEnemy = enemyPosition.x === x && enemyPosition.y === y;
-          const isVoid = voids.some(v => v.x === x && v.y === y);
-          
-          const laser = lasers.find(l => (l.axis === 'x' ? x === l.pos : y === l.pos));
-          const laserClass = laser ? (laser.active ? 'laser-active' : 'laser-warning') : '';
-
           return (
-            <div key={i} className={`cell ${laserClass} ${isVoid ? 'data-void' : ''}`}>
-              {isPlayer && <span style={{ color: THEME_COLOR }}>❖</span>}
-              {isEnemy && !isVoid && <span>⚡</span>}
-              {fragments.some(f => f.x === x && f.y === y) && !isVoid && <span>✦</span>}
+            <div key={i} className="cell">
+              {isPlayer && (
+                <span className="avatar-evolved" style={{ color: THEME_COLOR }}>
+                  {evolutionStages[evolutionLevel].icon}
+                </span>
+              )}
+              {isEnemy && <span>⚡</span>}
+              {fragments.some(f => f.x === x && f.y === y) && <span>✦</span>}
             </div>
           );
         })}
@@ -135,8 +131,8 @@ const SurvivorWorld = () => {
 
       {isGameOver && (
         <div className="overlay">
-          <h2>INTEGRITY_COMPROMISED</h2>
-          <button onClick={() => window.location.reload()}>RE-INITIALIZE</button>
+          <h2>EVOLUTION_CRITICAL_FAILURE</h2>
+          <button onClick={() => window.location.reload()}>RE-SYNC</button>
         </div>
       )}
     </div>
