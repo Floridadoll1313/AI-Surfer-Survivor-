@@ -12,35 +12,37 @@ const Home = () => {
   });
 
   useEffect(() => {
-    // Load Core Stats
+    // 1. Load basic stats
     const wallet = Number(localStorage.getItem('survivor_wallet')) || 0;
     const highScore = Number(localStorage.getItem('survivor_high_score')) || 0;
     const isMember = localStorage.getItem('membership_active') === 'true';
 
-    // Daily Mission Logic (Reset if it's a new day)
+    // 2. Daily Mission Reset Logic
     const today = new Date().toDateString();
-    const lastDate = localStorage.getItem('mission_date');
-    let dailyFragments = Number(localStorage.getItem('daily_fragments')) || 0;
-    let missionClaimed = localStorage.getItem('mission_claimed') === 'true';
+    const lastReset = localStorage.getItem('mission_last_reset');
+    
+    let dailyFrags = Number(localStorage.getItem('daily_fragments')) || 0;
+    let claimed = localStorage.getItem('mission_claimed') === 'true';
 
-    if (lastDate !== today) {
-      dailyFragments = 0;
-      missionClaimed = false;
-      localStorage.setItem('mission_date', today);
+    if (lastReset !== today) {
+      // New day: Reset daily stats
+      dailyFrags = 0;
+      claimed = false;
+      localStorage.setItem('mission_last_reset', today);
       localStorage.setItem('daily_fragments', '0');
       localStorage.setItem('mission_claimed', 'false');
     }
 
-    setStats({ wallet, highScore, isMember, dailyFragments, missionClaimed });
+    setStats({ wallet, highScore, isMember, dailyFragments: dailyFrags, missionClaimed: claimed });
   }, []);
 
-  const claimMission = () => {
+  const handleClaim = () => {
     if (stats.dailyFragments >= 50 && !stats.missionClaimed) {
-      const newWallet = stats.wallet + 500;
-      localStorage.setItem('survivor_wallet', newWallet.toString());
+      const newTotal = stats.wallet + 500;
+      localStorage.setItem('survivor_wallet', newTotal.toString());
       localStorage.setItem('mission_claimed', 'true');
-      setStats(prev => ({ ...prev, wallet: newWallet, missionClaimed: true }));
-      alert('MISSION_COMPLETE: +500 XP SECURED');
+      setStats(prev => ({ ...prev, wallet: newTotal, missionClaimed: true }));
+      alert('REWARD_SECURED: +500 XP added to Data Vault.');
     }
   };
 
@@ -54,26 +56,29 @@ const Home = () => {
         <button onClick={() => navigate('/inventory')} style={{ background: '#112240', border: '1px solid #35c9ff', color: '#35c9ff', padding: '10px 20px', cursor: 'pointer' }}>VIEW_GEAR</button>
       </header>
 
-      {/* DAILY MISSIONS PANEL */}
-      <div style={{ marginBottom: '30px', padding: '20px', border: '1px solid #64ffda', background: 'rgba(100, 255, 218, 0.05)' }}>
-        <h3 style={{ margin: '0 0 10px 0' }}>DAILY_OBJECTIVE</h3>
+      {/* DAILY MISSION SECTION */}
+      <div style={{ marginBottom: '30px', padding: '25px', border: '1px solid #64ffda', background: 'rgba(100, 255, 218, 0.05)' }}>
+        <h3 style={{ margin: '0 0 15px 0', color: '#64ffda' }}>[ DAILY_OBJECTIVE ]</h3>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
-            <p style={{ margin: 0 }}>Collect 50 Fragments in 24h</p>
-            <p style={{ fontSize: '0.8rem', color: '#8892b0' }}>Progress: {stats.dailyFragments} / 50</p>
+            <p style={{ margin: 0, fontSize: '1.1rem' }}>Data Extraction: 50 Fragments</p>
+            <p style={{ color: '#8892b0', marginTop: '5px' }}>Progress: {stats.dailyFragments} / 50</p>
           </div>
           <button 
             disabled={stats.dailyFragments < 50 || stats.missionClaimed}
-            onClick={claimMission}
+            onClick={handleClaim}
             style={{
-              padding: '10px 20px',
+              padding: '12px 24px',
               background: (stats.dailyFragments >= 50 && !stats.missionClaimed) ? '#64ffda' : '#112240',
               color: (stats.dailyFragments >= 50 && !stats.missionClaimed) ? '#0a192f' : '#4e566d',
               border: 'none', fontWeight: 'bold', cursor: 'pointer'
             }}
           >
-            {stats.missionClaimed ? 'CLAIMED' : 'CLAIM +500 XP'}
+            {stats.missionClaimed ? 'CLAIMED' : stats.dailyFragments >= 50 ? 'CLAIM_500_XP' : 'LOCKED'}
           </button>
+        </div>
+        <div style={{ width: '100%', height: '4px', background: '#112240', marginTop: '20px' }}>
+          <div style={{ width: `${Math.min((stats.dailyFragments / 50) * 100, 100)}%`, height: '100%', background: '#64ffda', transition: 'width 0.5s' }} />
         </div>
       </div>
 
