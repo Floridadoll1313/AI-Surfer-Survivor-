@@ -1,24 +1,20 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
-import Home from './pages/Home';
-import Challenges from './pages/Challenges';
-import SurvivorWorld from './pages/SurvivorWorld';
-import LessonList from './pages/LessonList';
-import LessonPage from './pages/LessonPage';
+
+// Temporary "Placeholder" pages so the app doesn't crash
+const Home = () => <div><h1>Home Page</h1><p>Welcome to the tide.</p></div>;
+const Challenges = () => <div><h1>Challenges</h1><p>Trials loading...</p></div>;
 
 export default function App() {
   return (
     <Router>
-      <Layout>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/challenges" element={<Challenges />} />
-          <Route path="/world" element={<SurvivorWorld />} />
-          <Route path="/lessons" element={<LessonList />} />
-          <Route path="/lessons/:id" element={<LessonPage />} />
-        </Routes>
-      </Layout>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Home />} />
+          <Route path="challenges" element={<Challenges />} />
+        </Route>
+      </Routes>
     </Router>
   );
 }
