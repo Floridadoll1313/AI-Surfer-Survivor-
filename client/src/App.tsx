@@ -4,10 +4,12 @@ import Layout from './components/Layout';
 import NavBar from './components/NavBar';
 import SiteFooter from './components/SiteFooter';
 
-// Page Imports (Make sure these files exist in your /pages folder!)
+// Page Imports
 import Home from './pages/Home';
 import MapPage from './pages/MapPage';
-import FloundersPage from './pages/FloundersPage'; // Your current filename
+import FloundersPage from './pages/FloundersPage'; 
+
+// KEEP THESE COMMENTED OUT until you create the files in the /pages folder!
 // import Challenges from './pages/Challenges'; 
 // import Gear from './pages/Gear';
 
@@ -21,8 +23,9 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/map" element={<MapPage />} />
             <Route path="/founders" element={<FloundersPage />} />
-            {/* Add more routes here as you create the pages */}
-            <Route path="*" element={<div>[ SIGNAL_LOST: Page Not Found ]</div>} />
+            
+            {/* This handles any links that don't have pages yet */}
+            <Route path="*" element={<div style={{color: '#00ff00', padding: '20px'}}>[ SIGNAL_LOST: Component Under Construction ]</div>} />
           </Routes>
         </Layout>
         <SiteFooter />
