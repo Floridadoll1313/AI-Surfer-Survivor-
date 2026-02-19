@@ -92,3 +92,74 @@ const MemberSection = () => {
 export default function App() {
   const [isAuth, setIsAuth] = useState(localStorage.getItem('isMember') === 'true');
   const [godMode, setGodMode] = useState(false);
+  const mastery = Number(localStorage.getItem('survivorMastery')) || 0;
+
+  useEffect(() => {
+    const sync = setInterval(() => setIsAuth(localStorage.getItem('isMember') === 'true'), 1000);
+    return () => clearInterval(sync);
+  }, []);
+
+  const color = godMode ? '#facc15' : '#22d3ee';
+
+  return (
+    <Router>
+      <div className="min-h-screen bg-[#0a192f] text-white flex flex-col relative overflow-x-hidden selection:bg-cyan-500/30">
+        <NeuralRain color={color} />
+        
+        {/* HEADER */}
+        <header className="sticky top-0 z-50 p-6 border-b border-white/5 bg-[#0a192f]/80 backdrop-blur-md">
+          <div className="container mx-auto flex justify-between items-center">
+            <Link to="/" className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-cyan-500 flex items-center justify-center text-xl shadow-[0_0_15px_rgba(34,211,238,0.4)]">🌊</div>
+              <h1 className="text-xl font-black italic tracking-tighter">AI SURFER <span style={{color}}>{godMode ? 'LEGEND' : 'SURVIVOR'}</span></h1>
+            </Link>
+            <nav className="flex gap-6 text-[10px] font-black uppercase tracking-widest items-center">
+              <Link to="/" className="hover:text-cyan-400">Main</Link>
+              {isAuth ? (
+                <>
+                  <Link to="/members" className="text-cyan-400">Lounge</Link>
+                  {mastery >= 100 && (
+                    <button onClick={() => setGodMode(!godMode)} className="px-3 py-1 border border-yellow-500 text-yellow-500 rounded-full animate-pulse">
+                      {godMode ? 'GOD MODE: ON' : 'ACTIVATE GOD'}
+                    </button>
+                  )}
+                  <button onClick={() => {localStorage.clear(); window.location.href='/';}} className="text-red-500">Exit</button>
+                </>
+              ) : <Link to="/login" className="bg-white text-black px-4 py-2 rounded-lg font-black hover:bg-cyan-400 transition-all">Entry</Link>}
+            </nav>
+          </div>
+        </header>
+
+        {/* MAIN CONTENT */}
+        <main className="flex-grow container mx-auto px-6 py-12 z-10">
+          <Routes>
+            <Route path="/" element={
+              <div className="text-center mt-20 space-y-4">
+                <h1 className="text-7xl font-black italic uppercase tracking-tighter animate-pulse">Sector 7</h1>
+                <p className="text-gray-500 font-mono tracking-[0.4em] uppercase text-xs">OTDAISURFER.SURF // Neural Realm Access</p>
+              </div>
+            } />
+            <Route path="/login" element={<Login />} />
+            <Route path="/members" element={isAuth ? <MemberSection /> : <Navigate to="/login" />} />
+            <Route path="*" element={<Navigate to="/" />} />
+          </Routes>
+        </main>
+
+        {/* FOOTER TICKER */}
+        <footer className="p-3 border-t border-white/5 bg-[#0a192f] z-50 overflow-hidden">
+          <div className="whitespace-nowrap inline-block animate-[ticker_30s_linear_infinite] font-mono text-[10px] uppercase tracking-[0.5em]" style={{color}}>
+            OTDAISURFER.SURF // SYSTEM STATUS: {isAuth ? 'VERIFIED' : 'SCANNING'} // SECTOR 7 // NO DATA LEAKS DETECTED // JOIN THE REALM // SURVIVOR #1313 // 
+            OTDAISURFER.SURF // SYSTEM STATUS: {isAuth ? 'VERIFIED' : 'SCANNING'} // SECTOR 7 // NO DATA LEAKS DETECTED // JOIN THE REALM // SURVIVOR #1313 // 
+          </div>
+        </footer>
+
+        <style>{`
+          @keyframes ticker {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+          }
+        `}</style>
+      </div>
+    </Router>
+  );
+}
