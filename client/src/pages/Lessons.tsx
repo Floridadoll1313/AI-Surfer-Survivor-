@@ -1,41 +1,23 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
-import ProtectedRoute from './components/ProtectedRoute';
+import { lessons } from '../data/lessonsData';
 
-// Page Imports - DOUBLE CHECK THESE FILENAMES IN GITHUB
-import Home from './pages/Home';
-import Members from './pages/Members';
-import Lessons from './pages/Lessons'; 
-import Profile from './pages/Profile';
-import SurvivorWorld from './pages/SurvivorWorld';
-import Achievements from './pages/Achievements';
-import Leaderboard from './pages/Leaderboard';
-
-function App() {
+const Lessons: React.FC = () => {
   return (
-    <AuthProvider>
-      <Router>
-        <div className="min-h-screen bg-[#0a192f]">
-          <Routes>
-            {/* PUBLIC PAGES (No login required) */}
-            <Route path="/" element={<Home />} />
-            <Route path="/lessons" element={<Lessons />} />
-
-            {/* PROTECTED PAGES (Need your localStorage trick) */}
-            <Route path="/members" element={<ProtectedRoute><Members /></ProtectedRoute>} />
-            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-            <Route path="/world" element={<ProtectedRoute><SurvivorWorld /></ProtectedRoute>} />
-            <Route path="/achievements" element={<ProtectedRoute><Achievements /></ProtectedRoute>} />
-            <Route path="/leaderboard" element={<ProtectedRoute><Leaderboard /></ProtectedRoute>} />
-            
-            {/* Redirect any typos back to Home */}
-            <Route path="*" element={<Home />} />
-          </Routes>
+    <div className="min-h-screen bg-[#0a192f] text-white p-8">
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-4xl font-bold mb-8 text-cyan-400">Survival Training</h1>
+        <div className="grid gap-6">
+          {lessons.map((lesson) => (
+            <div key={lesson.id} className="bg-[#112240] p-6 rounded-lg border border-cyan-900/50">
+              <h2 className="text-2xl font-semibold text-white mb-2">{lesson.title}</h2>
+              <p className="text-gray-400 mb-4">{lesson.description}</p>
+              <div className="text-gray-300">{lesson.content}</div>
+            </div>
+          ))}
         </div>
-      </Router>
-    </AuthProvider>
+      </div>
+    </div>
   );
-}
+};
 
-export default App;
+export default Lessons;
