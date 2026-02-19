@@ -6,11 +6,17 @@ const SurvivorWorld = () => {
   const { selectedAvatar } = useAvatar();
   const THEME_COLOR = '#64ffda';
 
-  // --- PERSISTENCE & ARCHIVE ---
+  // --- PERSISTENCE & MODIFIERS ---
   const [highScore, setHighScore] = useState(Number(localStorage.getItem('survivor_high_score') || 0));
   const [unlockedForms, setUnlockedForms] = useState<string[]>(
     JSON.parse(localStorage.getItem('survivor_forms') || '["INITIATE"]')
   );
+  
+  // New: Neural Modifiers
+  const [modifiers, setModifiers] = useState({
+    hardcore: false, // No Time Loop, 1-hit death
+    turbo: false     // Double speed
+  });
   const [showArchive, setShowArchive] = useState(false);
 
   // --- ENGINE STATE ---
@@ -22,43 +28,21 @@ const SurvivorWorld = () => {
   const [evoLevel, setEvoLevel] = useState(1);
   const [bossActive, setBossActive] = useState(false);
   const [victory, setVictory] = useState(false);
-  const [timer, setTimer] = useState(60);
 
-  // --- ARCHIVE LOGIC ---
-  const saveToArchive = useCallback((finalScore: number, level: number) => {
-    // Save High Score
-    if (finalScore > highScore) {
-      setHighScore(finalScore);
-      localStorage.setItem('survivor_high_score', finalScore.toString());
-    }
-
-    // Save Unlocked Forms
-    const formNames = ["INITIATE", "SENTINEL", "ARCHON", "OVERLORD"];
-    const currentForm = formNames[level - 1];
-    if (!unlockedForms.includes(currentForm)) {
-      const newForms = [...unlockedForms, currentForm];
-      setUnlockedForms(newForms);
-      localStorage.setItem('survivor_forms', JSON.stringify(newForms));
-    }
-  }, [highScore, unlockedForms]);
-
-  // Update Archive on End Game
-  useEffect(() => {
-    if (isGameOver || victory) {
-      saveToArchive(score, evoLevel);
-    }
-  }, [isGameOver, victory, score, evoLevel, saveToArchive]);
-
-  // --- FRAGMENT SPAWNER ---
+  // --- GAMEPLAY LOOP (Speed affected by Turbo) ---
   useEffect(() => {
     if (isGameOver || victory || showArchive) return;
-    const interval = setInterval(() => {
-      if (fragments.length < 10) {
-        setFragments(prev => [...prev, { x: Math.floor(Math.random() * 10), y: Math.floor(Math.random() * 10) }]);
-      }
-    }, 2500);
-    return () => clearInterval(interval);
-  }, [fragments, isGameOver, victory, showArchive]);
+    
+    const moveSpeed = modifiers.turbo ? 300 : 600;
+    const enemyMove = setInterval(() => {
+      setEnemyPosition(prev => ({
+        x: prev.x + (playerPosition.x > prev.x ? 1 : playerPosition.x < prev.x ? -1 : 0),
+        y: prev.y + (playerPosition.y > prev.y ? 1 : playerPosition.y < prev.y ? -1 : 0)
+      }));
+    }, moveSpeed);
+
+    return () => clearInterval(enemyMove);
+  }, [playerPosition, isGameOver, victory, showArchive, modifiers.turbo]);
 
   // --- MOVEMENT ---
   const handleMove = useCallback((dx: number, dy: number) => {
@@ -66,21 +50,27 @@ const SurvivorWorld = () => {
     setPlayerPosition(prev => {
       const nX = Math.max(0, Math.min(9, prev.x + dx));
       const nY = Math.max(0, Math.min(9, prev.y + dy));
-      const reach = evoLevel >= 3 ? 1 : 0;
+      
+      // Collision Logic
+      if (nX === enemyPosition.x && nY === enemyPosition.y) {
+        setIsGameOver(true);
+        playSound('gameOver');
+      }
 
+      // Fragment Collection (Score multiplier for modifiers)
+      const multiplier = (modifiers.hardcore ? 2 : 1) * (modifiers.turbo ? 1.5 : 1);
       setFragments(f => f.filter(frag => {
-        if (Math.abs(frag.x - nX) <= reach && Math.abs(frag.y - nY) <= reach) {
-          setScore(s => s + 10);
+        if (frag.x === nX && frag.y === nY) {
+          setScore(s => s + (10 * multiplier));
           playSound('collect');
           return false;
         }
         return true;
       }));
 
-      if (nX === enemyPosition.x && nY === enemyPosition.y) setIsGameOver(true);
       return { x: nX, y: nY };
     });
-  }, [enemyPosition, isGameOver, victory, evoLevel, showArchive]);
+  }, [enemyPosition, isGameOver, victory, showArchive, modifiers]);
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -95,41 +85,53 @@ const SurvivorWorld = () => {
   }, [handleMove]);
 
   return (
-    <div className={`survivor-world ${victory ? 'victory-glow' : ''}`}>
+    <div className={`survivor-world ${modifiers.hardcore ? 'hardcore-mode' : ''}`}>
       <style>{`
-        .archive-overlay { position: absolute; inset: 0; background: #000; z-index: 200; padding: 20px; border: 2px solid ${THEME_COLOR}; }
-        .form-badge { display: inline-block; padding: 4px 8px; border: 1px solid ${THEME_COLOR}; font-size: 0.7rem; margin: 4px; border-radius: 4px; }
-        .archive-btn { background: none; border: 1px solid ${THEME_COLOR}; color: ${THEME_COLOR}; cursor: pointer; font-size: 0.7rem; padding: 5px; }
+        .hardcore-mode { border-color: #ff0055 !important; box-shadow: 0 0 20px #ff0055; }
+        .modifier-toggle { 
+          margin: 10px 0; padding: 5px; border: 1px solid ${THEME_COLOR}; 
+          cursor: pointer; background: rgba(0,0,0,0.5); font-size: 0.7rem;
+        }
+        .active-mod { background: ${THEME_COLOR}; color: #000; }
+        .hard-mod.active-mod { background: #ff0055; color: #fff; border-color: #ff0055; }
       `}</style>
 
       <div className="game-header" style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <button className="archive-btn" onClick={() => setShowArchive(true)}>VIEW_ARCHIVE [A]</button>
-        <div className="stat">SCORE: {score} | BEST: {highScore}</div>
+        <button className="archive-btn" onClick={() => setShowArchive(true)}>NEURAL_ARCHIVE [A]</button>
+        <div className="stat">SCORE: {Math.floor(score)}</div>
       </div>
 
       {showArchive && (
-        <div className="archive-overlay">
-          <h2 style={{ color: THEME_COLOR }}>DATA_ARCHIVE</h2>
-          <p>GLOBAL_HIGH_SCORE: {highScore}</p>
-          <div style={{ margin: '20px 0' }}>
-            <p style={{ fontSize: '0.8rem', opacity: 0.7 }}>UNLOCKED_EVOLUTIONS:</p>
-            {unlockedForms.map(form => (
-              <span key={form} className="form-badge">{form}</span>
-            ))}
+        <div className="archive-overlay" style={{ position: 'absolute', inset: 0, background: '#000', zIndex: 200, padding: '20px' }}>
+          <h2 style={{ color: THEME_COLOR }}>NEURAL_MODIFIERS</h2>
+          
+          <div className={`modifier-toggle hard-mod ${modifiers.hardcore ? 'active-mod' : ''}`}
+               onClick={() => setModifiers(m => ({ ...m, hardcore: !m.hardcore }))}>
+            HARDCORE_PROTOCOL: {modifiers.hardcore ? 'ON (2x SCORE)' : 'OFF'}
           </div>
-          <button className="archive-btn" onClick={() => setShowArchive(false)}>RESUME_SIMULATION</button>
+
+          <div className={`modifier-toggle ${modifiers.turbo ? 'active-mod' : ''}`}
+               onClick={() => setModifiers(m => ({ ...m, turbo: !m.turbo }))}>
+            TURBO_OVERCLOCK: {modifiers.turbo ? 'ON (1.5x SCORE)' : 'OFF'}
+          </div>
+
+          <p style={{ fontSize: '0.7rem', opacity: 0.6, marginTop: '20px' }}>
+            BEST_RUN: {highScore} | FORMS: {unlockedForms.join(', ')}
+          </p>
+          
+          <button className="archive-btn" style={{ marginTop: '20px' }} onClick={() => setShowArchive(false)}>APPLY_&_SYNC</button>
         </div>
       )}
 
-      <div className="grid-container" style={{ display: 'grid', gridTemplateColumns: 'repeat(10, 40px)', gap: '4px', marginTop: '10px' }}>
+      <div className="grid-container" style={{ display: 'grid', gridTemplateColumns: 'repeat(10, 40px)', gap: '4px' }}>
         {[...Array(100)].map((_, i) => {
           const x = i % 10, y = Math.floor(i / 10);
           const isPlayer = playerPosition.x === x && playerPosition.y === y;
           return (
             <div key={i} className="cell" style={{ width: '40px', height: '40px', border: '1px solid #1a1a1a', display: 'flex', alignItems: 'center', justify-content: 'center' }}>
-              {isPlayer && <span style={{ color: THEME_COLOR, fontSize: '1.2rem' }}>❖</span>}
+              {isPlayer && <span style={{ color: modifiers.hardcore ? '#ff0055' : THEME_COLOR }}>❖</span>}
               {enemyPosition.x === x && enemyPosition.y === y && <span>⚡</span>}
-              {fragments.some(f => f.x === x && f.y === y) && <span style={{ color: '#fff' }}>✦</span>}
+              {fragments.some(f => f.x === x && f.y === y) && <span>✦</span>}
             </div>
           );
         })}
