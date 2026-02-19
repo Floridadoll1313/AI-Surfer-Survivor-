@@ -1,9 +1,9 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
-import Home from './pages/home';
-import Challenges from './pages/challenges';
-import SurvivorWorld from './pages/survivorworld';
+import Home from './pages/Home';
+import Challenges from './pages/Challenges';
+import SurvivorWorld from './pages/SurvivorWorld';
 import LessonList from './pages/LessonList';
 import LessonPage from './pages/LessonPage';
 
