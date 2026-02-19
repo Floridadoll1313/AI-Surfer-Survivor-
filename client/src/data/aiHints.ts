@@ -15,5 +15,11 @@ const sorted = fragments.sort((a, b) => {
   const distB = Math.abs(player.x - b.x) + Math.abs(player.y - b.y);
   return distA - distB;
 });
-const target = sorted[0]; // This is now your closest fragment`
+const target = sorted[0]; // This is now your closest fragment
+if (target) {
+  return {
+    dx: target.x > player.x ? 1 : target.x < player.x ? -1 : 0,
+    dy: target.y > player.y ? 1 : target.y < player.y ? -1 : 0
+  };
+}`
 };
