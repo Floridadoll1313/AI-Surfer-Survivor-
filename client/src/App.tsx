@@ -104,10 +104,6 @@ const Equipment = () => {
   );
 };
 
-/**
- * MapPage Component
- * Features: Interactive island map with coordinate tracking.
- */
 const MapPage = () => {
   const [coords, setCoords] = useState({ x: 0, y: 0 });
 
@@ -133,7 +129,8 @@ const MapPage = () => {
           border: '2px solid #35c9ff',
           borderRadius: '15px',
           overflow: 'hidden',
-          cursor: 'crosshair'
+          cursor: 'crosshair',
+          boxShadow: '0 0 30px rgba(53, 201, 255, 0.2)'
         }}
       >
         <img 
@@ -142,23 +139,54 @@ const MapPage = () => {
           style={{ maxWidth: '100%', display: 'block', filter: 'brightness(0.8) contrast(1.2)' }}
         />
         
-        {/* Coordinate Overlay */}
+        {/* Coordinate HUD */}
         <div style={{
-          position: 'absolute', bottom: '10px', right: '10px',
-          background: 'rgba(10, 25, 47, 0.8)', padding: '5px 15px',
+          position: 'absolute', bottom: '15px', right: '15px',
+          background: 'rgba(10, 25, 47, 0.9)', padding: '8px 15px',
           borderRadius: '5px', border: '1px solid #35c9ff',
           fontSize: '0.8rem', color: '#64ffda', fontFamily: 'monospace'
         }}>
-          LOC: {coords.x}X / {coords.y}Y
+          LAT: {coords.y} // LONG: {coords.x}
         </div>
 
-        {/* Example Clickable Sector Node */}
+        {/* Pulsing Deployment Point */}
         <div 
-          onClick={() => alert("Deploying to Sector 7...")}
+          onClick={() => alert("Initiating Landing Sequence for Sector 7...")}
           style={{
-            position: 'absolute', top: '40%', left: '55%',
-            width: '20px', height: '20px', borderRadius: '50%',
-            border: '2px solid #64ffda', background: 'rgba(100, 255, 218, 0.2)',
+            position: 'absolute', top: '45%', left: '52%',
+            width: '24px', height: '24px', borderRadius: '50%',
+            border: '2px solid #64ffda', background: 'rgba(100, 255, 218, 0.3)',
             cursor: 'pointer', animation: 'pulse 2s infinite'
           }}
-          title="Sector
+          title="Sector 7: Primary Hub"
+        />
+      </div>
+
+      <style>{`
+        @keyframes pulse {
+          0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(100, 255, 218, 0.7); }
+          70% { transform: scale(1.3); box-shadow: 0 0 0 15px rgba(100, 255, 218, 0); }
+          100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(100, 255, 218, 0); }
+        }
+      `}</style>
+    </div>
+  );
+};
+
+// --- MAIN APP ROUTER ---
+
+const App = () => {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Home />} />
+          <Route path="equipment" element={<Equipment />} />
+          <Route path="map" element={<MapPage />} />
+        </Route>
+      </Routes>
+    </Router>
+  );
+};
+
+export default App;
