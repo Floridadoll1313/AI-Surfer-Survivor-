@@ -2,10 +2,6 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import './NavBar.css';
 
-/**
- * NavBar Component
- * Features terminal-style brackets and active route highlighting.
- */
 const NavBar = () => {
   return (
     <nav className="terminal-nav">
@@ -13,36 +9,12 @@ const NavBar = () => {
         <span className="logo-icon">◈</span> TERMINAL_OS
       </div>
       <div className="nav-links">
-        <NavLink 
-          to="/" 
-          className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}
-        >
-          [ HOME ]
-        </NavLink>
-        <NavLink 
-          to="/map" 
-          className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}
-        >
-          [ NAV_MAP ]
-        </NavLink>
-        <NavLink 
-          to="/equipment" 
-          className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}
-        >
-          [ GEAR ]
-        </NavLink>
-        <NavLink 
-          to="/challenges" 
-          className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}
-        >
-          [ MISSIONS ]
-        </NavLink>
-        <NavLink 
-          to="/leaderboard" 
-          className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}
-        >
-          [ RANKINGS ]
-        </NavLink>
+        <NavLink to="/" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>[ HOME ]</NavLink>
+        <NavLink to="/map" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>[ NAV_MAP ]</NavLink>
+        <NavLink to="/equipment" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>[ GEAR ]</NavLink>
+        <NavLink to="/challenges" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>[ MISSIONS ]</NavLink>
+        <NavLink to="/leaderboard" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>[ RANKINGS ]</NavLink>
+        <NavLink to="/archive" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>[ ARCHIVE ]</NavLink>
       </div>
     </nav>
   );
