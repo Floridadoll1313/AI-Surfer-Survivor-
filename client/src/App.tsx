@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AvatarProvider } from './context/AvatarContext';
 import AvatarSelector from './pages/AvatarSelector';
 import Home from './pages/Home';
+import SurvivorWorld from './pages/SurvivorWorld';
 import Header from './components/Header';
 
 function App() {
@@ -21,11 +22,12 @@ function App() {
             <Routes>
               {/* Home page shows the user's status */}
               <Route path="/" element={<Home />} />
+              
               {/* Avatar page lets them change identity */}
               <Route path="/avatar" element={<AvatarSelector />} />
               
-              {/* Future route for the actual game */}
-              <Route path="/game" element={<div style={{ padding: '50px', textAlign: 'center' }}>SIGNAL_LOST: GAME_NOT_YET_INITIALIZED</div>} />
+              {/* The Game World Grid */}
+              <Route path="/game" element={<SurvivorWorld />} />
             </Routes>
           </main>
         </div>
