@@ -1,7 +1,22 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
 import NavBar from "./NavBar";
+import SiteFooter from "./Sitimport React from "react";
+import { Outlet } from "react-router-dom";
+import NavBar from "./NavBar";
 import SiteFooter from "./SiteFooter";
+
+export default function Layout() {
+  return (
+    <div style={{ background: '#020817', minHeight: '100vh', color: '#ffffff' }}>
+      <NavBar />
+      <main style={{ padding: '40px 20px', maxWidth: '1200px', margin: '0 auto' }}>
+        <Outlet /> {/* THIS LOADS THE PAGES FROM APP.TSX */}
+      </main>
+      <SiteFooter />
+    </div>
+  );
+}eFooter";
 
 export default function Layout() {
   return (
