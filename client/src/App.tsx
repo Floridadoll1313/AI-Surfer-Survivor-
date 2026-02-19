@@ -18,19 +18,12 @@ function App() {
       <Router>
         <div className="min-h-screen bg-[#0a192f]">
           <Routes>
-            {/* Public Routes */}
+            {/* Public Routes - No login required to see these now */}
             <Route path="/" element={<Home />} />
-            
-            {/* We removed ProtectedRoute from Lessons so you can actually see it! */}
             <Route path="/lessons" element={<Lessons />} />
+            <Route path="/members" element={<Members />} />
 
-            {/* Protected Member Routes */}
-            <Route path="/members" element={
-              <ProtectedRoute>
-                <Members />
-              </ProtectedRoute>
-            } />
-
+            {/* Protected Routes - These still require the Login hack */}
             <Route path="/profile" element={
               <ProtectedRoute>
                 <Profile />
