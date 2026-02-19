@@ -1,18 +1,18 @@
-export const getLevelInfo = (avatarId: string) => {
-  const totalXp = Number(localStorage.getItem(`xp_${avatarId}`)) || 0;
-  
-  // Basic leveling formula
-  let level = 1;
-  let xpNeeded = 1000;
-  let currentXp = totalXp;
+export interface DailyMission {
+  id: string;
+  description: string;
+  goal: number;
+  reward: number;
+}
 
-  while (currentXp >= level * 1000) {
-    currentXp -= (level * 1000);
-    level++;
-  }
+const MISSIONS: DailyMission[] = [
+  { id: 'collect_50', description: 'Harvest 50 Data Fragments in one run.', goal: 50, reward: 5000 },
+  { id: 'combo_5', description: 'Reach a 5x Combo Multiplier.', goal: 5, reward: 3000 },
+  { id: 'survive_3m', description: 'Stay connected to the Grid for 3 minutes.', goal: 180, reward: 4000 }
+];
 
-  // Bonus Stats based on level
-  const speedBonus = (level - 1) * 20; // -20ms delay per level
-  
-  return { level, currentXp, nextLevelXp: level * 1000, speedBonus };
+export const getDailyMission = () => {
+  // Rotates mission based on the day of the year
+  const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000);
+  return MISSIONS[dayOfYear % MISSIONS.length];
 };
