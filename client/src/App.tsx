@@ -1,19 +1,20 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
-import Home from './pages/Home';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Lessons from './pages/Lessons';
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
+    <Router>
+      <div className="min-h-screen bg-[#0a192f]">
         <Routes>
-          <Route path="/" element={<Home />} />
+          {/* This sends everyone straight to your Lessons page */}
+          <Route path="/" element={<Lessons />} />
           <Route path="/lessons" element={<Lessons />} />
+          {/* Redirect any other page back to lessons */}
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-      </Router>
-    </AuthProvider>
+      </div>
+    </Router>
   );
 }
 
