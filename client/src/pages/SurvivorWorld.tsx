@@ -19,6 +19,12 @@ const SurvivorWorld = () => {
   const [logs, setLogs] = useState<string[]>([]);
   const addLog = (msg: string) => setLogs(prev => [msg, ...prev].slice(0, 5));
 
+  // --- PERSISTENCE: Load High Score ---
+  useEffect(() => {
+    const savedScore = localStorage.getItem('survivor_peak_sync');
+    if (savedScore) setHighScore(parseInt(savedScore));
+  }, []);
+
   // --- ETERNAL SHARD GENERATION ---
   useEffect(() => {
     if (fragments.length < 3) {
@@ -40,7 +46,7 @@ const SurvivorWorld = () => {
       
       if (move) handleMove(move.dx || 0, move.dy || 0);
 
-      // ENEMY LOGIC: The Stalker (always moves toward player)
+      // ENEMY LOGIC: The Stalker
       setEnemyPosition(prev => ({
         x: prev.x < playerPosition.x ? prev.x + 1 : prev.x > playerPosition.x ? prev.x - 1 : prev.x,
         y: prev.y < playerPosition.y ? prev.y + 1 : prev.y > playerPosition.y ? prev.y - 1 : prev.y,
@@ -63,13 +69,15 @@ const SurvivorWorld = () => {
       const nX = Math.max(0, Math.min(9, prev.x + dx));
       const nY = Math.max(0, Math.min(9, prev.y + dy));
       
-      // Collection Logic
+      // Collection & Scoring
       setFragments(f => f.filter(frag => {
         if (frag.x === nX && frag.y === nY) {
           setScore(s => {
             const newScore = s + 10;
-            if (newScore > highScore) setHighScore(newScore);
-            // Realm Scaling: Speed up every 50 points
+            if (newScore > highScore) {
+              setHighScore(newScore);
+              localStorage.setItem('survivor_peak_sync', newScore.toString());
+            }
             if (newScore % 50 === 0) setTickRate(r => Math.max(100, r - 20));
             return newScore;
           });
@@ -79,13 +87,13 @@ const SurvivorWorld = () => {
         return true;
       }));
 
-      // Collision Logic (Realm Reset)
+      // Collision Logic
       if (nX === enemyPosition.x && nY === enemyPosition.y) {
         addLog("SYSTEM_RESET: Neural Collision");
         setScore(0);
         setTickRate(400);
         playSound('gameOver');
-        return { x: 5, y: 5 }; // Teleport to center
+        return { x: 5, y: 5 };
       }
       return { x: nX, y: nY };
     });
@@ -100,7 +108,7 @@ const SurvivorWorld = () => {
     <div style={{ background: '#000', color: THEME_COLOR, padding: '20px', display: 'flex', gap: '20px', fontFamily: 'monospace', minHeight: '100vh' }}>
       
       {/* Simulation Side */}
-      <div className="simulation">
+      <div className="simulation" style={{ minWidth: '420px' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(10, 40px)', gap: '4px', border: '2px solid #222', padding: '5px', background: '#050505' }}>
           {[...Array(100)].map((_, i) => (
             <div key={i} style={{ width: '40px', height: '40px', border: '1px solid #111', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -110,10 +118,17 @@ const SurvivorWorld = () => {
             </div>
           ))}
         </div>
+        
         <div style={{ marginTop: '15px', borderLeft: `3px solid ${THEME_COLOR}`, paddingLeft: '10px' }}>
           <div style={{ fontSize: '1.2rem' }}>SCORE: {score}</div>
           <div style={{ fontSize: '0.8rem', opacity: 0.5 }}>PEAK_SYNC: {highScore}</div>
-          <div style={{ fontSize: '0.8rem', color: '#ffcc00' }}>FREQ: {1000 - tickRate}Hz</div>
+        </div>
+
+        {/* 🏆 LOCAL RANKINGS PANEL */}
+        <div style={{ marginTop: '20px', padding: '10px', border: '1px solid #333', background: 'rgba(100, 255, 218, 0.05)', fontSize: '0.7rem' }}>
+          <div style={{ color: THEME_COLOR, marginBottom: '5px', fontWeight: 'bold' }}>🏆 LOCAL_RANKINGS</div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', opacity: 0.6 }}><span>RANK_S (AI_MASTER)</span><span>500+</span></div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', color: THEME_COLOR }}><span>YOU (CURRENT_PEAK)</span><span>{highScore}</span></div>
         </div>
       </div>
 
@@ -143,7 +158,6 @@ const SurvivorWorld = () => {
         <div style={{ marginTop: '15px', padding: '10px', background: '#050505', border: '1px solid #222', fontSize: '0.75rem' }}>
           <div style={{ color: THEME_COLOR, borderBottom: '1px solid #222', paddingBottom: '3px', marginBottom: '5px' }}>🛰️ REALM_LOGS</div>
           {logs.map((log, i) => <div key={i} style={{ color: log.startsWith('ERR') ? '#ff0055' : '#888' }}>> {log}</div>)}
-          {logs.length === 0 && <div style={{ color: '#333' }}>> AWAITING_DATA...</div>}
         </div>
 
         <div style={{ marginTop: '20px', padding: '10px', borderTop: '1px solid #222', fontSize: '0.7rem', opacity: 0.6 }}>
