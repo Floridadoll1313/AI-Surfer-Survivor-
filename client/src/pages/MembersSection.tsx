@@ -1,165 +1,51 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 const MemberSection = () => {
-  const [mastery, setMastery] = useState(Number(localStorage.getItem('survivorMastery')) || 85);
-  const [survival, setSurvival] = useState(92);
-  const [sentryTip, setSentryTip] = useState("Scan the horizon for neural peaks.");
+  const [mastery, setMastery] = useState(Number(localStorage.getItem('survivorMastery')) || 0);
   const [showToast, setShowToast] = useState(false);
-
-  const tips = [
-    "Neural currents are strongest at dawn.",
-    "Always encrypt your wave-data signatures.",
-    "The AI Sentries are watching Sector 7.",
-    "God Tier survivors never skip daily syncs.",
-    "Stay hydrated. The realm is vast."
-  ];
-
-  const playUnlockSound = () => {
-    const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2521/2521-preview.mp3');
-    audio.volume = 0.5;
-    audio.play().catch(() => console.log("Audio play blocked by browser"));
-  };
 
   const handleLevelUp = () => {
     if (mastery < 100) {
-      const newMastery = Math.min(mastery + 5, 100);
-      setMastery(newMastery);
-      setSurvival(prev => Math.min(prev + 2, 100));
-      localStorage.setItem('survivorMastery', newMastery.toString());
-      setSentryTip(tips[Math.floor(Math.random() * tips.length)]);
-      if (newMastery === 100) playUnlockSound();
+      const next = Math.min(mastery + 5, 100);
+      setMastery(next);
+      localStorage.setItem('survivorMastery', next.toString());
     }
   };
 
   const shareStats = () => {
-    const status = mastery >= 100 ? "GOD TIER 🏆" : "ELITE TIER 🏄‍♂️";
-    const asciiArt = `
-<<< AI SURFER ID >>>
-----------------------------
-SURVIVOR: #1313
-STATUS: ${status}
-MASTERY: ${mastery}%
-REALM: Sector 7
-----------------------------
-[otdaisurfer.surf]
-    `;
-    navigator.clipboard.writeText(asciiArt);
-    
-    // Show custom toast instead of alert
+    const art = `<<< AI SURFER ID >>>\nURL: otdaisurfer.surf\nMASTERY: ${mastery}%\nSTATUS: ${mastery >= 100 ? 'GOD' : 'SURVIVOR'}`;
+    navigator.clipboard.writeText(art);
     setShowToast(true);
-    setTimeout(() => setShowToast(false), 3000);
+    setTimeout(() => setShowToast(false), 2000);
   };
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8 pb-20 relative">
+    <div className="max-w-4xl mx-auto space-y-10">
+      {showToast && <div className="fixed bottom-24 left-1/2 -translate-x-1/2 bg-cyan-500 text-black px-8 py-3 rounded-full font-bold z-[100] animate-bounce">SYNCED TO CLIPBOARD</div>}
       
-      {/* --- SUCCESS TOAST NOTIFICATION --- */}
-      {showToast && (
-        <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-[100] bg-cyan-500 text-black px-6 py-3 rounded-full font-bold shadow-[0_0_20px_rgba(6,182,212,0.5)] animate-bounce">
-          ✨ STATS COPIED TO NEURAL LINK
+      <div className="bg-slate-900/50 border border-white/10 p-10 rounded-[2rem] backdrop-blur-xl">
+        <h2 className="text-4xl font-black italic mb-6">SURVIVOR #1313</h2>
+        <div className="w-full bg-white/5 h-6 rounded-full overflow-hidden mb-10 border border-white/10">
+          <div className={`h-full transition-all duration-1000 ${mastery >= 100 ? 'bg-yellow-400 shadow-[0_0_20px_#facc15]' : 'bg-cyan-500 shadow-[0_0_20px_#22d3ee]'}`} style={{ width: `${mastery}%` }}></div>
         </div>
-      )}
-
-      {/* --- SURVIVOR ID CARD --- */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-slate-900 to-cyan-950 p-1 rounded-2xl shadow-2xl">
-        <div className="bg-[#0a192f] p-8 rounded-xl flex flex-col md:flex-row items-center gap-8 relative z-10">
-          <div className="relative">
-            <div className="w-24 h-24 bg-cyan-500/20 rounded-full border-2 border-cyan-400 flex items-center justify-center shadow-[0_0_20px_rgba(6,182,212,0.3)]">
-              <span className="text-4xl">🏄‍♂️</span>
-            </div>
-            <div className="absolute -bottom-2 -right-2 bg-green-500 w-6 h-6 rounded-full border-4 border-[#0a192f] animate-pulse"></div>
-          </div>
-
-          <div className="flex-1 text-center md:text-left">
-            <div className="flex flex-col md:flex-row md:items-center gap-2 mb-2">
-              <h2 className="text-3xl font-black tracking-tighter uppercase italic text-white">Survivor #1313</h2>
-              <span className={`px-3 py-1 border text-[10px] font-bold rounded-full w-fit mx-auto md:mx-0 ${mastery >= 100 ? 'bg-yellow-500/10 border-yellow-500 text-yellow-400' : 'bg-cyan-500/10 border-cyan-500 text-cyan-400'}`}>
-                {mastery >= 100 ? 'GOD TIER UNLOCKED' : 'ELITE TIER'}
-              </span>
-            </div>
-            <p className="text-gray-400 text-sm font-mono mb-4">Location: The Never Ending Realm // Sector 7</p>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <div className="flex justify-between text-[10px] font-bold text-cyan-500 uppercase">
-                  <span>AI Mastery</span>
-                  <span>{mastery}%</span>
-                </div>
-                <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
-                  <div className={`h-full transition-all duration-1000 ${mastery >= 100 ? 'bg-yellow-400 shadow-[0_0_15px_rgba(250,204,21,1)]' : 'bg-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.8)]'}`} style={{ width: `${mastery}%` }}></div>
-                </div>
-              </div>
-              <div className="space-y-1">
-                <div className="flex justify-between text-[10px] font-bold text-orange-500 uppercase">
-                  <span>Survival Rate</span>
-                  <span>{survival}%</span>
-                </div>
-                <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
-                  <div className="bg-orange-500 h-full transition-all duration-1000" style={{ width: `${survival}%` }}></div>
-                </div>
-              </div>
-            </div>
-          </div>
+        <div className="flex flex-col md:flex-row gap-6">
+          <button onClick={handleLevelUp} className="flex-1 py-5 bg-white text-black font-black rounded-2xl hover:bg-cyan-400 transition-colors uppercase tracking-widest">Training Sync</button>
+          <button onClick={shareStats} className="flex-1 py-5 border border-white/20 rounded-2xl font-bold hover:bg-white/5 uppercase tracking-widest">Share Rank</button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 space-y-6">
-          <div className="bg-slate-900/50 border border-cyan-500/20 p-8 rounded-3xl">
-            <h3 className="text-2xl font-bold text-white mb-4">Training Terminal</h3>
-            <p className="text-gray-400 leading-relaxed mb-8">
-              Every sync increases your standing. Reach 100% to decrypt the Final Archive in the Vault.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4">
-              <button 
-                onClick={handleLevelUp}
-                className={`flex-1 py-4 font-black rounded-xl transition-all ${mastery >= 100 ? 'bg-yellow-500 text-black' : 'bg-cyan-500 text-black hover:bg-white hover:scale-[1.02]'}`}
-              >
-                {mastery >= 100 ? 'MASTERY MAXED' : 'COMPLETE DAILY TRAINING'}
-              </button>
-              <button 
-                onClick={shareStats}
-                className="flex-1 py-4 bg-transparent border border-white/20 hover:border-white text-white font-bold rounded-xl transition-all flex items-center justify-center gap-2"
-              >
-                📊 SHARE STATS
-              </button>
-            </div>
-          </div>
-
-          {/* Lore Section */}
-          <div className="bg-black/20 p-8 rounded-3xl border border-white/5">
-            <h4 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">Founder's Log // Entry 001</h4>
-            <p className="text-sm text-gray-500 italic leading-relaxed">
-              "We didn't build the Never Ending Realm to escape reality. We built it to survive the coming AI waves. 
-              The surfer isn't just a metaphor—it's the only way to move through infinite data without drowning."
-            </p>
-          </div>
-        </div>
-
-        <div className="space-y-6">
-          <div className="bg-cyan-950/20 border border-cyan-400/30 p-6 rounded-3xl relative">
-            <h4 className="font-bold text-cyan-400 text-sm uppercase mb-4 tracking-tighter">Sentry-Bot v.1</h4>
-            <p className="text-sm text-cyan-100 italic">"{sentryTip}"</p>
-            <div className="mt-4 pt-4 border-t border-cyan-500/10 text-[10px] text-gray-500 font-mono">STATUS: SCANNING...</div>
-          </div>
-
-          <div className="bg-slate-900/50 border border-white/5 p-6 rounded-3xl">
-            <h4 className="font-bold text-white mb-3 text-xs uppercase tracking-widest">Active Challenges</h4>
-            <ul className="space-y-3 text-sm">
-              <li className="flex gap-2 text-gray-400"><span>✅</span> Neural Mapping</li>
-              <li className="flex gap-2 text-gray-400"><span>✅</span> Sentry Deployment</li>
-              <li className={`flex gap-2 transition-all p-2 rounded ${mastery >= 100 ? 'text-yellow-400 font-bold bg-yellow-400/10 border border-yellow-500/50' : 'opacity-30'}`}>
-                <span>{mastery >= 100 ? '🔓' : '🔒'}</span>
-                <Link to="/the-vault" className="hover:underline italic">Access The Vault</Link>
-              </li>
-            </ul>
-          </div>
-        </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Link to="/the-vault" className={`p-8 rounded-3xl border transition-all ${mastery >= 100 ? 'border-yellow-500 bg-yellow-500/5 text-yellow-400' : 'border-white/5 bg-white/5 opacity-20 pointer-events-none'}`}>
+          <h3 className="text-xl font-bold mb-2 uppercase">The Vault</h3>
+          <p className="text-sm">Final decryption archive. Restricted to God Tier.</p>
+        </Link>
+        <Link to="/lore" className="p-8 rounded-3xl border border-cyan-500/20 bg-cyan-500/5 text-cyan-400">
+          <h3 className="text-xl font-bold mb-2 uppercase">Lore Archive</h3>
+          <p className="text-sm">Founder logs and Sector 7 history.</p>
+        </Link>
       </div>
     </div>
   );
 };
-
 export default MemberSection;
