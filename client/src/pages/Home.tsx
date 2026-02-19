@@ -1,44 +1,50 @@
-// Inside your Home component...
-const [missionStatus, setMissionStatus] = useState({
-  survivor: localStorage.getItem('mission_survivor') === 'done',
-  highSync: localStorage.getItem('mission_sync') === 'done'
-});
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-const claimMission = (id: 'survivor' | 'highSync', reward: number) => {
-  const currentWallet = Number(localStorage.getItem('survivor_wallet')) || 0;
-  localStorage.setItem('survivor_wallet', (currentWallet + reward).toString());
-  localStorage.setItem(`mission_${id}`, 'done');
-  setMissionStatus(prev => ({ ...prev, [id]: true }));
-  alert(`REWARD_CLAIMED: +${reward} XP`);
+const Home = () => {
+  const navigate = useNavigate();
+  const [isMember, setIsMember] = useState(false);
+
+  useEffect(() => {
+    setIsMember(localStorage.getItem('membership_active') === 'true');
+  }, []);
+
+  const handleDeactivate = () => {
+    localStorage.removeItem('membership_active');
+    setIsMember(false);
+    alert('ACCESS_REVOKED: Session terminated.');
+  };
+
+  return (
+    <div style={{ padding: '40px', maxWidth: '900px', margin: '0 auto', fontFamily: 'monospace', color: '#64ffda' }}>
+      <header style={{ marginBottom: '50px', textAlign: 'center' }}>
+        <h1 style={{ fontSize: '2.5rem', textShadow: '0 0 10px #64ffda' }}>AI_SURFER_SURVIVOR</h1>
+        <p style={{ color: '#8892b0' }}>V.2.06 // GLOBAL_ANOMALY_PROTOCOL</p>
+      </header>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+        <div style={{ border: '1px solid #35c9ff', padding: '20px', background: 'rgba(17, 34, 64, 0.8)' }}>
+          <h2 style={{ color: '#35c9ff' }}>&gt; GAME_CLIENT</h2>
+          <p>Status: {isMember ? 'AUTHORIZED' : 'LOCKED'}</p>
+          <button 
+            onClick={() => navigate('/survivor')}
+            style={{ width: '100%', padding: '15px', marginTop: '20px', background: isMember ? '#64ffda' : '#112240', color: isMember ? '#0a192f' : '#35c9ff', cursor: 'pointer' }}
+          >
+            {isMember ? 'LAUNCH_GAME' : 'UPGRADE_REQUIRED'}
+          </button>
+        </div>
+
+        <div style={{ border: '1px solid #8892b0', padding: '20px', background: 'rgba(10, 25, 47, 0.9)' }}>
+          <h2>&gt; ACCOUNT_CTRL</h2>
+          {isMember ? (
+            <button onClick={handleDeactivate} style={{ width: '100%', padding: '10px', marginTop: '20px', background: 'none', border: '1px solid #ff5f5f', color: '#ff5f5f' }}>CANCEL_MEMBERSHIP</button>
+          ) : (
+            <button onClick={() => navigate('/members')} style={{ width: '100%', padding: '10px', marginTop: '20px', background: 'none', border: '1px solid #64ffda', color: '#64ffda' }}>GET_PRO_ACCESS</button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 };
 
-// Add this section below your "System Status" cards:
-<div style={{ marginTop: '30px', border: '1px solid #64ffda', padding: '20px', borderRadius: '4px' }}>
-  <h3 style={{ color: '#64ffda' }}>&gt; ACTIVE_MISSIONS</h3>
-  
-  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-    <span style={{ color: '#8892b0' }}>[01] REACH_LEVEL_10</span>
-    {!missionStatus.survivor ? (
-      <button 
-        onClick={() => claimMission('survivor', 2000)}
-        disabled={Number(localStorage.getItem('survivor_high_score')) < 5000} // Assuming Level 10 is ~5000 XP
-        style={{ background: '#112240', color: '#64ffda', border: '1px solid #64ffda', cursor: 'pointer' }}
-      >
-        CLAIM_2000_XP
-      </button>
-    ) : <span style={{ color: '#4e566d' }}>COMPLETED</span>}
-  </div>
-
-  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-    <span style={{ color: '#8892b0' }}>[02] COLLECT_50_FRAGMENTS</span>
-    {!missionStatus.highSync ? (
-      <button 
-        onClick={() => claimMission('highSync', 1000)}
-        disabled={Number(localStorage.getItem('survivor_wallet')) < 500}
-        style={{ background: '#112240', color: '#64ffda', border: '1px solid #64ffda', cursor: 'pointer' }}
-      >
-        CLAIM_1000_XP
-      </button>
-    ) : <span style={{ color: '#4e566d' }}>COMPLETED</span>}
-  </div>
-</div>
+export default Home;
