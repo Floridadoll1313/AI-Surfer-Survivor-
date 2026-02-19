@@ -1,142 +1,99 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { useAvatar } from '../context/AvatarContext';
-import { getLevelInfo } from '../data/leveling';
-import { playSound } from '../utils/audio';
-import { SKILLS } from '../data/skills';
+/* --- CORE GRID & ATMOSPHERICS --- */
+.survivor-world {
+  position: relative;
+  background: #050505;
+  padding: 20px;
+  border: 2px solid;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.5s ease-in-out;
+}
 
-const SurvivorWorld = () => {
-  const { selectedAvatar } = useAvatar();
-  const THEME_COLOR = '#64ffda';
+/* --- NEON FLICKER ANIMATION --- */
+@keyframes neon-flicker {
+  0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+    text-shadow: 0 0 5px #64ffda, 0 0 10px #64ffda, 0 0 20px #64ffda;
+    opacity: 1;
+  }
+  20%, 22%, 24%, 55% {
+    text-shadow: none;
+    opacity: 0.5;
+  }
+}
 
-  // --- ENGINE & STATE ---
-  const [playerPosition, setPlayerPosition] = useState({ x: 0, y: 0 });
-  const [enemyPosition, setEnemyPosition] = useState({ x: 9, y: 9 });
-  const [fragments, setFragments] = useState<{ x: number, y: number }[]>([]);
-  const [score, setScore] = useState(0);
-  const [isGameOver, setIsGameOver] = useState(false);
-  const [logs, setLogs] = useState<string[]>(['> SIMULATION_LOADED']);
+.avatar-evolved {
+  animation: neon-flicker 3s infinite;
+}
 
-  // --- FEATURE: WEATHER & HAZARDS ---
-  const [weather, setWeather] = useState<'CLEAR' | 'NEON_FOG' | 'DATA_RAIN'>('CLEAR');
-  const [lasers, setLasers] = useState<{ axis: 'x' | 'y', pos: number, active: boolean }[]>([]);
+/* --- BOSS PULSE & RED ALERT --- */
+@keyframes boss-pulse {
+  0% { transform: scale(1); filter: brightness(1); }
+  50% { transform: scale(1.1); filter: brightness(1.5); box-shadow: 0 0 30px #ff0055; }
+  100% { transform: scale(1); filter: brightness(1); }
+}
 
-  // --- FEATURE: EVOLUTION & BOSS ---
-  const [evoLevel, setEvoLevel] = useState(1);
-  const [bossActive, setBossActive] = useState(false);
-  const [bossProjectiles, setBossProjectiles] = useState<{ x: number, y: number }[]>([]);
-  const [victory, setVictory] = useState(false);
-  const [timer, setTimer] = useState(60);
+.boss-mode {
+  animation: red-alert-bg 1s infinite alternate;
+}
 
-  // --- FEATURE: TIME LOOP ---
-  const [history, setHistory] = useState<{ p: any, e: any }[]>([]);
-  const [rewindReady, setRewindReady] = useState(true);
+@keyframes red-alert-bg {
+  from { background-color: #050505; }
+  to { background-color: #1a0008; }
+}
 
-  const addLog = (msg: string) => setLogs(prev => [`> ${msg}`, ...prev].slice(0, 5));
+.boss-core {
+  animation: boss-pulse 0.8s ease-in-out infinite;
+  box-shadow: 0 0 15px #ff0055;
+}
 
-  // --- CORE GAME LOOP ---
-  useEffect(() => {
-    if (isGameOver || victory) return;
+/* --- WEATHER EFFECTS --- */
+.weather-NEON_FOG {
+  filter: saturate(0.5) contrast(1.2);
+}
 
-    // Handle Weather Changes
-    const weatherCycle = setInterval(() => {
-      const weathers: ('CLEAR' | 'NEON_FOG' | 'DATA_RAIN')[] = ['CLEAR', 'NEON_FOG', 'DATA_RAIN'];
-      setWeather(weathers[Math.floor(Math.random() * weathers.length)]);
-    }, 10000);
-
-    // Enemy AI
-    const enemyMove = setInterval(() => {
-      if (weather === 'DATA_RAIN' && Math.random() > 0.7) return; // Rain slowdown
-      setEnemyPosition(prev => ({
-        x: prev.x + (playerPosition.x > prev.x ? 1 : playerPosition.x < prev.x ? -1 : 0),
-        y: prev.y + (playerPosition.y > prev.y ? 1 : playerPosition.y < prev.y ? -1 : 0)
-      }));
-    }, 600);
-
-    return () => { clearInterval(weatherCycle); clearInterval(enemyMove); };
-  }, [playerPosition, isGameOver, victory, weather]);
-
-  // --- EVOLUTION & BOSS TRIGGER ---
-  useEffect(() => {
-    if (score >= 500 && evoLevel === 1) { setEvoLevel(2); addLog("EVOLVED: SENTINEL"); }
-    if (score >= 1000 && evoLevel === 2) { setEvoLevel(3); addLog("EVOLVED: ARCHON (MAGNET_ON)"); }
-    if (score >= 1500 && !bossActive) { 
-        setBossActive(true); 
-        setEvoLevel(4); 
-        addLog("!!! BOSS_DETECTED: CORE_EXTRACTOR !!!"); 
-    }
-  }, [score, evoLevel, bossActive]);
-
-  // --- MOVEMENT HANDLER ---
-  const handleMove = useCallback((dx: number, dy: number) => {
-    if (isGameOver || victory) return;
-    setPlayerPosition(prev => {
-      const nX = Math.max(0, Math.min(9, prev.x + dx));
-      const nY = Math.max(0, Math.min(9, prev.y + dy));
-      
-      // Archon Magnet Reach (Evo 3)
-      const reach = evoLevel >= 3 ? 1 : 0;
-      setFragments(f => f.filter(frag => {
-        if (Math.abs(frag.x - nX) <= reach && Math.abs(frag.y - nY) <= reach) {
-            setScore(s => s + 10);
-            return false;
-        }
-        return true;
-      }));
-
-      if (nX === enemyPosition.x && nY === enemyPosition.y) setIsGameOver(true);
-      return { x: nX, y: nY };
-    });
-  }, [enemyPosition, isGameOver, victory, evoLevel]);
-
-  // --- RENDER ---
-  return (
-    <div className={`survivor-world weather-${weather}`} style={{ borderColor: THEME_COLOR }}>
-        <style>{`
-            .grid-container { display: grid; grid-template-columns: repeat(10, 40px); gap: 4px; }
-            .cell { width: 40px; height: 40px; border: 1px solid #1a1a1a; display: flex; align-items: center; justify-content: center; }
-            .weather-NEON_FOG .cell { filter: blur(1px); opacity: 0.5; }
-            .boss-cell { background: #ff005533; border-color: #ff0055; }
-            .overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.85); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100; }
-        `}</style>
-
-        <div className="game-header">
-            <div className="stat">SCORE: {score} | FORM: {evoLevel}</div>
-            {bossActive && <div className="timer">OVERLOAD: {timer}s</div>}
-        </div>
-
-        <div className="grid-container">
-            {[...Array(100)].map((_, i) => {
-                const x = i % 10, y = Math.floor(i / 10);
-                const isPlayer = playerPosition.x === x && playerPosition.y === y;
-                const isEnemy = enemyPosition.x === x && enemyPosition.y === y;
-                return (
-                    <div key={i} className={`cell ${bossActive && x > 3 && x < 6 && y > 3 && y < 6 ? 'boss-cell' : ''}`}>
-                        {isPlayer && <span style={{ color: THEME_COLOR }}>{evoLevel === 4 ? '🌀' : '❖'}</span>}
-                        {isEnemy && <span>⚡</span>}
-                        {fragments.some(f => f.x === x && f.y === y) && <span>✦</span>}
-                    </div>
-                );
-            })}
-        </div>
-
-        <div className="console-logs">{logs.map((l, i) => <div key={i}>{l}</div>)}</div>
-
-        {isGameOver && (
-            <div className="overlay">
-                <h2 style={{ color: '#ff4444' }}>SYSTEM_FAILURE</h2>
-                <button onClick={() => window.location.reload()}>REBOOT</button>
-            </div>
-        )}
-
-        {victory && (
-            <div className="overlay">
-                <h2 style={{ color: THEME_COLOR }}>SIGNAL_ASCENDED</h2>
-                <p>YOU HAVE SURVIVED THE VOID.</p>
-                <button onClick={() => window.location.reload()}>RETURN</button>
-            </div>
-        )}
-    </div>
+.weather-DATA_RAIN::after {
+  content: "";
+  position: absolute;
+  top: -100%;
+  left: 0;
+  width: 100%;
+  height: 200%;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(100, 255, 218, 0.1) 3px,
+    transparent 4px
   );
-};
+  animation: rain-scroll 0.5s linear infinite;
+  pointer-events: none;
+}
 
-export default SurvivorWorld;
+@keyframes rain-scroll {
+  from { transform: translateY(0); }
+  to { transform: translateY(50%); }
+}
+
+/* --- GLITCH & VICTORY --- */
+@keyframes glitch-shake {
+  0% { transform: translate(0); }
+  20% { transform: translate(-2px, 2px); }
+  40% { transform: translate(-2px, -2px); }
+  60% { transform: translate(2px, 2px); }
+  80% { transform: translate(2px, -2px); }
+  100% { transform: translate(0); }
+}
+
+.victory-glow {
+  animation: glitch-shake 0.2s infinite;
+  background: white !important;
+  color: black !important;
+}
+
+.cell {
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.cell:hover {
+  background: rgba(100, 255, 218, 0.05);
+}
