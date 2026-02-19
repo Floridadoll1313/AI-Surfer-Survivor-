@@ -1,88 +1,53 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAvatar } from '../context/AvatarContext';
-import { getLevelInfo } from '../data/leveling';
 import { playSound } from '../utils/audio';
-import { SKILLS } from '../data/skills';
 
 const SurvivorWorld = () => {
   const { selectedAvatar } = useAvatar();
   const THEME_COLOR = '#64ffda';
 
-  // --- BOSS & EVOLUTION STATE ---
-  const [evolutionLevel, setEvolutionLevel] = useState(1);
+  // --- VICTORY & BOSS STATE ---
   const [bossActive, setBossActive] = useState(false);
+  const [victory, setVictory] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(60);
   const [bossProjectiles, setBossProjectiles] = useState<{ x: number, y: number }[]>([]);
   
   // --- SESSION STATE ---
   const [playerPosition, setPlayerPosition] = useState({ x: 0, y: 0 });
   const [enemyPosition, setEnemyPosition] = useState({ x: 9, y: 9 });
-  const [fragments, setFragments] = useState<{ x: number, y: number }[]>([]);
   const [score, setScore] = useState(0);
   const [isGameOver, setIsGameOver] = useState(false);
-  const [logs, setLogs] = useState(['> SYSTEM_INITIALIZED']);
 
-  const addLog = (msg: string) => setLogs(prev => [`> ${msg}`, ...prev].slice(0, 5));
-
-  // --- FINAL BOSS LOGIC (Bullet Hell) ---
+  // --- VICTORY TIMER ---
   useEffect(() => {
-    if (score >= 1500 && !bossActive) {
+    if (bossActive && timeLeft > 0 && !isGameOver) {
+      const timer = setInterval(() => setTimeLeft(t => t - 1), 1000);
+      return () => clearInterval(timer);
+    } else if (bossActive && timeLeft === 0) {
+      setVictory(true);
+      setBossActive(false);
+      setBossProjectiles([]);
+      playSound('victory'); 
+    }
+  }, [bossActive, timeLeft, isGameOver]);
+
+  // --- BOSS ACTIVATION (At 1500 points) ---
+  useEffect(() => {
+    if (score >= 1500 && !bossActive && !victory) {
       setBossActive(true);
-      setEvolutionLevel(4);
-      addLog('!!! CRITICAL_THREAT: CORE_EXTRACTOR_AWAKENED !!!');
-      playSound('bossSpawn');
     }
-  }, [score, bossActive]);
-
-  useEffect(() => {
-    if (!bossActive || isGameOver) return;
-
-    const bulletInterval = setInterval(() => {
-      // Boss creates a pulse of projectiles from center (4,4) (5,5)
-      const newProjectiles = [
-        { x: 4, y: 3 }, { x: 4, y: 5 }, { x: 3, y: 4 }, { x: 5, y: 4 },
-        { x: 3, y: 3 }, { x: 5, y: 5 }, { x: 3, y: 5 }, { x: 5, y: 3 }
-      ];
-      setBossProjectiles(newProjectiles);
-
-      // Move projectiles outward after a delay
-      setTimeout(() => {
-        setBossProjectiles(prev => prev.map(p => ({
-          x: p.x + (p.x > 4 ? 1 : -1),
-          y: p.y + (p.y > 4 ? 1 : -1)
-        })).filter(p => p.x >= 0 && p.x <= 9 && p.y >= 0 && p.y <= 9));
-      }, 500);
-    }, 2000);
-
-    return () => clearInterval(bulletInterval);
-  }, [bossActive, isGameOver]);
-
-  // --- COLLISION CHECK ---
-  useEffect(() => {
-    const hitProjectile = bossProjectiles.some(p => p.x === playerPosition.x && p.y === playerPosition.y);
-    if (hitProjectile) {
-      setIsGameOver(true);
-      addLog('TERMINATED: CORE_CORRUPTION');
-    }
-  }, [playerPosition, bossProjectiles]);
+  }, [score, bossActive, victory]);
 
   // --- MOVEMENT ---
   const handleMove = useCallback((dx: number, dy: number) => {
-    if (isGameOver) return;
+    if (isGameOver || victory) return;
     setPlayerPosition(prev => {
       const nextX = Math.max(0, Math.min(9, prev.x + dx));
       const nextY = Math.max(0, Math.min(9, prev.y + dy));
-      
-      const fragIdx = fragments.findIndex(f => f.x === nextX && f.y === nextY);
-      if (fragIdx !== -1) {
-        setScore(s => s + (bossActive ? 50 : 10)); // Higher points during boss
-        setFragments(f => f.filter((_, i) => i !== fragIdx));
-        playSound('collect');
-      }
-
       if (nextX === enemyPosition.x && nextY === enemyPosition.y) setIsGameOver(true);
       return { x: nextX, y: nextY };
     });
-  }, [fragments, enemyPosition, isGameOver, bossActive]);
+  }, [enemyPosition, isGameOver, victory]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -97,46 +62,47 @@ const SurvivorWorld = () => {
   }, [handleMove]);
 
   return (
-    <div className={`survivor-world ${bossActive ? 'boss-mode' : ''}`} style={{ borderColor: bossActive ? '#ff0055' : THEME_COLOR }}>
+    <div className={`survivor-world ${victory ? 'victory-glow' : ''}`}>
       <style>{`
-        .boss-mode { animation: red-alert 2s infinite; }
-        @keyframes red-alert { 0% { box-shadow: 0 0 10px #ff0055; } 50% { box-shadow: 0 0 30px #ff0055; } 100% { box-shadow: 0 0 10px #ff0055; } }
-        .boss-core { background: #ff0055 !important; border-radius: 50%; animation: pulse 0.5s infinite; }
-        .projectile { background: #ffaa00 !important; transform: scale(0.6); border-radius: 2px; box-shadow: 0 0 8px #ffaa00; }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        .victory-glow { animation: matrix-flash 2s infinite; background: #000; }
+        @keyframes matrix-flash { 0% { box-shadow: 0 0 20px #64ffda; } 50% { box-shadow: 0 0 50px #fff; } 100% { box-shadow: 0 0 20px #64ffda; } }
+        .timer-display { font-family: 'Courier New', monospace; font-size: 1.5rem; color: #ff0055; text-align: center; margin-bottom: 10px; }
+        .lore-text { color: #64ffda; line-height: 1.6; text-align: center; max-width: 400px; }
       `}</style>
 
-      <div className="game-header">
-        <div className="stat" style={{ color: bossActive ? '#ff0055' : THEME_COLOR }}>
-          {bossActive ? '!!! EMERGENCY: BOSS_FIGHT !!!' : `SCORE: ${score}`}
+      {bossActive && !victory && (
+        <div className="timer-display">OVERLOAD_IN: {timeLeft}s</div>
+      )}
+
+      {!victory ? (
+        <div className="grid-container">
+          {[...Array(100)].map((_, i) => {
+            const x = i % 10; const y = Math.floor(i / 10);
+            const isPlayer = playerPosition.x === x && playerPosition.y === y;
+            const isBoss = bossActive && (x >= 4 && x <= 5 && y >= 4 && y <= 5);
+            return (
+              <div key={i} className={`cell ${isBoss ? 'boss-core' : ''}`}>
+                {isPlayer && <span style={{ color: THEME_COLOR }}>🌀</span>}
+                {enemyPosition.x === x && enemyPosition.y === y && <span>⚡</span>}
+              </div>
+            );
+          })}
         </div>
-      </div>
-
-      <div className="grid-container">
-        {[...Array(100)].map((_, i) => {
-          const x = i % 10; const y = Math.floor(i / 10);
-          const isPlayer = playerPosition.x === x && playerPosition.y === y;
-          const isEnemy = enemyPosition.x === x && enemyPosition.y === y;
-          const isProjectile = bossProjectiles.some(p => p.x === x && p.y === y);
-          const isBossCore = bossActive && (x >= 4 && x <= 5 && y >= 4 && y <= 5);
-
-          return (
-            <div key={i} className={`cell ${isBossCore ? 'boss-core' : ''} ${isProjectile ? 'projectile' : ''}`}>
-              {isPlayer && <span style={{ color: THEME_COLOR }}>🌀</span>}
-              {isEnemy && !isBossCore && <span>⚡</span>}
-              {fragments.some(f => f.x === x && f.y === y) && !isBossCore && <span>✦</span>}
-            </div>
-          );
-        })}
-      </div>
-
-      <div className="console-logs">{logs.map((l, i) => <div key={i} style={{ color: bossActive ? '#ff0055' : 'inherit' }}>{l}</div>)}</div>
+      ) : (
+        <div className="overlay">
+          <h1 style={{ color: '#64ffda' }}>SIGNAL_ASCENDED</h1>
+          <div className="lore-text">
+            <p>"The walls of the simulation have dissolved. You are no longer just data; you are the pulse of the network itself."</p>
+            <p><strong>YOU HAVE SURVIVED THE VOID.</strong></p>
+          </div>
+          <button onClick={() => window.location.reload()} style={{ marginTop: '20px' }}>RE-ENTER THE GRID</button>
+        </div>
+      )}
 
       {isGameOver && (
         <div className="overlay">
-          <h2 style={{ color: '#ff0055' }}>CORE_EXTRACTED</h2>
-          <p>FINAL_SCORE: {score}</p>
-          <button onClick={() => window.location.reload()}>RE-SYNC</button>
+          <h2>CONNECTION_FAILED</h2>
+          <button onClick={() => window.location.reload()}>RETRY</button>
         </div>
       )}
     </div>
