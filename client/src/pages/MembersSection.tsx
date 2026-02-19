@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 const MemberSection = () => {
   const [mastery, setMastery] = useState(Number(localStorage.getItem('survivorMastery')) || 85);
   const [survival, setSurvival] = useState(92);
   const [sentryTip, setSentryTip] = useState("Scan the horizon for neural peaks.");
+  const [showToast, setShowToast] = useState(false);
 
   const tips = [
     "Neural currents are strongest at dawn.",
@@ -44,12 +45,22 @@ REALM: Sector 7
 [otdaisurfer.surf]
     `;
     navigator.clipboard.writeText(asciiArt);
-    alert("Stats copied to clipboard! Ready to share in the realm.");
+    
+    // Show custom toast instead of alert
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 3000);
   };
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8 pb-20">
+    <div className="max-w-6xl mx-auto space-y-8 pb-20 relative">
       
+      {/* --- SUCCESS TOAST NOTIFICATION --- */}
+      {showToast && (
+        <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-[100] bg-cyan-500 text-black px-6 py-3 rounded-full font-bold shadow-[0_0_20px_rgba(6,182,212,0.5)] animate-bounce">
+          ✨ STATS COPIED TO NEURAL LINK
+        </div>
+      )}
+
       {/* --- SURVIVOR ID CARD --- */}
       <div className="relative overflow-hidden bg-gradient-to-r from-slate-900 to-cyan-950 p-1 rounded-2xl shadow-2xl">
         <div className="bg-[#0a192f] p-8 rounded-xl flex flex-col md:flex-row items-center gap-8 relative z-10">
@@ -76,7 +87,7 @@ REALM: Sector 7
                   <span>{mastery}%</span>
                 </div>
                 <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
-                  <div className={`h-full transition-all duration-1000 ${mastery >= 100 ? 'bg-yellow-400' : 'bg-cyan-500'}`} style={{ width: `${mastery}%` }}></div>
+                  <div className={`h-full transition-all duration-1000 ${mastery >= 100 ? 'bg-yellow-400 shadow-[0_0_15px_rgba(250,204,21,1)]' : 'bg-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.8)]'}`} style={{ width: `${mastery}%` }}></div>
                 </div>
               </div>
               <div className="space-y-1">
@@ -104,13 +115,13 @@ REALM: Sector 7
             <div className="flex flex-col sm:flex-row gap-4">
               <button 
                 onClick={handleLevelUp}
-                className={`flex-1 py-4 font-black rounded-xl transition-all ${mastery >= 100 ? 'bg-yellow-500 text-black' : 'bg-cyan-500 text-black hover:bg-white'}`}
+                className={`flex-1 py-4 font-black rounded-xl transition-all ${mastery >= 100 ? 'bg-yellow-500 text-black' : 'bg-cyan-500 text-black hover:bg-white hover:scale-[1.02]'}`}
               >
                 {mastery >= 100 ? 'MASTERY MAXED' : 'COMPLETE DAILY TRAINING'}
               </button>
               <button 
                 onClick={shareStats}
-                className="flex-1 py-4 bg-transparent border border-white/20 hover:border-white text-white font-bold rounded-xl transition-all"
+                className="flex-1 py-4 bg-transparent border border-white/20 hover:border-white text-white font-bold rounded-xl transition-all flex items-center justify-center gap-2"
               >
                 📊 SHARE STATS
               </button>
@@ -128,18 +139,20 @@ REALM: Sector 7
         </div>
 
         <div className="space-y-6">
-          <div className="bg-cyan-950/20 border border-cyan-400/30 p-6 rounded-3xl">
+          <div className="bg-cyan-950/20 border border-cyan-400/30 p-6 rounded-3xl relative">
             <h4 className="font-bold text-cyan-400 text-sm uppercase mb-4 tracking-tighter">Sentry-Bot v.1</h4>
             <p className="text-sm text-cyan-100 italic">"{sentryTip}"</p>
+            <div className="mt-4 pt-4 border-t border-cyan-500/10 text-[10px] text-gray-500 font-mono">STATUS: SCANNING...</div>
           </div>
 
           <div className="bg-slate-900/50 border border-white/5 p-6 rounded-3xl">
-            <h4 className="font-bold text-white mb-3 text-xs uppercase">Challenges</h4>
+            <h4 className="font-bold text-white mb-3 text-xs uppercase tracking-widest">Active Challenges</h4>
             <ul className="space-y-3 text-sm">
               <li className="flex gap-2 text-gray-400"><span>✅</span> Neural Mapping</li>
-              <li className={`flex gap-2 ${mastery >= 100 ? 'text-yellow-400 font-bold' : 'opacity-30'}`}>
+              <li className="flex gap-2 text-gray-400"><span>✅</span> Sentry Deployment</li>
+              <li className={`flex gap-2 transition-all p-2 rounded ${mastery >= 100 ? 'text-yellow-400 font-bold bg-yellow-400/10 border border-yellow-500/50' : 'opacity-30'}`}>
                 <span>{mastery >= 100 ? '🔓' : '🔒'}</span>
-                <Link to="/the-vault" className="hover:underline">The Vault</Link>
+                <Link to="/the-vault" className="hover:underline italic">Access The Vault</Link>
               </li>
             </ul>
           </div>
