@@ -2,19 +2,23 @@ import React from 'react';
 
 /**
  * SiteFooter Component
- * Provides a persistent footer with an emergency reset function to wipe progress.
+ * Provides a persistent footer with an emergency reset function to wipe all progress and logs.
  */
 const SiteFooter = () => {
   const handleReset = () => {
     // Critical confirmation to prevent accidental data loss
     const confirmed = window.confirm(
-      "CRITICAL WARNING: This will permanently wipe all neural synchronization data, survival logs, and equipment links. Proceed with system reset?"
+      "CRITICAL WARNING: This will permanently wipe all neural synchronization data, user-submitted survival logs, and equipment links. Proceed with system reset?"
     );
 
     if (confirmed) {
-      // Clears the progress from browser storage
+      // 1. Clears the sync progress percentage
       localStorage.removeItem('survivor_progress');
-      // Reloading ensures the Layout state and UI reflect the reset
+      
+      // 2. Clears the custom survival logs created on the Home page
+      localStorage.removeItem('survivor_user_logs');
+      
+      // 3. Reloading ensures the app state is refreshed and the UI reflects the reset
       window.location.reload();
     }
   };
@@ -22,7 +26,7 @@ const SiteFooter = () => {
   return (
     <footer style={{
       padding: '40px 20px',
-      marginTop: 'auto', // Ensures footer stays at the bottom of the page
+      marginTop: 'auto', 
       borderTop: '1px solid rgba(53, 201, 255, 0.1)',
       textAlign: 'center',
       background: 'rgba(2, 12, 27, 0.95)',
