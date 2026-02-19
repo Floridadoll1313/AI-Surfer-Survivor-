@@ -4,15 +4,10 @@ import Layout from './components/Layout';
 
 // --- PAGE COMPONENTS ---
 
-/**
- * Home Component
- * Features: Founder's Pass credential check and Survival Logs display.
- */
 const Home = () => {
   const [showPass, setShowPass] = useState(false);
 
   useEffect(() => {
-    // Simulates a credential check delay
     const timer = setTimeout(() => setShowPass(true), 1500);
     return () => clearTimeout(timer);
   }, []);
@@ -64,12 +59,7 @@ const Home = () => {
   );
 };
 
-/**
- * Equipment Component
- * Features: Grid of gear that updates the global progress state.
- */
 const Equipment = () => {
-  // Accesses the setProgress function provided by the Layout's Outlet context
   const { setProgress } = useOutletContext<{ setProgress: React.Dispatch<React.SetStateAction<number>> }>();
 
   const items = [
@@ -83,31 +73,4 @@ const Equipment = () => {
   };
 
   return (
-    <div style={{ maxWidth: '900px', margin: '40px auto', padding: '0 20px' }}>
-      <h1 style={{ color: '#35c9ff', fontSize: '2.5rem' }}>SURVIVAL GEAR</h1>
-      <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', 
-        gap: '20px', 
-        marginTop: '30px' 
-      }}>
-        {items.map((item, index) => (
-          <div key={index} style={{ 
-            background: '#112240', 
-            padding: '25px', 
-            borderRadius: '12px', 
-            border: '1px solid #35c9ff', 
-            display: 'flex', 
-            flexDirection: 'column', 
-            justifyContent: 'space-between',
-            boxShadow: '0 10px 30px -15px rgba(2,12,27,0.7)'
-          }}>
-            <div>
-              <h3 style={{ color: '#35c9ff', margin: '0 0 10px 0' }}>{item.name}</h3>
-              <p style={{ color: '#8892b0', fontSize: '0.9rem', lineHeight: '1.4' }}>{item.desc}</p>
-              <span style={{ fontSize: '0.75rem', color: '#64ffda', letterSpacing: '1px', textTransform: 'uppercase' }}>
-                {item.rarity}
-              </span>
-            </div>
-            <button 
-              onClick={() => collectItem(item.boost)}
+    <div style={{ maxWidth:
