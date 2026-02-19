@@ -55,19 +55,17 @@ const SurvivorWorld = () => {
     }
   }, [fragments, spawnFragment, isGameOver]);
 
-  const handleMove = (dx: number, dy: number) => {
+  const handleMove = useCallback((dx: number, dy: number) => {
     if (isGameOver) return;
 
     setPlayerPosition(prev => {
       const newX = Math.max(0, Math.min(9, prev.x + dx));
       const newY = Math.max(0, Math.min(9, prev.y + dy));
       
-      // Check for fragment collection
       const hitIndex = fragments.findIndex(f => f.x === newX && f.y === newY);
       if (hitIndex !== -1) {
         const now = Date.now();
         const newCombo = (now - lastCollectTime < 2000) ? combo + 1 : 1;
-        
         setScore(s => s + (10 * newCombo));
         setCombo(newCombo);
         setLastCollectTime(now);
@@ -76,7 +74,6 @@ const SurvivorWorld = () => {
         addLog(`DATA_FRAGMENT_RECOVERED (x${newCombo})`);
       }
 
-      // Enemy logic
       setEnemyPosition(ep => {
         const edx = newX > ep.x ? 1 : newX < ep.x ? -1 : 0;
         const edy = newY > ep.y ? 1 : newY < ep.y ? -1 : 0;
@@ -92,9 +89,9 @@ const SurvivorWorld = () => {
 
       return { x: newX, y: newY };
     });
-  };
+  }, [fragments, isGameOver, lastCollectTime, combo, abilityActive]);
 
-  const triggerAbility = () => {
+  const triggerAbility = useCallback(() => {
     if (onCooldown || isGameOver) return;
     
     setAbilityActive(true);
@@ -114,7 +111,22 @@ const SurvivorWorld = () => {
         return prev - 2;
       });
     }, 200);
-  };
+  }, [onCooldown, isGameOver, currentSkill.name]);
+
+  // --- KEYBOARD SUPPORT ---
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      switch(e.key) {
+        case 'ArrowUp': handleMove(0, -1); break;
+        case 'ArrowDown': handleMove(0, 1); break;
+        case 'ArrowLeft': handleMove(-1, 0); break;
+        case 'ArrowRight': handleMove(1, 0); break;
+        case ' ': triggerAbility(); break;
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleMove, triggerAbility]);
 
   const shareStats = () => {
     const card = generateCyberCard(selectedAvatar, score);
@@ -125,6 +137,31 @@ const SurvivorWorld = () => {
 
   return (
     <div className="survivor-world" style={{ borderColor: THEME_COLOR }}>
+      <style>{`
+        .overlay {
+          position: absolute;
+          top: 0; left: 0; right: 0; bottom: 0;
+          background: rgba(0, 0, 0, 0.85);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          z-index: 10;
+          text-align: center;
+          backdrop-filter: blur(4px);
+        }
+        .overlay h2 { color: #ff4444; margin-bottom: 10px; }
+        .overlay button {
+          margin: 5px;
+          padding: 10px 20px;
+          background: transparent;
+          color: ${THEME_COLOR};
+          border: 1px solid ${THEME_COLOR};
+          cursor: pointer;
+        }
+        .overlay button:hover { background: ${THEME_COLOR}33; }
+      `}</style>
+
       <div className="game-header">
         <div className="stat">SCORE: {score.toString().padStart(5, '0')}</div>
         <div className="stat">COMBO: x{combo}</div>
