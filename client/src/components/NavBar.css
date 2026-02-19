@@ -1,104 +1,37 @@
-.nav-container {
-  width: 100%;
-  background: rgba(0, 0, 0, 0.65);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(0, 150, 255, 0.4);
-  position: sticky;
-  top: 0;
-  z-index: 999;
-}
+import React, { useState } from 'react';
+import { NavLink } from 'react-router-dom';
+import './NavBar.css';
 
-.nav-inner {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 14px 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+const NavBar = () => {
+  const [isOpen, setIsOpen] = useState(false);
 
-.nav-logo {
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: #00c8ff;
-  text-shadow: 0 0 12px #009dff, 0 0 24px #00c8ff;
-  letter-spacing: 1px;
-}
+  return (
+    <nav className="nav-container">
+      <div className="nav-inner">
+        <div className="nav-logo">AI SURFER SURVIVOR</div>
+        
+        {/* The Mobile Toggle Button */}
+        <button className="nav-toggle" onClick={() => setIsOpen(!isOpen)}>
+          <div className={isOpen ? "bar open" : "bar"}></div>
+          <div className={isOpen ? "bar open" : "bar"}></div>
+          <div className={isOpen ? "bar open" : "bar"}></div>
+        </button>
 
-/* Desktop Links */
-.nav-links {
-  display: flex;
-  gap: 28px;
-  list-style: none;
-}
+        {/* Navigation Links */}
+        <ul className={`nav-links ${isOpen ? "open" : ""}`}>
+          <li>
+            <NavLink to="/" className="nav-link">Home</NavLink>
+          </li>
+          <li>
+            <NavLink to="/world" className="nav-link">The World</NavLink>
+          </li>
+          <li>
+            <NavLink to="/challenges" className="nav-link">Challenges</NavLink>
+          </li>
+        </ul>
+      </div>
+    </nav>
+  );
+};
 
-.nav-link {
-  color: #ffffff;
-  font-size: 1.05rem;
-  text-decoration: none;
-  transition: 0.25s ease;
-  position: relative;
-}
-
-.nav-link:hover {
-  color: #ff8c2f;
-  text-shadow: 0 0 10px #ff8c2f;
-}
-
-.nav-link.active {
-  color: #00c8ff;
-  text-shadow: 0 0 10px #00c8ff;
-}
-
-/* Mobile Toggle */
-.nav-toggle {
-  display: none;
-  flex-direction: column;
-  gap: 5px;
-  background: none;
-  border: none;
-  cursor: pointer;
-}
-
-.bar {
-  width: 26px;
-  height: 3px;
-  background: #ffffff;
-  transition: 0.3s ease;
-}
-
-.open:nth-child(1) {
-  transform: translateY(8px) rotate(45deg);
-}
-
-.open:nth-child(2) {
-  opacity: 0;
-}
-
-.open:nth-child(3) {
-  transform: translateY(-8px) rotate(-45deg);
-}
-
-/* Mobile Menu */
-@media (max-width: 768px) {
-  .nav-toggle {
-    display: flex;
-  }
-
-  .nav-links {
-    position: absolute;
-    top: 60px;
-    right: 0;
-    background: rgba(0, 0, 0, 0.85);
-    width: 100%;
-    flex-direction: column;
-    padding: 20px 0;
-    gap: 20px;
-    transform: translateY(-200%);
-    transition: 0.35s ease;
-  }
-
-  .nav-links.open {
-    transform: translateY(0);
-  }
-}
+export default NavBar;
