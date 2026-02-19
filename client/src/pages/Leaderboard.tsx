@@ -1,60 +1,47 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 
 const Leaderboard = () => {
-  // In a real app, these would come from a database. 
-  // For now, we pull the local player's best and use placeholders for others.
-  const localHighScore = localStorage.getItem('survivor_high_score') || '0';
-
-  const rankings = [
-    { rank: 1, id: 'surfer', label: 'AI_SURFER', score: Math.max(Number(localHighScore), 2500), isPlayer: Number(localHighScore) >= 2500 },
-    { rank: 2, id: 'runner', label: 'TIDE_RUNNER', score: 1800, isPlayer: false },
-    { rank: 3, id: 'ghost', label: 'NEURAL_GHOST', score: 1200, isPlayer: false },
-    { rank: 4, id: 'void', label: 'VOID_WALKER', score: 900, isPlayer: false },
-  ].sort((a, b) => b.score - a.score);
+  const survivors = [
+    { rank: 1, name: "Survivor #1313", score: 9800, tier: "GOD" },
+    { rank: 2, name: "WaveRunner_AI", score: 8500, tier: "ELITE" },
+    { rank: 3, name: "Neon_Surfer", score: 7200, tier: "ELITE" },
+    { rank: 4, name: "Void_Walker", score: 6100, tier: "SURVIVOR" },
+    { rank: 5, name: "DeepBlue_Zero", score: 4500, tier: "SURVIVOR" },
+  ];
 
   return (
-    <div style={{ maxWidth: '800px', margin: '40px auto', padding: '20px', fontFamily: 'monospace', color: '#ffffff' }}>
-      <h1 style={{ color: '#35c9ff', textAlign: 'center', letterSpacing: '3px' }}>&gt; GLOBAL_LEADERBOARD</h1>
-      
-      <div style={{ marginTop: '30px', border: '1px solid #35c9ff', borderRadius: '8px', overflow: 'hidden' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', background: 'rgba(17, 34, 64, 0.6)' }}>
+    <div className="max-w-4xl mx-auto space-y-8">
+      <div className="text-center">
+        <h2 className="text-4xl font-black text-white tracking-tighter italic uppercase">Global Standings</h2>
+        <p className="text-cyan-400 font-mono text-sm mt-2">SECTOR 7 // REAL-TIME RANKINGS</p>
+      </div>
+
+      <div className="bg-slate-900/80 border border-cyan-500/20 rounded-3xl overflow-hidden shadow-2xl">
+        <table className="w-full text-left border-collapse">
           <thead>
-            <tr style={{ borderBottom: '2px solid #35c9ff', color: '#64ffda' }}>
-              <th style={{ padding: '15px', textAlign: 'left' }}>RANK</th>
-              <th style={{ padding: '15px', textAlign: 'left' }}>IDENTITY</th>
-              <th style={{ padding: '15px', textAlign: 'right' }}>SYNC_XP</th>
+            <tr className="border-b border-cyan-500/10 bg-cyan-950/20">
+              <th className="p-6 text-cyan-500 font-bold uppercase text-xs">Rank</th>
+              <th className="p-6 text-cyan-500 font-bold uppercase text-xs">Survivor Name</th>
+              <th className="p-6 text-cyan-500 font-bold uppercase text-xs text-right">Mastery Score</th>
             </tr>
           </thead>
-          <tbody>
-            {rankings.map((r, index) => (
-              <tr key={r.id} style={{ 
-                borderBottom: '1px solid rgba(53, 201, 255, 0.1)',
-                backgroundColor: r.isPlayer ? 'rgba(100, 255, 218, 0.05)' : 'transparent'
-              }}>
-                <td style={{ padding: '15px', color: '#8892b0' }}>#{index + 1}</td>
-                <td style={{ padding: '15px', fontWeight: 'bold', color: '#35c9ff' }}>
-                  {r.label} {r.isPlayer && <span style={{ color: '#64ffda', fontSize: '0.7rem' }}>[YOU]</span>}
+          <tbody className="divide-y divide-cyan-500/5">
+            {survivors.map((s) => (
+              <tr key={s.rank} className={`hover:bg-cyan-500/5 transition-colors ${s.rank === 1 ? 'bg-cyan-500/10' : ''}`}>
+                <td className="p-6 font-black text-2xl italic text-gray-500 italic">
+                  {s.rank === 1 ? <span className="text-yellow-400">#1</span> : `#${s.rank}`}
                 </td>
-                <td style={{ padding: '15px', textAlign: 'right', color: '#64ffda' }}>{r.score}</td>
+                <td className="p-6">
+                  <div className="flex items-center gap-3">
+                    <span className="text-white font-bold">{s.name}</span>
+                    <span className="text-[10px] px-2 py-0.5 border border-cyan-500/30 text-cyan-400 rounded-full">{s.tier}</span>
+                  </div>
+                </td>
+                <td className="p-6 text-right font-mono text-cyan-400 font-bold">{s.score.toLocaleString()}</td>
               </tr>
             ))}
           </tbody>
         </table>
-      </div>
-
-      <div style={{ marginTop: '30px', textAlign: 'center' }}>
-        <Link to="/game" style={{
-          padding: '12px 30px',
-          backgroundColor: '#35c9ff',
-          color: '#0a192f',
-          textDecoration: 'none',
-          fontWeight: 'bold',
-          borderRadius: '4px',
-          display: 'inline-block'
-        }}>
-          RETURN_TO_GRID
-        </Link>
       </div>
     </div>
   );
