@@ -1,89 +1,92 @@
-import React from "react";
+import React, { useState, useEffect } from 'react';
+import { useAvatar } from '../context/AvatarContext';
 
-export default function SurvivorWorld() {
+const SurvivorWorld = () => {
+  const { selectedAvatar } = useAvatar();
+  
+  // Game Constants
+  const GRID_SIZE = 10;
+  const [playerPosition, setPlayerPosition] = useState({ x: 0, y: 0 });
+
+  const avatarIcons: Record<string, string> = {
+    ghost: '◈',
+    runner: '❖',
+    void: '⬢',
+    surfer: '🌀'
+  };
+
+  // Movement Logic
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      setPlayerPosition(prev => {
+        const newPos = { ...prev };
+        if (e.key === 'ArrowUp' && prev.y > 0) newPos.y -= 1;
+        if (e.key === 'ArrowDown' && prev.y < GRID_SIZE - 1) newPos.y += 1;
+        if (e.key === 'ArrowLeft' && prev.x > 0) newPos.x -= 1;
+        if (e.key === 'ArrowRight' && prev.x < GRID_SIZE - 1) newPos.x += 1;
+        return newPos;
+      });
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  // Create the Grid Array
+  const renderGrid = () => {
+    const cells = [];
+    for (let y = 0; y < GRID_SIZE; y++) {
+      for (let x = 0; x < GRID_SIZE; x++) {
+        const isPlayer = playerPosition.x === x && playerPosition.y === y;
+        cells.push(
+          <div 
+            key={`${x}-${y}`}
+            style={{
+              width: '100%',
+              paddingTop: '100%', // Makes it a perfect square
+              position: 'relative',
+              border: '1px solid rgba(53, 201, 255, 0.2)',
+              backgroundColor: isPlayer ? 'rgba(100, 255, 218, 0.1)' : 'transparent',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            <div style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              fontSize: '1.5rem',
+              textShadow: isPlayer ? '0 0 10px #64ffda' : 'none'
+            }}>
+              {isPlayer ? avatarIcons[selectedAvatar] : ''}
+            </div>
+          </div>
+        );
+      }
+    }
+    return cells;
+  };
+
   return (
-    <div className="world-root">
-      <style>{`
-        :root {
-          --ocean-blue: #35c9ff;
-          --deep-blue: #020818;
-          --sunset-orange: #ff9f40;
-          --glow-cyan: #4ef3ff;
-        }
-        .world-root {
-          min-height: 100vh;
-          background: radial-gradient(circle at top, #06213a 0%, #020818 55%, #000000 100%);
-          color: #e6f7ff;
-          font-family: 'Inter', sans-serif;
-          padding: 40px 20px;
-        }
-        .world-shell {
-          max-width: 1100px;
-          margin: 0 auto;
-        }
-        .world-header {
-          text-align: center;
-          margin-bottom: 60px;
-        }
-        .world-title {
-          font-size: 3rem;
-          color: var(--ocean-blue);
-          text-transform: uppercase;
-          letter-spacing: 4px;
-          text-shadow: 0 0 20px rgba(53, 201, 255, 0.6);
-        }
-        .map-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-          gap: 30px;
-        }
-        .map-card {
-          background: rgba(255, 255, 255, 0.03);
-          border: 1px solid rgba(78, 203, 255, 0.3);
-          border-radius: 12px;
-          padding: 15px;
-          transition: 0.3s ease;
-        }
-        .map-card:hover {
-          transform: scale(1.02);
-          border-color: var(--sunset-orange);
-          box-shadow: 0 0 20px rgba(255, 159, 64, 0.2);
-        }
-        .map-image {
-          width: 100%;
-          border-radius: 8px;
-          margin-bottom: 15px;
-        }
-        .card-label {
-          color: var(--sunset-orange);
-          font-size: 0.8rem;
-          text-transform: uppercase;
-          letter-spacing: 2px;
-        }
-      `}</style>
-
-      <div className="world-shell">
-        <header className="world-header">
-          <h1 className="world-title">The Digital Island</h1>
-          <p>Explore the territories of the Never Ending Realm.</p>
-        </header>
-
-        <div className="map-grid">
-          {/* Territory 1 */}
-          <div className="map-card">
-            <img src="/AI Surfer Survivor Island Map.png" alt="Island Map" className="map-image" />
-            <div className="card-label">Sector Alpha</div>
-            <h3>Mainland Surf</h3>
-          </div>
-
-          {/* Territory 2 */}
-          <div className="map-card">
-            <img src="/Mapping the Never Ending Realm.png" alt="Realm Map" className="map-image" />
-            <div className="card-label">Sector Beta</div>
-            <h3>Never Ending Realm</h3>
-          </div>
-        </div>
+    <div style={{ padding: '20px', maxWidth: '600px', margin: '0 auto', textAlign: 'center' }}>
+      <h2 style={{ color: '#35c9ff', marginBottom: '10px' }}>&gt; GRID_NAVIGATION_ACTIVE</h2>
+      <p style={{ color: '#8892b0', fontSize: '0.8rem', marginBottom: '20px' }}>
+        USE ARROW KEYS TO TRAVERSE THE NEURAL NET | POSITION: [{playerPosition.x}, {playerPosition.y}]
+      </p>
+      
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: `repeat(${GRID_SIZE}, 1fr)`,
+        border: '2px solid #35c9ff',
+        background: 'rgba(10, 25, 47, 0.8)',
+        boxShadow: '0 0 30px rgba(53, 201, 255, 0.1)'
+      }}>
+        {renderGrid()}
       </div>
     </div>
   );
-}
+};
+
+export default SurvivorWorld;
