@@ -1,51 +1,36 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-
-// --- PAGE IMPORTS ---
-import Home from './pages/Home';
-import Members from './pages/Members';
-import Success from './pages/Success';
-import Inventory from './pages/Inventory';
-import SurvivorWorld from './pages/SurvivorWorld';
-
-// --- COMPONENT IMPORTS ---
-import ProtectedRoute from './components/ProtectedRoute';
-
-// --- CONTEXT PROVIDERS ---
 import { AvatarProvider } from './context/AvatarContext';
+
+// Page Imports
+import Home from './pages/Home';
+import SurvivorWorld from './pages/SurvivorWorld';
+import Profile from './pages/Profile';
+import Shop from './pages/Shop';
+import Achievements from './pages/Achievements';
+import Leaderboard from './pages/Leaderboard';
+import Credits from './pages/Credits';
 
 function App() {
   return (
     <AvatarProvider>
       <Router>
-        <div style={{ minHeight: '100vh', backgroundColor: '#0a192f' }}>
+        <div className="min-h-screen bg-[#0a192f]">
           <Routes>
-            {/* PUBLIC ROUTES */}
+            {/* Main Hub */}
             <Route path="/" element={<Home />} />
-            <Route path="/members" element={<Members />} />
-            <Route path="/success" element={<Success />} />
-
-            {/* PROTECTED ROUTES (Requires Membership) */}
-            <Route 
-              path="/survivor" 
-              element={
-                <ProtectedRoute>
-                  <SurvivorWorld />
-                </ProtectedRoute>
-              } 
-            />
             
-            <Route 
-              path="/inventory" 
-              element={
-                <ProtectedRoute>
-                  <Inventory />
-                </ProtectedRoute>
-              } 
-            />
-
-            {/* FALLBACK: Redirect any unknown routes to Home */}
-            <Route path="*" element={<Home />} />
+            {/* Core Game */}
+            <Route path="/survivor" element={<SurvivorWorld />} />
+            
+            {/* Player Systems */}
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/shop" element={<Shop />} />
+            <Route path="/achievements" element={<Achievements />} />
+            
+            {/* Social & Info */}
+            <Route path="/leaderboard" element={<Leaderboard />} />
+            <Route path="/credits" element={<Credits />} />
           </Routes>
         </div>
       </Router>
