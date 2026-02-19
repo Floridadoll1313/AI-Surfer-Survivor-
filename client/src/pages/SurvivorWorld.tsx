@@ -8,49 +8,60 @@ const SurvivorWorld = () => {
   const [playerPosition, setPlayerPosition] = useState({ x: 0, y: 0 });
   const [fragments, setFragments] = useState<{x: number, y: number}[]>([]);
   const [enemyPosition, setEnemyPosition] = useState({ x: 9, y: 9 });
-  const [bossPosition, setBossPosition] = useState<{x: number, y: number} | null>(null);
   const [score, setScore] = useState(0);
   const [wallet, setWallet] = useState(Number(localStorage.getItem('survivor_wallet')) || 0);
-  const [highScore, setHighScore] = useState(Number(localStorage.getItem('survivor_high_score')) || 0);
   
-  // Combo Logic
+  // Anomaly State
+  const [anomaly, setAnomaly] = useState<{ name: string; type: string } | null>(null);
+  const [anomalyTimer, setAnomalyTimer] = useState(0);
+
+  // Combo & Stats
   const [combo, setCombo] = useState(1);
   const [comboTimer, setComboTimer] = useState(0);
-
-  // Upgrades
   const [energyMax, setEnergyMax] = useState(Number(localStorage.getItem('upgrade_energy')) || 100);
   const [energy, setEnergy] = useState(energyMax);
-  const [speedMod, setSpeedMod] = useState(Number(localStorage.getItem('upgrade_speed')) || 0);
   const [hasShield, setHasShield] = useState(false);
-
   const [level, setLevel] = useState(1);
   const [isGameOver, setIsGameOver] = useState(false);
-  const [isInvisible, setIsInvisible] = useState(false);
-  const [isGlitching, setIsGlitching] = useState(false);
-  const [showShop, setShowShop] = useState(false);
 
   const avatarIcons: Record<string, string> = {
     ghost: '◈', runner: '❖', void: '⬢', surfer: '🌀'
   };
 
-  // Combo Decay Effect
+  // --- ANOMALY PROTOCOL ---
   useEffect(() => {
-    if (comboTimer > 0) {
-      const timer = setInterval(() => {
-        setComboTimer(prev => Math.max(prev - 1, 0));
-      }, 1000);
+    const eventInterval = setInterval(() => {
+      const events = [
+        { name: 'DOUBLE_SYNC', type: 'buff' },
+        { name: 'VIRUS_TURBO', type: 'danger' },
+        { name: 'ENERGY_SURGE', type: 'buff' },
+        { name: 'GRID_FOG', type: 'danger' }
+      ];
+      const randomEvent = events[Math.floor(Math.random() * events.length)];
+      setAnomaly(randomEvent);
+      setAnomalyTimer(15); // Events last 15 seconds
+
+      // Visual/Audio Cue
+      const ctx = new AudioContext();
+      const osc = ctx.createOscillator();
+      osc.frequency.setValueAtTime(200, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.5);
+      osc.connect(ctx.destination);
+      osc.start(); osc.stop(ctx.currentTime + 0.5);
+
+    }, 45000); // Triggers every 45 seconds
+
+    return () => clearInterval(eventInterval);
+  }, []);
+
+  useEffect(() => {
+    if (anomalyTimer > 0) {
+      const timer = setInterval(() => setAnomalyTimer(prev => prev - 1), 1000);
       return () => clearInterval(timer);
     } else {
-      setCombo(1);
+      setAnomaly(null);
     }
-  }, [comboTimer]);
+  }, [anomalyTimer]);
 
-  const playSound = (type: 'collect' | 'error' | 'ability' | 'boss' | 'shield_break') => {
-    const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.connect(gain); gain.connect(ctx.destination);
-
-    if (type === 'collect') {
-      osc.type = 'square'; 
-      osc.
+  // --- MODIFIED ENEMY MOVEMENT ---
+  useEffect(() => {
