@@ -4,7 +4,7 @@ import './NavBar.css';
 
 /**
  * NavBar Component
- * Features futuristic terminal-style buttons with active state highlighting.
+ * Features terminal-style brackets and active route highlighting.
  */
 const NavBar = () => {
   return (
@@ -13,16 +13,28 @@ const NavBar = () => {
         <span className="logo-icon">◈</span> TERMINAL_OS
       </div>
       <div className="nav-links">
-        <NavLink to="/" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>
+        <NavLink 
+          to="/" 
+          className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}
+        >
           [ HOME ]
         </NavLink>
-        <NavLink to="/map" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>
+        <NavLink 
+          to="/map" 
+          className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}
+        >
           [ NAV_MAP ]
         </NavLink>
-        <NavLink to="/equipment" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>
+        <NavLink 
+          to="/equipment" 
+          className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}
+        >
           [ GEAR ]
         </NavLink>
-        <NavLink to="/leaderboard" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>
+        <NavLink 
+          to="/leaderboard" 
+          className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}
+        >
           [ RANKINGS ]
         </NavLink>
       </div>
