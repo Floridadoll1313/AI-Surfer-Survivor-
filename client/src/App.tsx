@@ -1,10 +1,48 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
 import Lessons from './pages/Lessons'; 
 import MemberSection from './pages/MemberSection';
 import Login from './pages/Login';
 import Leaderboard from './pages/Leaderboard';
 import TheVault from './pages/TheVault';
+
+// --- NEURAL RAIN EFFECT COMPONENT ---
+const NeuralRain = ({ color }: { color: string }) => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const columns = Math.floor(canvas.width / 20);
+    const drops = new Array(columns).fill(1);
+
+    const draw = () => {
+      ctx.fillStyle = 'rgba(10, 25, 47, 0.1)'; // Matches your bg color
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      ctx.fillStyle = color; // Cyan or Gold
+      ctx.font = '15px monospace';
+
+      for (let i = 0; i < drops.length; i++) {
+        const text = String.fromCharCode(0x30A0 + Math.random() * 33);
+        ctx.fillText(text, i * 20, drops[i] * 20);
+        if (drops[i] * 20 > canvas.height && Math.random() > 0.975) drops[i] = 0;
+        drops[i]++;
+      }
+    };
+
+    const interval = setInterval(draw, 33);
+    return () => clearInterval(interval);
+  }, [color]);
+
+  return <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none z-0 opacity-20" />;
+};
 
 function App() {
   const [isAuth, setIsAuth] = useState(localStorage.getItem('isMember') === 'true');
@@ -26,39 +64,41 @@ function App() {
     window.location.href = '/';
   };
 
-  // Define dynamic colors based on God Mode
-  const themeColor = godMode ? 'text-yellow-400' : 'text-cyan-400';
+  const themeColor = godMode ? '#facc15' : '#22d3ee'; // Gold vs Cyan hex
+  const tailwindColor = godMode ? 'text-yellow-400' : 'text-cyan-400';
   const themeBg = godMode ? 'bg-yellow-500' : 'bg-cyan-500';
   const themeBorder = godMode ? 'border-yellow-500/50' : 'border-cyan-500/20';
-  const themeGlow = godMode ? 'shadow-[0_0_20px_rgba(250,204,21,0.5)]' : 'shadow-[0_0_15px_rgba(6,182,212,0.5)]';
 
   return (
     <Router>
-      <div className={`min-h-screen bg-[#0a192f] text-white transition-colors duration-1000`}>
-        {/* --- GLOBAL HEADER --- */}
+      <div className="min-h-screen bg-[#0a192f] text-white transition-colors duration-1000 relative overflow-x-hidden">
+        
+        {/* --- THE NEURAL RAIN --- */}
+        {godMode && <NeuralRain color={themeColor} />}
+
         <header className={`sticky top-0 z-50 w-full border-b ${themeBorder} bg-[#0a192f]/80 backdrop-blur-md transition-all`}>
           <div className="container mx-auto px-6 py-4 flex justify-between items-center">
-            <Link to="/" className="flex items-center gap-3 group">
-              <div className={`w-10 h-10 ${themeBg} rounded-lg flex items-center justify-center ${themeGlow} transition-all`}>
+            <Link to="/" className="flex items-center gap-3 group relative z-10">
+              <div className={`w-10 h-10 ${themeBg} rounded-lg flex items-center justify-center shadow-lg transition-all`}>
                 <span className="text-2xl">🌊</span>
               </div>
               <h1 className="text-xl font-bold tracking-tighter">
-                AI SURFER <span className={`${themeColor} uppercase`}>{godMode ? 'Legend' : 'Survivor'}</span>
+                AI SURFER <span className={`${tailwindColor} uppercase`}>{godMode ? 'Legend' : 'Survivor'}</span>
               </h1>
             </Link>
             
-            <nav className="flex gap-6 text-sm font-medium items-center">
+            <nav className="flex gap-6 text-sm font-medium items-center relative z-10">
               <Link to="/leaderboard" className="text-gray-400 hover:text-white uppercase tracking-widest text-[10px]">Rankings</Link>
               
               {isAuth && (
                 <>
-                  <Link to="/members" className={`${themeColor} font-bold`}>LOUNGE</Link>
+                  <Link to="/members" className={`${tailwindColor} font-bold`}>LOUNGE</Link>
                   {mastery >= 100 && (
                     <button 
                       onClick={() => setGodMode(!godMode)}
-                      className={`px-3 py-1 border ${themeBorder} ${themeColor} rounded-full text-[10px] font-black animate-pulse`}
+                      className={`px-4 py-1 border ${themeBorder} ${tailwindColor} rounded-full text-[10px] font-black animate-pulse bg-black/40`}
                     >
-                      {godMode ? 'GOD MODE: ON' : 'ACTIVATE GOD MODE'}
+                      {godMode ? 'GOD MODE: ACTIVE' : 'ACTIVATE GOD MODE'}
                     </button>
                   )}
                   <button onClick={handleLogout} className="text-red-500 text-[10px] border border-red-500/20 px-2 py-1 rounded">EXIT</button>
@@ -68,7 +108,7 @@ function App() {
           </div>
         </header>
 
-        <main className="container mx-auto px-6 py-8">
+        <main className="container mx-auto px-6 py-8 relative z-10">
           <Routes>
             <Route path="/" element={<Lessons />} />
             <Route path="/lessons" element={<Lessons />} />
