@@ -32,6 +32,12 @@ const NavBar = () => {
           [ GEAR ]
         </NavLink>
         <NavLink 
+          to="/challenges" 
+          className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}
+        >
+          [ MISSIONS ]
+        </NavLink>
+        <NavLink 
           to="/leaderboard" 
           className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}
         >
