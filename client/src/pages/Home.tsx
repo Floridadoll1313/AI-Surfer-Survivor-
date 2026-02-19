@@ -25,14 +25,20 @@ const Home = () => {
 
   return (
     <div style={{ padding: '40px', maxWidth: '1000px', margin: '0 auto', fontFamily: 'monospace', color: '#64ffda' }}>
-      <header style={{ marginBottom: '40px', borderBottom: '1px solid #112240', paddingBottom: '20px' }}>
-        <h1 style={{ fontSize: '2rem' }}>&gt; MISSION_CONTROL</h1>
-        <p style={{ color: '#8892b0' }}>System Status: <span style={{ color: stats.isMember ? '#64ffda' : '#ff5f5f' }}>{stats.isMember ? 'ONLINE' : 'RESTRICTED'}</span></p>
+      <header style={{ marginBottom: '40px', borderBottom: '1px solid #112240', paddingBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+        <div>
+          <h1 style={{ fontSize: '2rem', margin: 0 }}>&gt; MISSION_CONTROL</h1>
+          <p style={{ color: '#8892b0', margin: 0 }}>System Status: <span style={{ color: stats.isMember ? '#64ffda' : '#ff5f5f' }}>{stats.isMember ? 'ONLINE' : 'RESTRICTED'}</span></p>
+        </div>
+        <button 
+          onClick={() => navigate('/inventory')}
+          style={{ background: '#112240', border: '1px solid #35c9ff', color: '#35c9ff', padding: '10px 20px', cursor: 'pointer' }}
+        >
+          VIEW_GEAR
+        </button>
       </header>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
-        
-        {/* STATS PANEL */}
         <div style={{ border: '1px solid #35c9ff', padding: '25px', background: 'rgba(17, 34, 64, 0.5)' }}>
           <h3 style={{ color: '#35c9ff' }}>[01] DATA_VAULT</h3>
           <div style={{ marginTop: '20px' }}>
@@ -41,19 +47,17 @@ const Home = () => {
           </div>
         </div>
 
-        {/* GAME ACCESS */}
         <div style={{ border: '1px solid #64ffda', padding: '25px', background: 'rgba(10, 25, 47, 0.8)' }}>
           <h3>[02] NEURAL_LINK</h3>
           <p style={{ color: '#8892b0', margin: '15px 0' }}>{stats.isMember ? 'Access to Survivor World is live.' : 'Membership required to enter the void.'}</p>
           <button 
             onClick={() => navigate('/survivor')}
-            style={{ width: '100%', padding: '15px', background: stats.isMember ? '#64ffda' : '#112240', color: stats.isMember ? '#0a192f' : '#35c9ff', border: 'none', fontWeight: 'bold', cursor: 'pointer' }}
+            style={{ width: '100%', padding: '15px', background: stats.isMember ? '#64ffda' : '#0a192f', color: stats.isMember ? '#0a192f' : '#35c9ff', border: 'none', fontWeight: 'bold', cursor: 'pointer' }}
           >
             {stats.isMember ? 'LAUNCH_SIMULATION' : 'UPGRADE_REQUIRED'}
           </button>
         </div>
 
-        {/* ACCOUNT CONTROL */}
         <div style={{ border: '1px solid #4e566d', padding: '25px', background: 'rgba(10, 25, 47, 0.9)' }}>
           <h3 style={{ color: '#8892b0' }}>[03] SETTINGS</h3>
           <div style={{ marginTop: '20px' }}>
@@ -64,12 +68,7 @@ const Home = () => {
             )}
           </div>
         </div>
-
       </div>
-
-      <footer style={{ marginTop: '50px', color: '#4e566d', fontSize: '0.8rem', textAlign: 'center' }}>
-        TERMINAL_ID: {Math.random().toString(36).substring(7).toUpperCase()} // ALL_SYSTEMS_GO
-      </footer>
     </div>
   );
 };
