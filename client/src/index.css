@@ -4,17 +4,19 @@
 
 :root {
   --background: #0a192f;
+  --cyan: #22d3ee;
+  --gold: #facc15;
 }
 
 body {
   margin: 0;
   background-color: var(--background);
   color: white;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Inter', system-ui, sans-serif;
   overflow-x: hidden;
 }
 
-/* --- THE NEURAL TICKER --- */
+/* --- THE NEURAL TICKER ANIMATION --- */
 @keyframes ticker {
   0% { transform: translate3d(0, 0, 0); }
   100% { transform: translate3d(-50%, 0, 0); }
@@ -32,26 +34,11 @@ body {
   will-change: transform;
 }
 
-/* --- CUSTOM DARK SCROLLBAR --- */
-::-webkit-scrollbar {
-  width: 8px;
-}
-::-webkit-scrollbar-track {
-  background: #0a192f;
-}
+/* --- CUSTOM CYBERPUNK SCROLLBAR --- */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: #0a192f; }
 ::-webkit-scrollbar-thumb {
   background: #1e293b;
   border-radius: 10px;
 }
-::-webkit-scrollbar-thumb:hover {
-  background: #22d3ee;
-}
-
-/* --- ANIMATIONS --- */
-@keyframes spin-slow {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-.animate-spin-slow {
-  animation: spin-slow 12s linear infinite;
-}
+::-webkit-scrollbar-thumb:hover { background: var(--cyan); }
