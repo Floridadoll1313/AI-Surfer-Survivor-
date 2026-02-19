@@ -1,24 +1,16 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
-import './NavBar.css';
 
-const NavBar = () => {
+const FoundersPage = () => {
   return (
-    <nav className="terminal-nav">
-      <div className="nav-logo">
-        <span className="logo-icon">◈</span> TERMINAL_OS
-      </div>
-      <div className="nav-links">
-        <NavLink to="/" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>[ HOME ]</NavLink>
-        <NavLink to="/map" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>[ MAP ]</NavLink>
-        <NavLink to="/equipment" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>[ GEAR ]</NavLink>
-        <NavLink to="/challenges" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>[ MISSIONS ]</NavLink>
-        <NavLink to="/rewards" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>[ RECHARGE ]</NavLink>
-        <NavLink to="/diagnostic" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>[ STATUS ]</NavLink>
-        <NavLink to="/archive" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>[ ? ]</NavLink>
-      </div>
-    </nav>
+    <div className="terminal-content" style={{ padding: '20px', color: '#00ff00', fontFamily: 'monospace' }}>
+      <h1>[ FOUNDERS_PROTOCOL ]</h1>
+      <section>
+        <h3>Welcome, Early Adopter.</h3>
+        <p>The Never Ending Realm was built by those who saw the tide coming before it hit the shore.</p>
+        {/* You can add more text here or even a list of names */}
+      </section>
+    </div>
   );
 };
 
-export default NavBar;
+export default FoundersPage;
