@@ -2,6 +2,10 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import './NavBar.css';
 
+/**
+ * NavBar Component
+ * The primary command hub for navigating the Never Ending Realm.
+ */
 const NavBar = () => {
   return (
     <nav className="terminal-nav">
@@ -9,12 +13,48 @@ const NavBar = () => {
         <span className="logo-icon">◈</span> TERMINAL_OS
       </div>
       <div className="nav-links">
-        <NavLink to="/" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>[ HOME ]</NavLink>
-        <NavLink to="/map" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>[ NAV_MAP ]</NavLink>
-        <NavLink to="/equipment" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>[ GEAR ]</NavLink>
-        <NavLink to="/challenges" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>[ MISSIONS ]</NavLink>
-        <NavLink to="/leaderboard" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>[ RANKINGS ]</NavLink>
-        <NavLink to="/archive" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>[ ARCHIVE ]</NavLink>
+        <NavLink 
+          to="/" 
+          className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}
+        >
+          [ HOME ]
+        </NavLink>
+        <NavLink 
+          to="/map" 
+          className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}
+        >
+          [ NAV_MAP ]
+        </NavLink>
+        <NavLink 
+          to="/equipment" 
+          className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}
+        >
+          [ GEAR ]
+        </NavLink>
+        <NavLink 
+          to="/challenges" 
+          className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}
+        >
+          [ MISSIONS ]
+        </NavLink>
+        <NavLink 
+          to="/leaderboard" 
+          className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}
+        >
+          [ RANKINGS ]
+        </NavLink>
+        <NavLink 
+          to="/archive" 
+          className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}
+        >
+          [ ARCHIVE ]
+        </NavLink>
+        <NavLink 
+          to="/identity" 
+          className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}
+        >
+          [ IDENTITY ]
+        </NavLink>
       </div>
     </nav>
   );
