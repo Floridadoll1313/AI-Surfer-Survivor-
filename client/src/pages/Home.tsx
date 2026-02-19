@@ -2,10 +2,9 @@ import React, { useState, useEffect } from 'react';
 
 /**
  * Home Component
- * Features: Glitch Title, Automated System Logs, and User Submission Logs.
+ * Features: Glitch Title, User Submission Logs, and Data Export Utility.
  */
 const Home = () => {
-  // 1. Initial State for Logs (combining system defaults with user-saved logs)
   const [userLogs, setUserLogs] = useState<{ id: number, date: string, msg: string }[]>(() => {
     const saved = localStorage.getItem('survivor_user_logs');
     return saved ? JSON.parse(saved) : [];
@@ -18,7 +17,6 @@ const Home = () => {
     { id: 's2', date: "2026.02.18", msg: "Pulse Animation module integrated." }
   ];
 
-  // 2. Save logs to localStorage whenever they change
   useEffect(() => {
     localStorage.setItem('survivor_user_logs', JSON.stringify(userLogs));
   }, [userLogs]);
@@ -37,6 +35,28 @@ const Home = () => {
     setInputMsg('');
   };
 
+  // --- NEW: EXPORT LOGS TO .TXT ---
+  const downloadLogs = () => {
+    if (userLogs.length === 0) {
+      alert("NO USER DATA FOUND TO EXPORT.");
+      return;
+    }
+
+    const logContent = userLogs
+      .map(log => `[${log.date}] ${log.msg}`)
+      .join('\n');
+    
+    const header = "--- AI SURFER SURVIVOR: NEURAL LOG EXPORT ---\n\n";
+    const blob = new Blob([header + logContent], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    
+    link.href = url;
+    link.download = `survivor_logs_${new Date().getTime()}.txt`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div style={{ padding: '60px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       
@@ -49,7 +69,7 @@ const Home = () => {
         SYSTEM_STATUS: <span style={{ color: '#64ffda' }}>OPERATIONAL</span>
       </p>
 
-      {/* NEW: LOG SUBMISSION TERMINAL */}
+      {/* LOG SUBMISSION TERMINAL */}
       <div style={{ 
         maxWidth: '800px', width: '100%', margin: '40px auto 0',
         padding: '20px', background: 'rgba(2, 12, 27, 0.6)',
@@ -78,24 +98,35 @@ const Home = () => {
         </form>
       </div>
 
-      {/* DYNAMIC LOG FEED */}
+      {/* LOG FEED */}
       <div style={{ 
         maxWidth: '800px', width: '100%', margin: '30px auto',
         padding: '30px', background: 'rgba(17, 34, 64, 0.4)',
         borderRadius: '10px', border: '1px solid rgba(53, 201, 255, 0.2)'
       }}>
-        <h2 style={{ color: '#ffffff', fontSize: '1.2rem', borderBottom: '1px solid #35c9ff', paddingBottom: '15px', marginBottom: '20px', fontFamily: 'monospace' }}>
-          &gt; RECENT_SURVIVAL_LOGS
-        </h2>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', borderBottom: '1px solid #35c9ff', paddingBottom: '15px' }}>
+          <h2 style={{ color: '#ffffff', fontSize: '1.2rem', margin: 0, fontFamily: 'monospace' }}>
+            &gt; RECENT_SURVIVAL_LOGS
+          </h2>
+          {/* EXPORT BUTTON */}
+          <button 
+            onClick={downloadLogs}
+            style={{
+              background: 'transparent', border: '1px solid #35c9ff', color: '#35c9ff',
+              padding: '5px 12px', fontSize: '0.7rem', cursor: 'pointer',
+              fontFamily: 'monospace', borderRadius: '4px'
+            }}
+          >
+            [ EXPORT_DATA ]
+          </button>
+        </div>
         
-        {/* User Logs Appear First */}
         {userLogs.map(log => (
           <div key={log.id} style={{ background: 'rgba(100, 255, 218, 0.05)', padding: '15px', marginBottom: '10px', borderLeft: '4px solid #64ffda', color: '#ffffff', fontFamily: 'monospace' }}>
             <span style={{ color: '#64ffda', fontWeight: 'bold', marginRight: '10px' }}>[{log.date}]</span> {log.msg}
           </div>
         ))}
 
-        {/* System Logs */}
         {systemLogs.map(log => (
           <div key={log.id} style={{ background: 'rgba(53, 201, 255, 0.03)', padding: '15px', marginBottom: '10px', borderLeft: '4px solid #35c9ff', color: '#ffffff', fontFamily: 'monospace' }}>
             <span style={{ color: '#35c9ff', fontWeight: 'bold', marginRight: '10px' }}>[{log.date}]</span> {log.msg}
