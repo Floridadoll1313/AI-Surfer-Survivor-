@@ -32,9 +32,13 @@ const SurvivorWorld = () => {
   const [logs, setLogs] = useState<string[]>(['> SIMULATION_LOADED']);
   const [copyFeedback, setCopyFeedback] = useState('SHARE_SCORE');
 
-  // --- DIFFICULTY SCALING ---
+  // --- DIFFICULTY & SAFE ZONE ---
   const [difficultyLevel, setDifficultyLevel] = useState(1);
-  const enemySpeed = Math.max(300, 1000 - (difficultyLevel * 100)); // Gets faster every level
+  const enemySpeed = Math.max(300, 1000 - (difficultyLevel * 100));
+  
+  const isPlayerInSafeZone = 
+    playerPosition.x >= 4 && playerPosition.x <= 5 && 
+    playerPosition.y >= 4 && playerPosition.y <= 5;
 
   // --- ABILITY STATE ---
   const [abilityActive, setAbilityActive] = useState(false);
@@ -49,6 +53,11 @@ const SurvivorWorld = () => {
       x: Math.floor(Math.random() * 10),
       y: Math.floor(Math.random() * 10)
     };
+    // Don't spawn fragments in the Safe Zone
+    if (newFrag.x >= 4 && newFrag.x <= 5 && newFrag.y >= 4 && newFrag.y <= 5) {
+      spawnFragment();
+      return;
+    }
     setFragments(prev => [...prev, newFrag]);
   }, []);
 
@@ -69,9 +78,9 @@ const SurvivorWorld = () => {
     }
   }, [score, difficultyLevel]);
 
-  // --- ENEMY AUTO-MOVE (Chase Logic) ---
+  // --- ENEMY AUTO-MOVE ---
   useEffect(() => {
-    if (isGameOver) return;
+    if (isGameOver || isPlayerInSafeZone) return;
 
     const moveEnemy = setInterval(() => {
       setEnemyPosition(ep => {
@@ -89,7 +98,7 @@ const SurvivorWorld = () => {
     }, enemySpeed);
 
     return () => clearInterval(moveEnemy);
-  }, [playerPosition, enemySpeed, isGameOver, abilityActive]);
+  }, [playerPosition, enemySpeed, isGameOver, abilityActive, isPlayerInSafeZone]);
 
   const handleMove = useCallback((dx: number, dy: number) => {
     if (isGameOver) return;
@@ -102,7 +111,6 @@ const SurvivorWorld = () => {
       if (hitIndex !== -1) {
         const now = Date.now();
         const newCombo = (now - lastCollectTime < 2000) ? combo + 1 : 1;
-        
         setScore(s => s + (10 * newCombo));
         setCombo(newCombo);
         setLastCollectTime(now);
@@ -116,14 +124,11 @@ const SurvivorWorld = () => {
 
   const triggerAbility = useCallback(() => {
     if (onCooldown || isGameOver) return;
-    
     setAbilityActive(true);
     setOnCooldown(true);
     setCooldownPercent(100);
     addLog(`ABILITY_ACTIVATED: ${currentSkill.name.toUpperCase()}`);
-
     setTimeout(() => setAbilityActive(false), 3000);
-
     const cdInterval = setInterval(() => {
       setCooldownPercent(prev => {
         if (prev <= 0) {
@@ -169,26 +174,21 @@ const SurvivorWorld = () => {
     <div className="survivor-world" style={{ borderColor: THEME_COLOR }}>
       <style>{`
         .overlay {
-          position: absolute;
-          top: 0; left: 0; right: 0; bottom: 0;
-          background: rgba(0, 0, 0, 0.9);
-          display: flex; flex-direction: column;
-          align-items: center; justify-content: center;
-          z-index: 10; text-align: center; backdrop-filter: blur(6px);
+          position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+          background: rgba(0, 0, 0, 0.9); display: flex; flex-direction: column;
+          align-items: center; justify-content: center; z-index: 10;
+          text-align: center; backdrop-filter: blur(6px);
         }
-        .overlay h2 { color: #ff4444; text-shadow: 0 0 10px #ff0000; }
-        .overlay button {
-          margin: 5px; padding: 10px 20px; background: transparent;
-          color: ${THEME_COLOR}; border: 1px solid ${THEME_COLOR};
-          cursor: pointer; min-width: 140px;
-        }
-        .difficulty-tag { font-size: 0.7rem; color: #ff4444; margin-top: 5px; }
+        .safe-zone-cell { border: 1px dashed ${THEME_COLOR}55 !important; background: ${THEME_COLOR}11; }
+        .in-safe-zone { filter: drop-shadow(0 0 5px ${THEME_COLOR}); }
       `}</style>
 
       <div className="game-header">
         <div className="stat-group">
           <div className="stat">SCORE: {score.toString().padStart(5, '0')}</div>
-          <div className="difficulty-tag">LVL_{difficultyLevel} SPEED: {enemySpeed}ms</div>
+          <div className="difficulty-tag" style={{ color: isPlayerInSafeZone ? THEME_COLOR : '#ff4444' }}>
+            {isPlayerInSafeZone ? 'STATUS: CLOAKED' : `LVL_${difficultyLevel} SPEED: ${enemySpeed}ms`}
+          </div>
         </div>
         <div className="stat">BEST: {highScore.toString().padStart(5, '0')}</div>
       </div>
@@ -200,10 +200,15 @@ const SurvivorWorld = () => {
           const isPlayer = playerPosition.x === x && playerPosition.y === y;
           const isEnemy = enemyPosition.x === x && enemyPosition.y === y;
           const isFrag = fragments.some(f => f.x === x && f.y === y);
+          const isSafe = x >= 4 && x <= 5 && y >= 4 && y <= 5;
 
           return (
-            <div key={i} className={`cell ${abilityActive ? 'glitch-bg' : ''}`}>
-              {isPlayer && <span className="avatar-icon" style={{ color: THEME_COLOR }}>{avatarIcons[selectedAvatar]}</span>}
+            <div key={i} className={`cell ${abilityActive ? 'glitch-bg' : ''} ${isSafe ? 'safe-zone-cell' : ''}`}>
+              {isPlayer && (
+                <span className={`avatar-icon ${isPlayerInSafeZone ? 'in-safe-zone' : ''}`} style={{ color: THEME_COLOR }}>
+                  {avatarIcons[selectedAvatar]}
+                </span>
+              )}
               {isEnemy && <span className="enemy-icon">⚡</span>}
               {isFrag && <span className="frag-icon">✦</span>}
             </div>
@@ -215,11 +220,7 @@ const SurvivorWorld = () => {
         <button onClick={() => handleMove(0, -1)}>▲</button>
         <div className="mid-row">
           <button onClick={() => handleMove(-1, 0)}>◀</button>
-          <button 
-            className={`ability-btn ${onCooldown ? 'disabled' : ''}`}
-            onClick={triggerAbility}
-            style={{ '--cd': `${cooldownPercent}%` } as any}
-          >
+          <button className={`ability-btn ${onCooldown ? 'disabled' : ''}`} onClick={triggerAbility} style={{ '--cd': `${cooldownPercent}%` } as any}>
             {onCooldown ? '...' : '⚡'}
           </button>
           <button onClick={() => handleMove(1, 0)}>▶</button>
@@ -234,7 +235,6 @@ const SurvivorWorld = () => {
       {isGameOver && (
         <div className="overlay">
           <h2>SYSTEM_HALTED</h2>
-          {score >= highScore && score > 0 && <p style={{color: '#ffcc00'}}>★ NEW RECORD ★</p>}
           <p>FINAL_SCORE: {score}</p>
           <button onClick={() => window.location.reload()}>REBOOT</button>
           <button onClick={shareStats}>{copyFeedback}</button>
