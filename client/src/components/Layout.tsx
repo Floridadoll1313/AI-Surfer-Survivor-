@@ -4,30 +4,31 @@ import NavBar from './NavBar';
 import SiteFooter from './SiteFooter';
 
 const Layout = () => {
-  const [progress, setProgress] = useState(() => {
-    const saved = localStorage.getItem('survivor_progress');
-    return saved ? parseInt(saved, 10) : 0;
-  });
-
-  useEffect(() => {
-    localStorage.setItem('survivor_progress', progress.toString());
-  }, [progress]);
+  const [progress, setProgress] = useState(Number(localStorage.getItem('survivor_progress')) || 0);
+  const avatarId = localStorage.getItem('survivor_avatar') || 'ghost';
+  
+  // Simple mapping for display
+  const avatarMap: Record<string, string> = { ghost: '◈', runner: '❖', void: '⬢', surfer: '🌀' };
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#020c1b', color: '#ffffff', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', background: '#020c1b' }}>
       <NavBar />
-      <div style={{ position: 'sticky', top: '0', zIndex: 100, background: '#020c1b', padding: '10px 20px', borderBottom: '1px solid rgba(53, 201, 255, 0.2)' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', marginBottom: '5px' }}>
-          <span style={{ color: '#35c9ff' }}>SYNC LEVEL</span>
-          <span style={{ color: '#64ffda' }}>{progress}%</span>
-        </div>
-        <div style={{ width: '100%', height: '6px', background: '#112240', borderRadius: '3px', overflow: 'hidden' }}>
-          <div style={{ width: `${progress}%`, height: '100%', background: 'linear-gradient(90deg, #35c9ff, #64ffda)', transition: 'width 0.5s ease-out' }} />
+      
+      {/* HUD HEADER */}
+      <div style={{ padding: '20px', background: 'rgba(2, 12, 27, 0.8)', borderBottom: '1px solid #35c9ff', display: 'flex', alignItems: 'center', gap: '20px' }}>
+        <div style={{ fontSize: '2rem', color: '#64ffda' }}>{avatarMap[avatarId]}</div>
+        <div style={{ flex: 1 }}>
+          <div style={{ color: '#35c9ff', fontSize: '0.7rem', marginBottom: '5px', fontFamily: 'monospace' }}>SYNC_LEVEL: {progress}%</div>
+          <div style={{ width: '100%', height: '4px', background: '#112240' }}>
+            <div style={{ width: `${progress}%`, height: '100%', background: '#64ffda', boxShadow: '0 0 10px #64ffda' }} />
+          </div>
         </div>
       </div>
+
       <main style={{ flex: 1 }}>
         <Outlet context={{ setProgress }} />
       </main>
+
       <SiteFooter />
     </div>
   );
