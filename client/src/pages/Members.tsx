@@ -1,55 +1,53 @@
-import React from 'react';
-import { loadStripe } from '@stripe/stripe-js';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-// Replace with your actual Publishable Key from Stripe Dashboard
-const stripePromise = loadStripe('pk_test_your_key_here');
+const Home = () => {
+  const navigate = useNavigate();
+  const [isMember, setIsMember] = useState(false);
 
-const Members = () => {
-  const handleCheckout = async () => {
-    // --- THIS IS THE SUCCESS TRIGGER ---
-    // We set this flag so the ProtectedRoute knows the user is allowed in.
-    // In a real production app, your server would do this via a Webhook.
-    localStorage.setItem('membership_active', 'true');
-    
-    // This directs them to your Stripe-hosted checkout link
-    // Replace this URL with your actual "Payment Link" from Stripe
-    window.location.href = 'https://buy.stripe.com/test_your_actual_link';
+  // Check membership status on load
+  useEffect(() => {
+    const status = localStorage.getItem('membership_active') === 'true';
+    setIsMember(status);
+  }, []);
+
+  const handleDeactivate = () => {
+    // Clear the membership flag
+    localStorage.removeItem('membership_active');
+    setIsMember(false);
+    alert('SESSION_TERMINATED: Membership access revoked.');
   };
 
   return (
-    <div style={{ padding: '40px', maxWidth: '800px', margin: '0 auto', fontFamily: 'monospace', color: '#64ffda' }}>
-      <h1 style={{ borderBottom: '2px solid #35c9ff', paddingBottom: '10px' }}>&gt; ACCESS_GATEWAY</h1>
-      
-      <div style={{ background: 'rgba(17, 34, 64, 0.8)', padding: '30px', border: '1px solid #35c9ff', marginTop: '20px' }}>
-        <h3>LEVEL: PRO_SURFER_MEMBERSHIP</h3>
-        <p style={{ color: '#8892b0' }}>Status: <span style={{ color: '#ff5f5f' }}>LOCKED</span></p>
-        
-        <ul style={{ color: '#8892b0', lineHeight: '2', marginTop: '20px' }}>
-          <li>[+] UNLIMITED_DATA_MINING (Survivor World Access)</li>
-          <li>[+] EXCLUSIVE_AVATAR_COSMETICS</li>
-          <li>[+] AD-FREE_INTERFACE</li>
-        </ul>
-        
-        <div style={{ marginTop: '30px' }}>
-          <p style={{ fontSize: '1.2rem' }}>COST: <span style={{ color: '#fff' }}>$10.00 / MONTH</span></p>
+    <div style={{ padding: '40px', maxWidth: '900px', margin: '0 auto', fontFamily: 'monospace', color: '#64ffda' }}>
+      <header style={{ marginBottom: '50px', textAlign: 'center' }}>
+        <h1 style={{ fontSize: '2.5rem', textShadow: '0 0 10px #64ffda' }}>AI_SURFER_SURVIVOR</h1>
+        <p style={{ color: '#8892b0' }}>V.2.06 // GLOBAL_ANOMALY_PROTOCOL</p>
+      </header>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+        {/* GAME ACCESS CARD */}
+        <div style={{ border: '1px solid #35c9ff', padding: '20px', background: 'rgba(17, 34, 64, 0.8)' }}>
+          <h2 style={{ color: '#35c9ff' }}>&gt; GAME_CLIENT</h2>
+          <p style={{ color: '#8892b0' }}>Status: {isMember ? 
+            <span style={{ color: '#64ffda' }}>AUTHORIZED</span> : 
+            <span style={{ color: '#ff5f5f' }}>UNAUTHORIZED</span>}
+          </p>
+          
           <button 
-            onClick={handleCheckout}
+            onClick={() => navigate('/survivor')}
             style={{
-              background: '#64ffda', color: '#0a192f', padding: '15px 30px', 
-              border: 'none', fontWeight: 'bold', cursor: 'pointer', width: '100%',
-              boxShadow: '0 0 15px rgba(100, 255, 218, 0.4)'
+              width: '100%', padding: '15px', marginTop: '20px',
+              background: isMember ? '#64ffda' : '#112240',
+              color: isMember ? '#0a192f' : '#35c9ff',
+              border: isMember ? 'none' : '1px solid #35c9ff',
+              fontWeight: 'bold', cursor: 'pointer'
             }}
           >
-            INITIATE_PAYMENT_PROTOCOL
+            {isMember ? 'LAUNCH_SYSTEM' : 'UPGRADE_REQUIRED'}
           </button>
         </div>
-      </div>
-      
-      <p style={{ marginTop: '20px', color: '#4e566d', fontSize: '0.8rem', textAlign: 'center' }}>
-        SECURE_ENCRYPTION_ACTIVE // STRIPE_TERMINAL_v2.0
-      </p>
-    </div>
-  );
-};
 
-export default Members;
+        {/* ACCOUNT MANAGEMENT CARD */}
+        <div style={{ border: '1px solid #8892b0', padding: '20px', background: 'rgba(10, 25, 47, 0.9)' }}>
+          <h2>&gt; ACCOUNT
