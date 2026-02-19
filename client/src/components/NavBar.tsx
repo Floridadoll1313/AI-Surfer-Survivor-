@@ -7,28 +7,38 @@ export default function NavBar() {
       display: 'flex',
       justifyContent: 'space-between',
       alignItems: 'center',
-      padding: '20px 40px',
+      padding: '25px 50px',
       background: '#0a192f',
-      borderBottom: '1px solid rgba(53, 201, 255, 0.3)'
+      borderBottom: '1px solid rgba(53, 201, 255, 0.2)',
+      position: 'sticky',
+      top: 0,
+      zIndex: 1100
     }}>
-      <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#35c9ff', letterSpacing: '2px' }}>
+      <div style={{ 
+        fontSize: '1.6rem', 
+        fontWeight: '900', 
+        color: '#35c9ff', 
+        letterSpacing: '3px',
+        textTransform: 'uppercase'
+      }}>
         AI SURFER
       </div>
       
-      <div style={{ display: 'flex', gap: '30px' }}>
-        <Link to="/" style={linkStyle}>Home</Link>
-        <Link to="/world" style={linkStyle}>The Island</Link>
-        <Link to="/challenges" style={linkStyle}>Challenges</Link>
+      <div style={{ display: 'flex', gap: '40px' }}>
+        <Link to="/" style={navLinkStyle}>Console</Link>
+        <Link to="/world" style={navLinkStyle}>The Island</Link>
+        <Link to="/challenges" style={navLinkStyle}>Trials</Link>
       </div>
     </nav>
   );
 }
 
-const linkStyle = {
+const navLinkStyle = {
   color: '#ffffff',
   textDecoration: 'none',
-  fontSize: '0.85rem',
+  fontSize: '0.8rem',
   textTransform: 'uppercase' as const,
-  letterSpacing: '1px',
-  fontWeight: '600'
+  letterSpacing: '2px',
+  fontWeight: '700',
+  transition: 'color 0.3s ease'
 };
