@@ -22,37 +22,62 @@ const SurvivorWorld = () => {
   const [fragments, setFragments] = useState<{ x: number, y: number }[]>([]);
   const [enemyPosition, setEnemyPosition] = useState({ x: 9, y: 9 });
   const [score, setScore] = useState(0);
-  const [credits, setCredits] = useState(0); // New Currency
+  const [credits, setCredits] = useState(0);
   const [isGameOver, setIsGameOver] = useState(false);
   const [isShopOpen, setIsShopOpen] = useState(false);
   const [logs, setLogs] = useState<string[]>(['> SIMULATION_LOADED']);
 
-  // --- UPGRADES ---
+  // --- QUEST SYSTEM ---
+  const [currentQuest, setCurrentQuest] = useState<{ desc: string, target: number, progress: number, reward: number } | null>({
+    desc: "RECOVER_5_FRAGMENTS",
+    target: 5,
+    progress: 0,
+    reward: 50
+  });
+
+  // --- UPGRADES & LIVES ---
   const [hasAutoShield, setHasAutoShield] = useState(false);
   const [extraLives, setExtraLives] = useState(0);
 
   const addLog = (msg: string) => setLogs(prev => [`> ${msg}`, ...prev].slice(0, 6));
 
+  // --- QUEST LOGIC ---
+  const updateQuest = useCallback(() => {
+    if (!currentQuest) return;
+    
+    const newProgress = currentQuest.progress + 1;
+    if (newProgress >= currentQuest.target) {
+      setCredits(c => c + currentQuest.reward);
+      addLog(`QUEST_COMPLETE: +${currentQuest.reward} CREDITS`);
+      playSound('questComplete');
+      
+      // Generate next quest
+      const quests = [
+        { desc: "RECOVER_10_FRAGMENTS", target: 10, reward: 120 },
+        { desc: "ELITE_RECOVERY_15", target: 15, reward: 250 }
+      ];
+      setCurrentQuest({ ...quests[Math.floor(Math.random() * quests.length)], progress: 0 });
+    } else {
+      setCurrentQuest({ ...currentQuest, progress: newProgress });
+    }
+  }, [currentQuest]);
+
   // --- SHOP LOGIC ---
-  const buyUpgrade = (type: 'SHIELD' | 'LIFE' | 'ENERGY') => {
+  const buyUpgrade = (type: 'SHIELD' | 'LIFE') => {
     if (type === 'SHIELD' && credits >= 50) {
       setHasAutoShield(true);
       setCredits(c => c - 50);
-      addLog('PURCHASED: AUTO_SHIELD_V1');
+      addLog('SHIELD_EQUIPPED');
     } else if (type === 'LIFE' && credits >= 100) {
       setExtraLives(l => l + 1);
       setCredits(c => c - 100);
-      addLog('PURCHASED: EXTRA_LIFE');
-    } else if (type === 'ENERGY' && credits >= 20) {
-      // Logic for instant energy refill
-      setCredits(c => c - 20);
-      addLog('PURCHASED: ENERGY_REFILL');
+      addLog('LIFE_EXTENDED');
     } else {
-      addLog('INSUFFICIENT_CREDITS');
+      addLog('INSUFFICIENT_DATA_CREDITS');
     }
   };
 
-  // --- MOVEMENT & COLLISION ---
+  // --- MOVEMENT ---
   const handleMove = useCallback((dx: number, dy: number) => {
     if (isGameOver || isShopOpen) return;
     setPlayerPosition(prev => {
@@ -62,27 +87,28 @@ const SurvivorWorld = () => {
       const fragIdx = fragments.findIndex(f => f.x === newX && f.y === newY);
       if (fragIdx !== -1) {
         setScore(s => s + 10);
-        setCredits(c => c + 5); // Gain credits per fragment
+        setCredits(c => c + 5);
         setFragments(f => f.filter((_, i) => i !== fragIdx));
+        updateQuest();
         playSound('collect');
       }
 
-      // Check Enemy Collision
       if (newX === enemyPosition.x && newY === enemyPosition.y) {
         if (hasAutoShield) {
           setHasAutoShield(false);
-          addLog('SHIELD_BROKEN');
+          addLog('SHIELD_DEPLETED');
         } else if (extraLives > 0) {
           setExtraLives(l => l - 1);
-          setPlayerPosition({ x: 0, y: 0 }); // Respawn at start
-          addLog('LIFE_LOST: RESPAWNING');
+          setPlayerPosition({ x: 0, y: 0 });
+          addLog('INTEGRITY_RECOVERED: -1 LIFE');
         } else {
           setIsGameOver(true);
+          addLog('SYSTEM_CRITICAL: SHUTDOWN');
         }
       }
       return { x: newX, y: newY };
     });
-  }, [fragments, enemyPosition, hasAutoShield, extraLives, isGameOver, isShopOpen]);
+  }, [fragments, enemyPosition, hasAutoShield, extraLives, isGameOver, isShopOpen, updateQuest]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -101,30 +127,40 @@ const SurvivorWorld = () => {
   return (
     <div className="survivor-world" style={{ borderColor: THEME_COLOR }}>
       <style>{`
-        .shop-overlay { position: absolute; top: 10%; left: 10%; width: 80%; height: 80%; background: #000; border: 2px solid ${THEME_COLOR}; z-index: 20; padding: 20px; color: ${THEME_COLOR}; }
-        .shop-item { display: flex; justify-content: space-between; margin: 10px 0; padding: 5px; border: 1px solid #333; cursor: pointer; }
-        .shop-item:hover { background: #222; }
-        .player-shield { border: 2px solid #00f0ff !important; box-shadow: 0 0 10px #00f0ff; }
+        .quest-banner { background: rgba(100, 255, 218, 0.1); padding: 5px 15px; border-bottom: 1px solid ${THEME_COLOR}; font-size: 0.75rem; width: 100%; display: flex; justify-content: space-between; }
+        .progress-bar { width: 50px; height: 6px; background: #222; border: 1px solid ${THEME_COLOR}; position: relative; }
+        .progress-fill { height: 100%; background: ${THEME_COLOR}; transition: width 0.3s; }
+        .shop-overlay { position: absolute; top: 15%; left: 10%; width: 80%; background: #000; border: 2px solid ${THEME_COLOR}; z-index: 20; padding: 20px; box-shadow: 0 0 20px #000; }
       `}</style>
+
+      {currentQuest && (
+        <div className="quest-banner">
+          <span>QUEST: {currentQuest.desc}</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <span>{currentQuest.progress}/{currentQuest.target}</span>
+            <div className="progress-bar">
+              <div className="progress-fill" style={{ width: `${(currentQuest.progress / currentQuest.target) * 100}%` }} />
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="game-header">
         <div className="stat">CREDITS: {credits}</div>
-        <div className="stat">LIVES: {extraLives}</div>
+        <div className="stat" style={{ color: extraLives > 0 ? THEME_COLOR : '#ff4444' }}>LIVES: {extraLives}</div>
       </div>
 
       {isShopOpen && (
         <div className="shop-overlay">
-          <h3>UPGRADE_TERMINAL [S to Close]</h3>
-          <p>Available Credits: {credits}</p>
-          <div className="shop-item" onClick={() => buyUpgrade('SHIELD')}>
-            <span>AUTO_SHIELD (1 Use)</span> <span>50c</span>
+          <h3 style={{ margin: '0 0 15px 0' }}>UPGRADE_TERMINAL</h3>
+          <div style={{ borderBottom: `1px solid ${THEME_COLOR}`, marginBottom: '10px' }} />
+          <div className="shop-item" onClick={() => buyUpgrade('SHIELD')} style={{ cursor: 'pointer', padding: '10px', border: '1px solid #333', marginBottom: '5px' }}>
+            AUTO_SHIELD [50c] {hasAutoShield ? '(ACTIVE)' : ''}
           </div>
-          <div className="shop-item" onClick={() => buyUpgrade('LIFE')}>
-            <span>EXTRA_LIFE</span> <span>100c</span>
+          <div className="shop-item" onClick={() => buyUpgrade('LIFE')} style={{ cursor: 'pointer', padding: '10px', border: '1px solid #333' }}>
+            EXTRA_LIFE [100c]
           </div>
-          <div className="shop-item" onClick={() => buyUpgrade('ENERGY')}>
-            <span>ENERGY_PACK</span> <span>20c</span>
-          </div>
+          <p style={{ fontSize: '0.7rem', marginTop: '10px' }}>PRESS 'S' TO RESUME SIMULATION</p>
         </div>
       )}
 
@@ -142,7 +178,7 @@ const SurvivorWorld = () => {
         })}
       </div>
 
-      <div className="console-logs">{logs.map((l, i) => <div key={i}>{l}</div>)}</div>
+      <div className="console-logs">{logs.map((l, i) => <div key={i} style={{ fontSize: '0.7rem', opacity: 1 - (i * 0.15) }}>{l}</div>)}</div>
     </div>
   );
 };
