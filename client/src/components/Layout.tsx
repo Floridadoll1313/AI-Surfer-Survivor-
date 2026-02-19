@@ -1,40 +1,58 @@
-import React, { useState } from "react";
-import { Outlet } from "react-router-dom";
-import NavBar from "./NavBar";
-import SiteFooter from "./SiteFooter";
+import React, { useState, useEffect } from 'react';
+import { Outlet } from 'react-router-dom';
+import NavBar from './NavBar';
 
-export default function Layout() {
-  const [progress, setProgress] = useState(45); // Start at 45%
+const Layout = () => {
+  // 1. Initialize state by checking localStorage first
+  const [progress, setProgress] = useState(() => {
+    const saved = localStorage.getItem('survivor_progress');
+    return saved ? parseInt(saved, 10) : 0;
+  });
+
+  // 2. Optional: Keep the bar synced if progress changes elsewhere
+  useEffect(() => {
+    localStorage.setItem('survivor_progress', progress.toString());
+  }, [progress]);
 
   return (
-    <>
-      <style>{`
-        body { margin: 0; background: #020817; color: #ffffff; font-family: 'Inter', sans-serif; }
-        .otd-shell { min-height: 100vh; display: flex; flex-direction: column; }
-        .otd-main { flex: 1; padding: 60px 20px; max-width: 1200px; margin: 0 auto; width: 100%; box-sizing: border-box; }
-        .progress-hud {
-          position: fixed; top: 100px; right: 30px; width: 240px;
-          background: rgba(10, 25, 47, 0.98); border: 1px solid #35c9ff;
-          padding: 20px; border-radius: 12px; z-index: 1000;
-        }
-        .hud-label { font-size: 0.75rem; text-transform: uppercase; color: #35c9ff; font-weight: 800; display: block; margin-bottom: 10px; }
-        .bar-outer { width: 100%; height: 10px; background: #061426; border-radius: 5px; overflow: hidden; }
-        .bar-inner { height: 100%; background: #35c9ff; transition: width 0.5s ease-in-out; }
-      `}</style>
-      <div className="otd-shell">
-        <NavBar />
-        <div className="progress-hud">
-          <span className="hud-label">Sync Progress: {progress}%</span>
-          <div className="bar-outer">
-            <div className="bar-inner" style={{ width: `${progress}%` }}></div>
-          </div>
+    <div style={{ 
+      minHeight: '100vh', 
+      backgroundColor: '#020c1b', 
+      color: '#ffffff',
+      fontFamily: '"Segoe UI", Roboto, sans-serif' 
+    }}>
+      <NavBar />
+      
+      {/* GLOBAL SYNC BAR */}
+      <div style={{ 
+        position: 'sticky', 
+        top: '70px', 
+        zIndex: 100, 
+        background: '#020c1b', 
+        padding: '10px 20px',
+        borderBottom: '1px solid rgba(53, 201, 255, 0.2)'
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', marginBottom: '5px' }}>
+          <span style={{ color: '#35c9ff' }}>SYNC LEVEL</span>
+          <span style={{ color: '#64ffda' }}>{progress}%</span>
         </div>
-        <main className="otd-main">
-          {/* We pass the setProgress function to all child pages */}
-          <Outlet context={{ progress, setProgress }} />
-        </main>
-        <SiteFooter />
+        <div style={{ width: '100%', height: '8px', background: '#112240', borderRadius: '4px', overflow: 'hidden' }}>
+          <div style={{ 
+            width: `${progress}%`, 
+            height: '100%', 
+            background: 'linear-gradient(90deg, #35c9ff, #64ffda)',
+            transition: 'width 0.5s ease-out',
+            boxShadow: '0 0 10px #35c9ff'
+          }} />
+        </div>
       </div>
-    </>
+
+      <main>
+        {/* We pass setProgress through the Outlet context so all pages can use it */}
+        <Outlet context={{ setProgress }} />
+      </main>
+    </div>
   );
-}
+};
+
+export default Layout;
