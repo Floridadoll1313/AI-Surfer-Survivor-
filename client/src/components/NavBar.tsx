@@ -9,28 +9,26 @@ export default function NavBar() {
       alignItems: 'center',
       padding: '20px 40px',
       background: '#0a192f',
-      borderBottom: '1px solid rgba(53, 201, 255, 0.3)',
-      color: '#ffffff'
+      borderBottom: '1px solid rgba(53, 201, 255, 0.3)'
     }}>
-      <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#35c9ff' }}>
+      <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#35c9ff', letterSpacing: '2px' }}>
         AI SURFER
       </div>
       
-      <div style={{ display: 'flex', gap: '25px' }}>
-        <Link to="/" style={navItemStyle}>Home</Link>
-        <Link to="/world" style={navItemStyle}>The Island</Link>
-        <Link to="/challenges" style={navItemStyle}>Challenges</Link>
-        <Link to="/lessons" style={navItemStyle}>Mastery</Link>
+      <div style={{ display: 'flex', gap: '30px' }}>
+        <Link to="/" style={linkStyle}>Home</Link>
+        <Link to="/world" style={linkStyle}>The Island</Link>
+        <Link to="/challenges" style={linkStyle}>Challenges</Link>
       </div>
     </nav>
   );
 }
 
-const navItemStyle = {
+const linkStyle = {
   color: '#ffffff',
   textDecoration: 'none',
-  fontSize: '0.9rem',
+  fontSize: '0.85rem',
   textTransform: 'uppercase' as const,
   letterSpacing: '1px',
-  fontWeight: '500'
+  fontWeight: '600'
 };
