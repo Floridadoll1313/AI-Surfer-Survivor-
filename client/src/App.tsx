@@ -9,7 +9,6 @@ import Home from './pages/Home';
 import MapPage from './pages/MapPage';
 import Equipment from './pages/Equipment';
 import Leaderboard from './pages/Leaderboard';
-import Challenges from './pages/Challenges';
 
 // --- HELPER COMPONENTS ---
 
@@ -62,9 +61,14 @@ const LoadingScreen = ({ onFinished }: { onFinished: () => void }) => {
 
 // --- MAIN APP ROUTER ---
 
+/**
+ * App Component
+ * Handles the global loading state and the primary routing table.
+ */
 const App = () => {
   const [isLoading, setIsLoading] = useState(true);
 
+  // If system is booting, show the terminal sequence
   if (isLoading) {
     return <LoadingScreen onFinished={() => setIsLoading(false)} />;
   }
@@ -72,11 +76,11 @@ const App = () => {
   return (
     <Router>
       <Routes>
+        {/* All routes are wrapped in the Layout for consistent Header/Footer */}
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
           <Route path="map" element={<MapPage />} />
           <Route path="equipment" element={<Equipment />} />
-          <Route path="challenges" element={<Challenges />} />
           <Route path="leaderboard" element={<Leaderboard />} />
         </Route>
       </Routes>
