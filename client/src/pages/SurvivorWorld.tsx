@@ -25,6 +25,7 @@ const SurvivorWorld = () => {
   const [fragments, setFragments] = useState<{ x: number, y: number }[]>([]);
   const [enemyPosition, setEnemyPosition] = useState({ x: 9, y: 9 });
   const [score, setScore] = useState(0);
+  const [highScore, setHighScore] = useState(Number(localStorage.getItem('survivor_highscore')) || 0);
   const [combo, setCombo] = useState(1);
   const [lastCollectTime, setLastCollectTime] = useState(0);
   const [isGameOver, setIsGameOver] = useState(false);
@@ -32,7 +33,6 @@ const SurvivorWorld = () => {
   const [copyFeedback, setCopyFeedback] = useState('SHARE_SCORE');
 
   // --- TUTORIAL & ABILITY STATE ---
-  const [showTutorial, setShowTutorial] = useState(!localStorage.getItem('survivor_tutorial_seen'));
   const [abilityActive, setAbilityActive] = useState(false);
   const [onCooldown, setOnCooldown] = useState(false);
   const [cooldownPercent, setCooldownPercent] = useState(0);
@@ -66,7 +66,9 @@ const SurvivorWorld = () => {
       if (hitIndex !== -1) {
         const now = Date.now();
         const newCombo = (now - lastCollectTime < 2000) ? combo + 1 : 1;
-        setScore(s => s + (10 * newCombo));
+        const points = 10 * newCombo;
+        
+        setScore(s => s + points);
         setCombo(newCombo);
         setLastCollectTime(now);
         setFragments(prevFrags => prevFrags.filter((_, i) => i !== hitIndex));
@@ -113,6 +115,15 @@ const SurvivorWorld = () => {
     }, 200);
   }, [onCooldown, isGameOver, currentSkill.name]);
 
+  // --- HIGH SCORE PERSISTENCE ---
+  useEffect(() => {
+    if (isGameOver && score > highScore) {
+      setHighScore(score);
+      localStorage.setItem('survivor_highscore', score.toString());
+      addLog('NEW_PERSONAL_BEST_RECORDS_UPDATED');
+    }
+  }, [isGameOver, score, highScore]);
+
   // --- KEYBOARD SUPPORT ---
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -141,16 +152,17 @@ const SurvivorWorld = () => {
         .overlay {
           position: absolute;
           top: 0; left: 0; right: 0; bottom: 0;
-          background: rgba(0, 0, 0, 0.85);
+          background: rgba(0, 0, 0, 0.9);
           display: flex;
           flex-direction: column;
           align-items: center;
           justify-content: center;
           z-index: 10;
           text-align: center;
-          backdrop-filter: blur(4px);
+          backdrop-filter: blur(6px);
         }
-        .overlay h2 { color: #ff4444; margin-bottom: 10px; }
+        .overlay h2 { color: #ff4444; margin-bottom: 5px; text-shadow: 0 0 10px #ff0000; }
+        .overlay .high-score-msg { color: #ffcc00; font-size: 0.8rem; margin-bottom: 15px; }
         .overlay button {
           margin: 5px;
           padding: 10px 20px;
@@ -158,13 +170,14 @@ const SurvivorWorld = () => {
           color: ${THEME_COLOR};
           border: 1px solid ${THEME_COLOR};
           cursor: pointer;
+          min-width: 140px;
         }
         .overlay button:hover { background: ${THEME_COLOR}33; }
       `}</style>
 
       <div className="game-header">
         <div className="stat">SCORE: {score.toString().padStart(5, '0')}</div>
-        <div className="stat">COMBO: x{combo}</div>
+        <div className="stat">BEST: {highScore.toString().padStart(5, '0')}</div>
       </div>
 
       <div className="grid-container">
@@ -208,7 +221,9 @@ const SurvivorWorld = () => {
       {isGameOver && (
         <div className="overlay">
           <h2>SYSTEM_HALTED</h2>
+          {score >= highScore && score > 0 && <p className="high-score-msg">★ NEW RECORD LOCALIZED ★</p>}
           <p>FINAL_SCORE: {score}</p>
+          <p style={{ fontSize: '0.8rem', opacity: 0.7 }}>BEST_SESSION: {highScore}</p>
           <button onClick={() => window.location.reload()}>REBOOT</button>
           <button onClick={shareStats}>{copyFeedback}</button>
         </div>
