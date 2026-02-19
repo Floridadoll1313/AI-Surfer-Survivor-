@@ -8,7 +8,6 @@ const Home = () => {
   const [showPass, setShowPass] = useState(false);
 
   useEffect(() => {
-    // Show the pass 1.5 seconds after landing
     const timer = setTimeout(() => setShowPass(true), 1500);
     return () => clearTimeout(timer);
   }, []);
@@ -21,7 +20,6 @@ const Home = () => {
 
   return (
     <div style={{ padding: '40px 20px', position: 'relative' }}>
-      {/* FOUNDER'S PASS MODAL */}
       {showPass && (
         <div style={{
           position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
@@ -38,32 +36,22 @@ const Home = () => {
               Welcome, Original Survivor. Your biometric signature has been logged. 
               Access to early-stage trials and the Never Ending Realm is now granted.
             </p>
-            <button 
-              onClick={() => setShowPass(false)}
-              style={{
+            <button onClick={() => setShowPass(false)} style={{
                 background: '#35c9ff', color: '#020817', border: 'none',
                 padding: '12px 30px', borderRadius: '5px', fontWeight: 'bold',
                 cursor: 'pointer', textTransform: 'uppercase'
-              }}>
-              Accept Credentials
-            </button>
+            }}>Accept Credentials</button>
           </div>
         </div>
       )}
 
       <div style={{ textAlign: 'center', marginBottom: '60px' }}>
-        <h1 style={{ fontSize: '3.5rem', color: '#ffffff', letterSpacing: '4px', marginBottom: '15px' }}>
-          OCEAN TIDE DROP
-        </h1>
-        <p style={{ fontSize: '1.1rem', color: '#35c9ff', textTransform: 'uppercase', letterSpacing: '2px' }}>
-          System Status: Online // Survivor Verified
-        </p>
+        <h1 style={{ fontSize: '3.5rem', color: '#ffffff', letterSpacing: '4px' }}>OCEAN TIDE DROP</h1>
+        <p style={{ color: '#35c9ff', textTransform: 'uppercase', letterSpacing: '2px' }}>System Status: Online</p>
       </div>
 
       <div style={{ maxWidth: '700px', margin: '0 auto' }}>
-        <h2 style={{ color: '#ffffff', fontSize: '1.2rem', borderBottom: '1px solid #35c9ff', paddingBottom: '10px', marginBottom: '20px' }}>
-          SURVIVAL LOGS
-        </h2>
+        <h2 style={{ color: '#ffffff', fontSize: '1.2rem', borderBottom: '1px solid #35c9ff', paddingBottom: '10px', marginBottom: '20px' }}>SURVIVAL LOGS</h2>
         {logs.map(log => (
           <div key={log.id} style={{ 
             background: 'rgba(53, 201, 255, 0.05)', padding: '15px', borderRadius: '4px', 
@@ -78,12 +66,32 @@ const Home = () => {
   );
 };
 
+const Equipment = () => {
+  const items = [
+    { name: "Biometric Link", desc: "Syncs your pulse to the Realm's data flow.", rarity: "Essential" },
+    { name: "Digital Compass", desc: "Points toward the nearest stable synchronization node.", rarity: "Common" }
+  ];
+
+  return (
+    <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+      <h1 style={{ color: '#35c9ff', fontSize: '2.5rem' }}>SURVIVAL GEAR</h1>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '20px', marginTop: '30px' }}>
+        {items.map((item, i) => (
+          <div key={i} style={{ background: '#0a192f', border: '1px solid rgba(53, 201, 255, 0.3)', padding: '20px', borderRadius: '10px' }}>
+            <div style={{ color: '#ff9f40', fontSize: '0.7rem', textTransform: 'uppercase', marginBottom: '5px' }}>{item.rarity}</div>
+            <h3 style={{ color: '#ffffff', margin: '0 0 10px 0' }}>{item.name}</h3>
+            <p style={{ color: '#b0c4de', fontSize: '0.9rem', lineHeight: '1.4' }}>{item.desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 const Island = () => (
   <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
-    <h1 style={{ color: '#35c9ff', fontSize: '2.5rem', marginBottom: '10px' }}>SURVIVOR MAP</h1>
-    <div style={{ border: '2px solid rgba(53, 201, 255, 0.4)', padding: '20px', borderRadius: '15px', background: '#0a192f' }}>
-      <img src="https://otdaisurfer.surf/AI%20Surfer%20Survivor%20Island%20Map.png" alt="Island Map" style={{ width: '100%', borderRadius: '10px' }} />
-    </div>
+    <h1 style={{ color: '#35c9ff', fontSize: '2.5rem' }}>SURVIVOR MAP</h1>
+    <img src="https://otdaisurfer.surf/AI%20Surfer%20Survivor%20Island%20Map.png" alt="Map" style={{ width: '100%', borderRadius: '15px', border: '2px solid rgba(53, 201, 255, 0.4)' }} />
   </div>
 );
 
@@ -105,6 +113,7 @@ export default function App() {
           <Route index element={<Home />} />
           <Route path="world" element={<Island />} />
           <Route path="challenges" element={<Challenges />} />
+          <Route path="equipment" element={<Equipment />} />
         </Route>
       </Routes>
     </Router>
