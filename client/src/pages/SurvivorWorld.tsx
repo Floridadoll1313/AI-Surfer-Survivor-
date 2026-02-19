@@ -24,6 +24,7 @@ const SurvivorWorld = () => {
   const [playerPosition, setPlayerPosition] = useState({ x: 0, y: 0 });
   const [fragments, setFragments] = useState<{ x: number, y: number }[]>([]);
   const [enemyPosition, setEnemyPosition] = useState({ x: 9, y: 9 });
+  const [bossPosition, setBossPosition] = useState<{ x: number, y: number } | null>(null);
   const [score, setScore] = useState(0);
   const [highScore, setHighScore] = useState(Number(localStorage.getItem('survivor_highscore')) || 0);
   const [combo, setCombo] = useState(1);
@@ -32,10 +33,10 @@ const SurvivorWorld = () => {
   const [logs, setLogs] = useState<string[]>(['> SIMULATION_LOADED']);
   const [copyFeedback, setCopyFeedback] = useState('SHARE_SCORE');
 
-  // --- DIFFICULTY & SAFE ZONE ---
+  // --- DIFFICULTY & ENERGY ---
   const [difficultyLevel, setDifficultyLevel] = useState(1);
   const [energy, setEnergy] = useState(100);
-  const enemySpeed = Math.max(300, 1000 - (difficultyLevel * 100));
+  const enemySpeed = Math.max(250, 1000 - (difficultyLevel * 100));
   
   const isSafeRect = playerPosition.x >= 4 && playerPosition.x <= 5 && 
                      playerPosition.y >= 4 && playerPosition.y <= 5;
@@ -48,7 +49,50 @@ const SurvivorWorld = () => {
 
   const addLog = (msg: string) => setLogs(prev => [`> ${msg}`, ...prev].slice(0, 6));
 
-  // --- SAFE ZONE ENERGY DRAIN ---
+  // --- BOSS LOGIC ---
+  useEffect(() => {
+    const shouldHaveBoss = score > 0 && score % 500 === 0;
+    const bossActive = bossPosition !== null;
+
+    if (shouldHaveBoss && !bossActive) {
+      setBossPosition({ x: 0, y: 9 });
+      addLog('!!! BOSS_SENTINEL_DETECTED !!!');
+      playSound('bossSpawn'); 
+    } else if (score % 500 !== 0 && score % 500 < 100 && bossActive) {
+      // Keep boss active for 100 points after spawn
+    } else if (bossActive && score % 500 >= 100) {
+      setBossPosition(null);
+      addLog('BOSS_SENTINEL_DEFEATED');
+    }
+  }, [score, bossPosition]);
+
+  // --- BOSS MOVEMENT (Blink Pattern) ---
+  useEffect(() => {
+    if (isGameOver || !bossPosition || isPlayerInSafeZone) return;
+
+    const moveBoss = setInterval(() => {
+      setBossPosition(bp => {
+        if (!bp) return null;
+        const bdx = playerPosition.x > bp.x ? 2 : playerPosition.x < bp.x ? -2 : 0;
+        const bdy = playerPosition.y > bp.y ? 2 : playerPosition.y < bp.y ? -2 : 0;
+        
+        const nextB = { 
+          x: Math.max(0, Math.min(9, bp.x + bdx)), 
+          y: Math.max(0, Math.min(9, bp.y + bdy)) 
+        };
+
+        if (nextB.x === playerPosition.x && nextB.y === playerPosition.y && !abilityActive) {
+          setIsGameOver(true);
+          playSound('death');
+        }
+        return nextB;
+      });
+    }, enemySpeed / 1.5);
+
+    return () => clearInterval(moveBoss);
+  }, [playerPosition, bossPosition, enemySpeed, isGameOver, abilityActive, isPlayerInSafeZone]);
+
+  // --- ENERGY DRAIN ---
   useEffect(() => {
     if (isGameOver) return;
     const timer = setInterval(() => {
@@ -63,12 +107,9 @@ const SurvivorWorld = () => {
     return () => clearInterval(timer);
   }, [isSafeRect, energy, isGameOver]);
 
-  // --- GAME LOGIC: SPAWNING ---
+  // --- SPAWNING ---
   const spawnFragment = useCallback(() => {
-    const newFrag = {
-      x: Math.floor(Math.random() * 10),
-      y: Math.floor(Math.random() * 10)
-    };
+    const newFrag = { x: Math.floor(Math.random() * 10), y: Math.floor(Math.random() * 10) };
     if (newFrag.x >= 4 && newFrag.x <= 5 && newFrag.y >= 4 && newFrag.y <= 5) {
       spawnFragment();
       return;
@@ -83,45 +124,29 @@ const SurvivorWorld = () => {
     }
   }, [fragments, spawnFragment, isGameOver]);
 
-  // --- DIFFICULTY UPDATE ---
-  useEffect(() => {
-    const newLevel = Math.floor(score / 100) + 1;
-    if (newLevel > difficultyLevel) {
-      setDifficultyLevel(newLevel);
-      addLog(`DIFFICULTY_INCREASED: LEVEL_${newLevel}`);
-      playSound('levelUp'); 
-    }
-  }, [score, difficultyLevel]);
-
   // --- ENEMY AUTO-MOVE ---
   useEffect(() => {
     if (isGameOver || isPlayerInSafeZone) return;
-
     const moveEnemy = setInterval(() => {
       setEnemyPosition(ep => {
         const edx = playerPosition.x > ep.x ? 1 : playerPosition.x < ep.x ? -1 : 0;
         const edy = playerPosition.y > ep.y ? 1 : playerPosition.y < ep.y ? -1 : 0;
         const nextE = { x: ep.x + edx, y: ep.y + edy };
-
         if (nextE.x === playerPosition.x && nextE.y === playerPosition.y && !abilityActive) {
           setIsGameOver(true);
           playSound('death');
-          addLog('CRITICAL_FAILURE: CONNECTION_LOST');
         }
         return nextE;
       });
     }, enemySpeed);
-
     return () => clearInterval(moveEnemy);
   }, [playerPosition, enemySpeed, isGameOver, abilityActive, isPlayerInSafeZone]);
 
   const handleMove = useCallback((dx: number, dy: number) => {
     if (isGameOver) return;
-
     setPlayerPosition(prev => {
       const newX = Math.max(0, Math.min(9, prev.x + dx));
       const newY = Math.max(0, Math.min(9, prev.y + dy));
-      
       const hitIndex = fragments.findIndex(f => f.x === newX && f.y === newY);
       if (hitIndex !== -1) {
         const now = Date.now();
@@ -129,10 +154,10 @@ const SurvivorWorld = () => {
         setScore(s => s + (10 * newCombo));
         setCombo(newCombo);
         setLastCollectTime(now);
-        setEnergy(prevE => Math.min(100, prevE + 25)); // Recharge energy on collect
+        setEnergy(prevE => Math.min(100, prevE + 25));
         setFragments(prevFrags => prevFrags.filter((_, i) => i !== hitIndex));
         playSound('collect');
-        addLog(`DATA_RECOVERED (x${newCombo}) +ENERGY`);
+        addLog(`DATA_RECOVERED (x${newCombo})`);
       }
       return { x: newX, y: newY };
     });
@@ -143,30 +168,19 @@ const SurvivorWorld = () => {
     setAbilityActive(true);
     setOnCooldown(true);
     setCooldownPercent(100);
-    addLog(`ABILITY: ${currentSkill.name.toUpperCase()}`);
+    addLog(`ABILITY_ACTIVE`);
     setTimeout(() => setAbilityActive(false), 3000);
     const cdInterval = setInterval(() => {
       setCooldownPercent(prev => {
-        if (prev <= 0) {
-          clearInterval(cdInterval);
-          setOnCooldown(false);
-          return 0;
-        }
+        if (prev <= 0) { clearInterval(cdInterval); setOnCooldown(false); return 0; }
         return prev - 2;
       });
     }, 200);
-  }, [onCooldown, isGameOver, currentSkill.name]);
-
-  // --- PERSISTENCE & KEYBOARD ---
-  useEffect(() => {
-    if (isGameOver && score > highScore) {
-      setHighScore(score);
-      localStorage.setItem('survivor_highscore', score.toString());
-    }
-  }, [isGameOver, score, highScore]);
+  }, [onCooldown, isGameOver]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) e.preventDefault();
       switch(e.key) {
         case 'ArrowUp': handleMove(0, -1); break;
         case 'ArrowDown': handleMove(0, 1); break;
@@ -179,59 +193,40 @@ const SurvivorWorld = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [handleMove, triggerAbility]);
 
-  const shareStats = () => {
-    const card = generateCyberCard(selectedAvatar, score);
-    navigator.clipboard.writeText(card);
-    setCopyFeedback('COPIED!');
-    setTimeout(() => setCopyFeedback('SHARE_SCORE'), 2000);
-  };
-
   return (
     <div className="survivor-world" style={{ borderColor: THEME_COLOR }}>
       <style>{`
-        .overlay {
-          position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-          background: rgba(0, 0, 0, 0.9); display: flex; flex-direction: column;
-          align-items: center; justify-content: center; z-index: 10;
-          text-align: center; backdrop-filter: blur(6px);
-        }
-        .safe-zone-cell { border: 1px dashed ${energy > 0 ? THEME_COLOR : '#ff4444'}55 !important; background: ${energy > 0 ? THEME_COLOR : '#ff4444'}11; }
-        .energy-bar-container { width: 100%; height: 4px; background: #222; margin: 10px 0; border-radius: 2px; overflow: hidden; }
-        .energy-fill { height: 100%; background: ${THEME_COLOR}; transition: width 0.3s ease; }
-        .in-safe-zone { filter: drop-shadow(0 0 5px ${THEME_COLOR}); }
+        .overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10; backdrop-filter: blur(6px); }
+        .boss-icon { font-size: 1.5rem; animation: pulse 0.5s infinite; color: #ff0055; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        .energy-bar { width: 100%; height: 4px; background: #222; margin: 10px 0; }
+        .energy-fill { height: 100%; transition: width 0.3s; }
       `}</style>
 
       <div className="game-header">
-        <div className="stat-group">
-          <div className="stat">SCORE: {score.toString().padStart(5, '0')}</div>
-          <div className="difficulty-tag" style={{ color: isPlayerInSafeZone ? THEME_COLOR : '#ff4444' }}>
-            {isPlayerInSafeZone ? 'STATUS: CLOAKED' : energy <= 0 && isSafeRect ? 'SYSTEM_FAIL: NO_ENERGY' : `LVL_${difficultyLevel} SPEED: ${enemySpeed}ms`}
-          </div>
+        <div className="stat">SCORE: {score.toString().padStart(5, '0')}</div>
+        <div className="difficulty-tag" style={{ color: bossPosition ? '#ff0055' : THEME_COLOR }}>
+          {bossPosition ? '!!! BOSS_SENTINEL_ACTIVE !!!' : isPlayerInSafeZone ? 'CLOAKED' : `LVL_${difficultyLevel}`}
         </div>
         <div className="stat">BEST: {highScore.toString().padStart(5, '0')}</div>
       </div>
 
-      <div className="energy-bar-container">
-        <div className="energy-fill" style={{ width: `${energy}%`, backgroundColor: energy < 30 ? '#ff4444' : THEME_COLOR }} />
-      </div>
+      <div className="energy-bar"><div className="energy-fill" style={{ width: `${energy}%`, background: energy < 30 ? '#f44' : THEME_COLOR }} /></div>
 
       <div className="grid-container">
         {[...Array(100)].map((_, i) => {
-          const x = i % 10;
-          const y = Math.floor(i / 10);
+          const x = i % 10; const y = Math.floor(i / 10);
           const isPlayer = playerPosition.x === x && playerPosition.y === y;
           const isEnemy = enemyPosition.x === x && enemyPosition.y === y;
+          const isBoss = bossPosition?.x === x && bossPosition?.y === y;
           const isFrag = fragments.some(f => f.x === x && f.y === y);
           const isSafe = x >= 4 && x <= 5 && y >= 4 && y <= 5;
 
           return (
-            <div key={i} className={`cell ${abilityActive ? 'glitch-bg' : ''} ${isSafe ? 'safe-zone-cell' : ''}`}>
-              {isPlayer && (
-                <span className={`avatar-icon ${isPlayerInSafeZone ? 'in-safe-zone' : ''}`} style={{ color: THEME_COLOR }}>
-                  {avatarIcons[selectedAvatar]}
-                </span>
-              )}
+            <div key={i} className={`cell ${isSafe ? 'safe-zone-cell' : ''} ${abilityActive ? 'glitch-bg' : ''}`}>
+              {isPlayer && <span className={isPlayerInSafeZone ? 'in-safe-zone' : ''} style={{ color: THEME_COLOR }}>{avatarIcons[selectedAvatar]}</span>}
               {isEnemy && <span className="enemy-icon">⚡</span>}
+              {isBoss && <span className="boss-icon">👹</span>}
               {isFrag && <span className="frag-icon">✦</span>}
             </div>
           );
@@ -242,24 +237,19 @@ const SurvivorWorld = () => {
         <button onClick={() => handleMove(0, -1)}>▲</button>
         <div className="mid-row">
           <button onClick={() => handleMove(-1, 0)}>◀</button>
-          <button className={`ability-btn ${onCooldown ? 'disabled' : ''}`} onClick={triggerAbility} style={{ '--cd': `${cooldownPercent}%` } as any}>
-            {onCooldown ? '...' : '⚡'}
-          </button>
+          <button className={`ability-btn ${onCooldown ? 'disabled' : ''}`} onClick={triggerAbility} style={{ '--cd': `${cooldownPercent}%` } as any}>{onCooldown ? '...' : '⚡'}</button>
           <button onClick={() => handleMove(1, 0)}>▶</button>
         </div>
         <button onClick={() => handleMove(0, 1)}>▼</button>
       </div>
 
-      <div className="console-logs">
-        {logs.map((log, i) => <div key={i} className="log-line">{log}</div>)}
-      </div>
+      <div className="console-logs">{logs.map((log, i) => <div key={i} className="log-line">{log}</div>)}</div>
 
       {isGameOver && (
         <div className="overlay">
           <h2>SYSTEM_HALTED</h2>
-          <p>FINAL_SCORE: {score}</p>
+          <p>SCORE: {score}</p>
           <button onClick={() => window.location.reload()}>REBOOT</button>
-          <button onClick={shareStats}>{copyFeedback}</button>
         </div>
       )}
     </div>
