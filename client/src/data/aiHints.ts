@@ -21,5 +21,22 @@ if (target) {
     dx: target.x > player.x ? 1 : target.x < player.x ? -1 : 0,
     dy: target.y > player.y ? 1 : target.y < player.y ? -1 : 0
   };
+}`,
+
+  pathfinding: `// Mutation Awareness: Obstacle Avoidance
+if (fragments.length > 0) {
+  const target = fragments[0];
+  let dx = target.x > player.x ? 1 : target.x < player.x ? -1 : 0;
+  let dy = target.y > player.y ? 1 : target.y < player.y ? -1 : 0;
+
+  // Check if the intended move hits a Static Glitch (obstacle)
+  const isBlocked = obstacles.some(o => o.x === player.x + dx && o.y === player.y + dy);
+  
+  if (isBlocked) {
+    log("Path blocked! Recalculating...");
+    // Try moving on the other axis instead to go around
+    return { dx: dy, dy: dx }; 
+  }
+  return { dx, dy };
 }`
 };
