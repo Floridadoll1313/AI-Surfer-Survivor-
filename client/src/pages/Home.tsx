@@ -1,147 +1,132 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 /**
- * MapPage Component
- * Features: Interactive island map with coordinate tracking and status HUD.
+ * Home Component
+ * Features: Glitch Title, Automated System Logs, and User Submission Logs.
  */
-const MapPage = () => {
-  const [coords, setCoords] = useState({ x: 0, y: 0 });
+const Home = () => {
+  // 1. Initial State for Logs (combining system defaults with user-saved logs)
+  const [userLogs, setUserLogs] = useState<{ id: number, date: string, msg: string }[]>(() => {
+    const saved = localStorage.getItem('survivor_user_logs');
+    return saved ? JSON.parse(saved) : [];
+  });
+  
+  const [inputMsg, setInputMsg] = useState('');
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const bounds = e.currentTarget.getBoundingClientRect();
-    // Calculate coordinates relative to the image container
-    setCoords({
-      x: Math.floor(e.clientX - bounds.left),
-      y: Math.floor(e.clientY - bounds.top)
-    });
+  const systemLogs = [
+    { id: 's1', date: "2026.02.19", msg: "Sector Alpha synchronization stable." },
+    { id: 's2', date: "2026.02.18", msg: "Pulse Animation module integrated." }
+  ];
+
+  // 2. Save logs to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('survivor_user_logs', JSON.stringify(userLogs));
+  }, [userLogs]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!inputMsg.trim()) return;
+
+    const newLog = {
+      id: Date.now(),
+      date: new Date().toISOString().split('T')[0].replace(/-/g, '.'),
+      msg: inputMsg
+    };
+
+    setUserLogs([newLog, ...userLogs]);
+    setInputMsg('');
   };
 
   return (
-    <div style={{ 
-      padding: '40px', 
-      color: '#ffffff', 
-      display: 'flex', 
-      gap: '30px', 
-      flexWrap: 'wrap', 
-      justifyContent: 'center',
-      minHeight: '80vh'
-    }}>
+    <div style={{ padding: '60px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       
-      {/* MAIN NAVIGATION TERMINAL */}
-      <div style={{ flex: '2', minWidth: '400px', maxWidth: '900px' }}>
-        <h1 style={{ 
-          color: '#35c9ff', 
-          textShadow: '0 0 10px #35c9ff',
-          fontFamily: 'monospace',
-          marginBottom: '20px'
-        }}>
-          > REALM_NAVIGATION_SYSTEM
-        </h1>
-        
-        <div 
-          onMouseMove={handleMouseMove}
-          style={{ 
-            position: 'relative', 
-            border: '2px solid #35c9ff',
-            borderRadius: '15px',
-            overflow: 'hidden',
-            cursor: 'crosshair',
-            boxShadow: '0 0 30px rgba(53, 201, 255, 0.2)'
-          }}
-        >
-          {/* Using your repository's map asset */}
-          <img 
-            src="/AI Surfer Survivor Island Map.png" 
-            alt="Island Map" 
-            style={{ 
-              width: '100%', 
-              display: 'block', 
-              filter: 'brightness(0.7) contrast(1.1) sepia(0.1)' 
-            }}
-          />
-          
-          {/* FLOATING COORDINATE HUD */}
-          <div style={{
-            position: 'absolute', 
-            bottom: '20px', 
-            right: '20px',
-            background: 'rgba(10, 25, 47, 0.9)', 
-            padding: '10px 20px',
-            borderRadius: '5px', 
-            border: '1px solid #35c9ff',
-            fontSize: '0.9rem', 
-            color: '#64ffda', 
-            fontFamily: 'monospace',
-            boxShadow: '0 0 15px rgba(100, 255, 218, 0.2)'
-          }}>
-            X_POS: {coords.x} // Y_POS: {coords.y}
-          </div>
+      {/* GLITCH TITLE */}
+      <div className="glitch-wrapper">
+        <h1 className="glitch-text" data-text="OCEAN TIDE DROP">OCEAN TIDE DROP</h1>
+      </div>
+      
+      <p style={{ color: '#8892b0', marginTop: '10px', fontSize: '1.1rem', letterSpacing: '2px', fontFamily: 'monospace' }}>
+        SYSTEM_STATUS: <span style={{ color: '#64ffda' }}>OPERATIONAL</span>
+      </p>
 
-          {/* PULSING SECTOR NODE */}
-          <div 
-            onClick={() => alert("COMMENCING LANDING SEQUENCE...")}
+      {/* NEW: LOG SUBMISSION TERMINAL */}
+      <div style={{ 
+        maxWidth: '800px', width: '100%', margin: '40px auto 0',
+        padding: '20px', background: 'rgba(2, 12, 27, 0.6)',
+        border: '1px solid #64ffda', borderRadius: '8px'
+      }}>
+        <form onSubmit={handleSubmit} style={{ display: 'flex', gap: '10px' }}>
+          <span style={{ color: '#64ffda', fontFamily: 'monospace', paddingTop: '10px' }}>&gt;</span>
+          <input 
+            type="text"
+            value={inputMsg}
+            onChange={(e) => setInputMsg(e.target.value)}
+            placeholder="ENTER_SURVIVAL_LOG_ENTRY..."
             style={{
-              position: 'absolute', top: '45%', left: '52%',
-              width: '25px', height: '25px', borderRadius: '50%',
-              border: '2px solid #64ffda', background: 'rgba(100, 255, 218, 0.2)',
-              cursor: 'pointer', animation: 'map-pulse 2s infinite'
+              flex: 1, background: 'transparent', border: 'none',
+              outline: 'none', color: '#64ffda', fontFamily: 'monospace',
+              fontSize: '1rem', padding: '10px'
             }}
-            title="Sector 7: Hub Terminal"
           />
-        </div>
+          <button type="submit" style={{
+            background: '#64ffda', color: '#020c1b', border: 'none',
+            padding: '0 20px', cursor: 'pointer', fontFamily: 'monospace',
+            fontWeight: 'bold', borderRadius: '4px'
+          }}>
+            SUBMIT
+          </button>
+        </form>
       </div>
 
-      {/* BIOMETRIC SIDEBAR */}
+      {/* DYNAMIC LOG FEED */}
       <div style={{ 
-        flex: '1', 
-        minWidth: '280px', 
-        maxWidth: '350px',
-        background: 'rgba(17, 34, 64, 0.6)', 
-        padding: '30px', 
-        borderRadius: '15px', 
-        border: '1px solid #35c9ff',
-        height: 'fit-content'
+        maxWidth: '800px', width: '100%', margin: '30px auto',
+        padding: '30px', background: 'rgba(17, 34, 64, 0.4)',
+        borderRadius: '10px', border: '1px solid rgba(53, 201, 255, 0.2)'
       }}>
-        <h3 style={{ 
-          color: '#35c9ff', 
-          borderBottom: '1px solid #35c9ff', 
-          paddingBottom: '10px',
-          fontFamily: 'monospace'
-        }}>
-          LIVE_BIOMETRICS
-        </h3>
+        <h2 style={{ color: '#ffffff', fontSize: '1.2rem', borderBottom: '1px solid #35c9ff', paddingBottom: '15px', marginBottom: '20px', fontFamily: 'monospace' }}>
+          &gt; RECENT_SURVIVAL_LOGS
+        </h2>
         
-        <div style={{ margin: '25px 0', fontFamily: 'monospace' }}>
-          <p style={{ margin: '10px 0' }}>O2_LEVEL: <span style={{ color: '#64ffda' }}>98.4%</span></p>
-          <p style={{ margin: '10px 0' }}>HEART_RATE: <span style={{ color: '#64ffda' }}>72 BPM</span></p>
-          <p style={{ margin: '10px 0' }}>LINK_STABILITY: <span style={{ color: '#35c9ff' }}>OPTIMAL</span></p>
-        </div>
+        {/* User Logs Appear First */}
+        {userLogs.map(log => (
+          <div key={log.id} style={{ background: 'rgba(100, 255, 218, 0.05)', padding: '15px', marginBottom: '10px', borderLeft: '4px solid #64ffda', color: '#ffffff', fontFamily: 'monospace' }}>
+            <span style={{ color: '#64ffda', fontWeight: 'bold', marginRight: '10px' }}>[{log.date}]</span> {log.msg}
+          </div>
+        ))}
 
-        <h4 style={{ 
-          color: '#ffffff', 
-          fontSize: '0.8rem', 
-          textTransform: 'uppercase', 
-          letterSpacing: '1px',
-          marginTop: '30px'
-        }}>
-          ACTIVE_ZONES
-        </h4>
-        <ul style={{ listStyle: 'none', padding: 0, fontSize: '0.85rem', color: '#8892b0', fontFamily: 'monospace' }}>
-          <li style={{ padding: '8px 0', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>🟢 ALPHA_STATION</li>
-          <li style={{ padding: '8px 0', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>🟡 DELTA_REEF</li>
-          <li style={{ padding: '8px 0' }}>🔴 GAMMA_VOID</li>
-        </ul>
+        {/* System Logs */}
+        {systemLogs.map(log => (
+          <div key={log.id} style={{ background: 'rgba(53, 201, 255, 0.03)', padding: '15px', marginBottom: '10px', borderLeft: '4px solid #35c9ff', color: '#ffffff', fontFamily: 'monospace' }}>
+            <span style={{ color: '#35c9ff', fontWeight: 'bold', marginRight: '10px' }}>[{log.date}]</span> {log.msg}
+          </div>
+        ))}
       </div>
 
       <style>{`
-        @keyframes map-pulse {
-          0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(100, 255, 218, 0.7); }
-          70% { transform: scale(1.3); box-shadow: 0 0 0 15px rgba(100, 255, 218, 0); }
-          100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(100, 255, 218, 0); }
+        .glitch-wrapper { position: relative; }
+        .glitch-text {
+          font-size: 4rem; font-weight: 900; color: #ffffff;
+          text-transform: uppercase; position: relative;
+          text-shadow: 0 0 15px rgba(53, 201, 255, 0.6);
+        }
+        .glitch-text::before, .glitch-text::after {
+          content: attr(data-text); position: absolute;
+          top: 0; left: 0; width: 100%; height: 100%; opacity: 0.8;
+        }
+        .glitch-text::before { color: #35c9ff; z-index: -1; animation: glitch 3s cubic-bezier(.25, .46, .45, .94) both infinite; }
+        .glitch-text::after { color: #ff4d4d; z-index: -2; animation: glitch 3s cubic-bezier(.25, .46, .45, .94) reverse both infinite; }
+        @keyframes glitch {
+          0% { transform: translate(0); }
+          20% { transform: translate(-3px, 3px); }
+          40% { transform: translate(-3px, -3px); }
+          60% { transform: translate(3px, 3px); }
+          80% { transform: translate(3px, -3px); }
+          100% { transform: translate(0); }
         }
       `}</style>
     </div>
   );
 };
 
-export default MapPage;
+export default Home;
