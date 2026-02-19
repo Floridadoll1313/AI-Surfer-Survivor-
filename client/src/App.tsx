@@ -4,6 +4,7 @@ import { AvatarProvider } from './context/AvatarContext';
 import AvatarSelector from './pages/AvatarSelector';
 import Home from './pages/Home';
 import SurvivorWorld from './pages/SurvivorWorld';
+import Leaderboard from './pages/Leaderboard';
 import Header from './components/Header';
 
 function App() {
@@ -20,14 +21,10 @@ function App() {
           <Header />
           <main style={{ flex: 1 }}>
             <Routes>
-              {/* Home page shows the user's status */}
               <Route path="/" element={<Home />} />
-              
-              {/* Avatar page lets them change identity */}
               <Route path="/avatar" element={<AvatarSelector />} />
-              
-              {/* The Game World Grid */}
               <Route path="/game" element={<SurvivorWorld />} />
+              <Route path="/leaderboard" element={<Leaderboard />} />
             </Routes>
           </main>
         </div>
