@@ -2,19 +2,51 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useOutletContext } from 'react-router-dom';
 import Layout from './components/Layout';
 
-// --- PAGE COMPONENTS ---
+// --- HELPER COMPONENTS ---
 
-/**
- * Home Component: Founder's Pass & Survival Logs
- */
-const Home = () => {
-  const [showPass, setShowPass] = useState(false);
+const LoadingScreen = ({ onFinished }: { onFinished: () => void }) => {
+  const [logs, setLogs] = useState<string[]>([]);
+  const bootMessages = [
+    "> INITIALIZING SECTOR_ALPHA_TERMINAL...",
+    "> LOADING NEURAL_OS v1.0.4",
+    "> SCANNING BIOMETRICS...",
+    "> ESTABLISHING REALM CONNECTION...",
+    "> ACCESS GRANTED. WELCOME, SURFER."
+  ];
 
   useEffect(() => {
-    const timer = setTimeout(() => setShowPass(true), 1500);
-    return () => clearTimeout(timer);
-  }, []);
+    let currentLine = 0;
+    const interval = setInterval(() => {
+      if (currentLine < bootMessages.length) {
+        setLogs(prev => [...prev, bootMessages[currentLine]]);
+        currentLine++;
+      } else {
+        clearInterval(interval);
+        setTimeout(onFinished, 1000);
+      }
+    }, 600);
+    return () => clearInterval(interval);
+  }, [onFinished]);
 
+  return (
+    <div style={{
+      position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
+      backgroundColor: '#020c1b', color: '#35c9ff', zIndex: 9999,
+      fontFamily: '"Courier New", Courier, monospace',
+      display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '10%'
+    }}>
+      <div style={{ maxWidth: '600px' }}>
+        {logs.map((log, i) => <p key={i} style={{ margin: '5px 0', fontSize: '1.2rem' }}>{log}</p>)}
+        <div style={{ marginTop: '20px', width: '20px', height: '30px', background: '#35c9ff', animation: 'blink 1s infinite' }} />
+      </div>
+      <style>{`@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }`}</style>
+    </div>
+  );
+};
+
+// --- PAGE COMPONENTS ---
+
+const Home = () => {
   const logs = [
     { id: 1, date: "2026.02.19", msg: "Sector Alpha synchronization stable." },
     { id: 2, date: "2026.02.18", msg: "Pulse Animation module integrated." },
@@ -23,28 +55,6 @@ const Home = () => {
 
   return (
     <div style={{ padding: '40px 20px' }}>
-      {showPass && (
-        <div style={{
-          position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
-          backgroundColor: 'rgba(0,0,0,0.85)', zIndex: 2000,
-          display: 'flex', justifyContent: 'center', alignItems: 'center',
-          backdropFilter: 'blur(8px)'
-        }}>
-          <div style={{
-            background: '#0a192f', padding: '40px', borderRadius: '20px',
-            border: '2px solid #35c9ff', maxWidth: '500px', textAlign: 'center'
-          }}>
-            <h2 style={{ color: '#35c9ff', fontSize: '2rem' }}>FOUNDER'S PASS</h2>
-            <p style={{ color: '#ffffff', marginBottom: '25px' }}>Access to the Realm is granted.</p>
-            <button 
-              onClick={() => setShowPass(false)} 
-              style={{ background: '#35c9ff', color: '#020817', border: 'none', padding: '12px 30px', borderRadius: '5px', fontWeight: 'bold', cursor: 'pointer' }}
-            >
-              Accept Credentials
-            </button>
-          </div>
-        </div>
-      )}
       <h1 style={{ textAlign: 'center', fontSize: '3.5rem', color: '#ffffff', textShadow: '0 0 20px #35c9ff' }}>OCEAN TIDE DROP</h1>
       <div style={{ maxWidth: '700px', margin: '40px auto' }}>
         <h2 style={{ color: '#ffffff', borderBottom: '1px solid #35c9ff', paddingBottom: '10px' }}>SURVIVAL LOGS</h2>
@@ -58,10 +68,5 @@ const Home = () => {
   );
 };
 
-/**
- * Equipment Component: Item collection with LocalStorage persistence
- */
 const Equipment = () => {
-  const { setProgress } = useOutletContext<{ setProgress: React.Dispatch<React.SetStateAction<number>> }>();
-  const items = [
-    { id: 'bio
+  const { setProgress } = useOutletContext<{ setProgress:
