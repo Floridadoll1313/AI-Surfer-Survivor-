@@ -1,44 +1,17 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-:root {
-  --background: #0a192f;
-  --cyan: #22d3ee;
-  --gold: #facc15;
-}
-
-body {
-  margin: 0;
-  background-color: var(--background);
-  color: white;
-  font-family: 'Inter', system-ui, sans-serif;
-  overflow-x: hidden;
-}
-
-/* --- THE NEURAL TICKER ANIMATION --- */
-@keyframes ticker {
-  0% { transform: translate3d(0, 0, 0); }
-  100% { transform: translate3d(-50%, 0, 0); }
-}
-
-.ticker-wrapper {
-  display: flex;
-  width: 100%;
-}
-
-.ticker-content {
-  display: inline-block;
-  white-space: nowrap;
-  animation: ticker 40s linear infinite;
-  will-change: transform;
-}
-
-/* --- CUSTOM CYBERPUNK SCROLLBAR --- */
-::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-track { background: #0a192f; }
-::-webkit-scrollbar-thumb {
-  background: #1e293b;
-  border-radius: 10px;
-}
-::-webkit-scrollbar-thumb:hover { background: var(--cyan); }
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OTD AI SURFER | Sector 7</title>
+    <meta name="description" content="Official Portal for the Never Ending Realm Survivors." />
+    <link rel="icon" href="data:image/svg+xml,
+      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>
+        <text y='.9em' font-size='90'>🌊</text>
+      </svg>">
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
