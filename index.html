@@ -1,14 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>OTD AI SURFER | Sector 7</title>
-    <meta name="description" content="Official Portal for the Never Ending Realm Survivors.">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌊</text></svg>">
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OTD AI SURFER | Sector 7</title>
+
+  <!-- Meta -->
+  <meta name="description" content="Official Portal for the Never Ending Realm Survivors.">
+
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,
+    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>
+      <text y='.9em' font-size='90'>🌊</text>
+    </svg>">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+  <!-- Root Container -->
+  <div id="app-root">
+    <h1 class="title">Ocean Tide Drop — AI Surfer Survivor</h1>
+    <p class="subtitle">Sector 7 Access Portal</p>
+
+    <nav class="main-nav">
+      <a href="home.html">Home</a>
+      <a href="island.html">Island</a>
+      <a href="challenges.html">Challenges</a>
+      <a href="progression.html">Progression</a>
+      <a href="members.html">Members</a>
+      <a href="founders.html">Founders</a>
+    </nav>
+
+    <div id="dynamic-content"></div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="content.js" defer></script>
+  <script src="pages.js" defer></script>
+
+</body>
 </html>
