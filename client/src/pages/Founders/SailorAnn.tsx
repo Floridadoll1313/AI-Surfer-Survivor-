@@ -2,10 +2,13 @@ import React from "react";
 import FounderLayout from "./components/FounderLayout";
 import FounderImageRow from "./components/FounderImageRow";
 import FounderTextBlock from "./components/FounderTextBlock";
+import FoundersNav from "./components/FoundersNav";
 
 const SailorAnn: React.FC = () => {
   return (
     <FounderLayout title="Sailor Ann" role="The Gentle Heart">
+      <FoundersNav />
+
       <FounderImageRow
         images={[
           { src: "/20260220_130443.jpg", alt: "Sailor Ann sitting" },
