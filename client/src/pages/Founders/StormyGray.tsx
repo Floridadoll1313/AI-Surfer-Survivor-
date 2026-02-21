@@ -2,10 +2,13 @@ import React from "react";
 import FounderLayout from "./components/FounderLayout";
 import FounderImageRow from "./components/FounderImageRow";
 import FounderTextBlock from "./components/FounderTextBlock";
+import FoundersNav from "./components/FoundersNav";
 
 const StormyGray: React.FC = () => {
   return (
     <FounderLayout title="Stormy Gray" role="The Protector">
+      <FoundersNav />
+
       <FounderImageRow
         images={[
           {
