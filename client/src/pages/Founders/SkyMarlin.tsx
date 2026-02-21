@@ -2,10 +2,13 @@ import React from "react";
 import FounderLayout from "./components/FounderLayout";
 import FounderImageRow from "./components/FounderImageRow";
 import FounderTextBlock from "./components/FounderTextBlock";
+import FoundersNav from "./components/FoundersNav";
 
 const SkyMarlin: React.FC = () => {
   return (
     <FounderLayout title="Sky Marlin" role="The Little Captain">
+      <FoundersNav />
+
       <FounderImageRow
         images={[
           { src: "/20260220_131307.jpg", alt: "Sky Marlin in the tent" },
