@@ -2,18 +2,15 @@ import NavBar from "./NavBar";
 import SiteFooter from "./SiteFooter";
 import "../GlobalTheme.css";
 
-function Layout({ children }) {
+type LayoutProps = {
+  children: React.ReactNode;
+};
+
+function Layout({ children }: LayoutProps) {
   return (
     <div className="layout-wrapper">
-      {/* NAVIGATION */}
       <NavBar />
-
-      {/* PAGE CONTENT */}
-      <main className="layout-content">
-        {children}
-      </main>
-
-      {/* FOOTER */}
+      <main className="layout-content">{children}</main>
       <SiteFooter />
     </div>
   );
