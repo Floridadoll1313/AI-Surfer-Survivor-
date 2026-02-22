@@ -1,0 +1,33 @@
+
+`css
+.hero-cosmic {
+  position: relative;
+  padding: 120px 20px;
+  text-align: center;
+  background: radial-gradient(
+    circle at 50% 20%,
+    rgba(0, 255, 213, 0.15),
+    rgba(0, 10, 20, 1)
+  );
+  overflow: hidden;
+}
+
+.hero-cosmic::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("https://i.imgur.com/9z3sQ0P.png");
+  background-size: cover;
+  opacity: 0.25;
+  animation: starDrift 40s linear infinite;
+}
+
+@keyframes starDrift {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-20%);
+  }
+}
+`
