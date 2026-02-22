@@ -157,3 +157,14 @@ body {
   color: var(--glow-primary);
   text-shadow: 0 0 10px var(--glow-primary);
 }
+@keyframes pulseGlow {
+  0% {
+    text-shadow: 0 0 12px var(--glow-primary);
+  }
+  50% {
+    text-shadow: 0 0 28px var(--glow-primary);
+  }
+  100% {
+    text-shadow: 0 0 12px var(--glow-primary);
+  }
+}
