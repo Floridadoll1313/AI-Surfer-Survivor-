@@ -1,3 +1,5 @@
+
+`tsx
 import NavBar from "./NavBar";
 import SiteFooter from "./SiteFooter";
 import "../GlobalTheme.css";
@@ -18,3 +20,4 @@ function Layout({ children }) {
 }
 
 export default Layout;
+`
