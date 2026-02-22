@@ -1,0 +1,132 @@
+/* ================================
+   OCEAN TIDE DROP — GLOBAL THEME
+   Cosmic Neon Surf + Aqua-Teal Glow
+   ================================ */
+
+/* COLOR SYSTEM */
+:root {
+  --glow-primary: #00ffd5; /* aqua-teal glow */
+  --glow-secondary: #ff7b00; /* warm orange contrast */
+  --bg-dark: #00111a;
+  --bg-darker: #000a0f;
+  --text-light: #e6ffff;
+  --text-dim: #88aabb;
+}
+
+/* GLOBAL RESET */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Inter", sans-serif;
+}
+
+/* GLOBAL BACKGROUND */
+body {
+  background: var(--bg-dark);
+  color: var(--text-light);
+  overflow-x: hidden;
+}
+
+/* GLOW TEXT */
+.glow-title {
+  color: var(--glow-primary);
+  text-shadow:
+    0 0 12px var(--glow-primary),
+    0 0 24px var(--glow-primary),
+    0 0 48px rgba(0, 255, 213, 0.6);
+}
+
+/* HERO SECTION */
+.hero {
+  position: relative;
+  padding: 120px 20px;
+  text-align: center;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 255, 213, 0.15),
+    rgba(0, 17, 26, 1)
+  );
+}
+
+.hero h1 {
+  font-size: 3rem;
+  margin-bottom: 20px;
+}
+
+.hero p {
+  font-size: 1.3rem;
+  opacity: 0.9;
+}
+
+/* WAVE DIVIDER */
+.wave-divider {
+  width: 100%;
+  height: 80px;
+  background: url("https://i.imgur.com/8Kq8x7F.png") repeat-x;
+  background-size: contain;
+  opacity: 0.35;
+  margin: 40px 0;
+}
+
+/* GLOW BUTTONS */
+.btn-glow {
+  padding: 12px 28px;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--bg-dark);
+  background: var(--glow-primary);
+  box-shadow: 0 0 20px var(--glow-primary);
+  transition: 0.25s ease;
+}
+
+.btn-glow:hover {
+  box-shadow: 0 0 35px var(--glow-primary);
+  transform: translateY(-3px);
+}
+
+/* CARD GRID */
+.card-grid {
+  display: grid;
+  gap: 30px;
+  padding: 40px 20px;
+}
+
+@media (min-width: 700px) {
+  .card-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1100px) {
+  .card-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* CINEMATIC CARD */
+.card {
+  background: var(--bg-darker);
+  border: 1px solid rgba(0, 255, 213, 0.2);
+  border-radius: 14px;
+  padding: 24px;
+  text-align: center;
+  box-shadow: 0 0 20px rgba(0, 255, 213, 0.1);
+  transition: 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 0 35px rgba(0, 255, 213, 0.4);
+}
+
+.card h2 {
+  margin-bottom: 12px;
+  color: var(--glow-primary);
+}
+
+.card p {
+  opacity: 0.85;
+}
