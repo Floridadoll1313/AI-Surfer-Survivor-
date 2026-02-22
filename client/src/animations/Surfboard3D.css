@@ -1,0 +1,15 @@
+
+`css
+.surfboard-3d {
+  perspective: 1000px;
+}
+
+.surfboard-3d .inner {
+  transition: transform 0.6s ease;
+  transform-style: preserve-3d;
+}
+
+.surfboard-3d:hover .inner {
+  transform: rotateY(18deg) rotateX(6deg);
+}
+`
