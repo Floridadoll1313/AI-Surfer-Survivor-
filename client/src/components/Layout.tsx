@@ -1,16 +1,17 @@
 import NavBar from "./NavBar";
 import SiteFooter from "./SiteFooter";
 import "../GlobalTheme.css";
+import "../animations/PageTransitions.css";
 
-type LayoutProps = {
-  children: React.ReactNode;
-};
-
-function Layout({ children }: LayoutProps) {
+function Layout({ children }) {
   return (
     <div className="layout-wrapper">
       <NavBar />
-      <main className="layout-content">{children}</main>
+
+      <main className="layout-content page-transition">
+        {children}
+      </main>
+
       <SiteFooter />
     </div>
   );
