@@ -1,0 +1,46 @@
+
+`css
+.parallax-ocean {
+  position: relative;
+  height: 300px;
+  overflow: hidden;
+}
+
+.parallax-ocean .layer {
+  position: absolute;
+  inset: 0;
+  background-repeat: repeat-x;
+  background-size: cover;
+  opacity: 0.4;
+}
+
+.layer.wave1 {
+  background-image: url("https://i.imgur.com/8Kq8x7F.png");
+  animation: wave1 18s linear infinite;
+}
+
+.layer.wave2 {
+  background-image: url("https://i.imgur.com/8Kq8x7F.png");
+  animation: wave2 28s linear infinite;
+  opacity: 0.25;
+}
+
+@keyframes wave1 {
+  from { transform: translateX(0); }
+  to { transform: translateX(-20%); }
+}
+
+@keyframes wave2 {
+  from { transform: translateX(0); }
+  to { transform: translateX(-40%); }
+}
+`
+
+Use it anywhere:
+
+`html
+<div class="parallax-ocean">
+  <div class="layer wave1"></div>
+  <div class="layer wave2"></div>
+</div>
+`
