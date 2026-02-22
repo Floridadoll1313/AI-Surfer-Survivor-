@@ -1,0 +1,39 @@
+
+`css
+.hero-deepsea {
+  position: relative;
+  padding: 120px 20px;
+  text-align: center;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 5, 10, 1),
+    rgba(0, 0, 0, 1)
+  );
+  overflow: hidden;
+}
+
+.hero-deepsea::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at 50% 80%,
+    rgba(0, 255, 213, 0.1),
+    transparent 70%
+  );
+  animation: deepPulse 8s infinite ease-in-out;
+  opacity: 0.3;
+}
+
+@keyframes deepPulse {
+  0% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 0.2;
+  }
+}
+`
