@@ -168,3 +168,10 @@ body {
     text-shadow: 0 0 12px var(--glow-primary);
   }
 }
+`css
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+`
