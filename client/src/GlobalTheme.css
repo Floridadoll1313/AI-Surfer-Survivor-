@@ -28,6 +28,20 @@ body {
   overflow-x: hidden;
 }
 
+/* LAYOUT WRAPPER */
+.layout-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-dark);
+}
+
+/* MAIN CONTENT AREA */
+.layout-content {
+  flex: 1;
+  padding-bottom: 40px;
+}
+
 /* GLOW TEXT */
 .glow-title {
   color: var(--glow-primary);
