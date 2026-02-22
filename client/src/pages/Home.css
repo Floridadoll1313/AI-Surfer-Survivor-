@@ -1,0 +1,113 @@
+/* CINEMATIC HERO SECTION */
+.home-hero {
+  position: relative;
+  height: 85vh;
+  width: 100%;
+  background: linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.4),
+      rgba(0, 0, 0, 0.8)
+    ),
+    url("https://images.unsplash.com/photo-1507525428034-b723cf961d3e")
+      center/cover no-repeat;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+/* COSMIC OVERLAY */
+.home-overlay {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at center,
+    rgba(0, 200, 255, 0.25),
+    transparent 70%
+  );
+  pointer-events: none;
+}
+
+/* CONTENT */
+.home-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 20px;
+  max-width: 700px;
+}
+
+/* TITLE */
+.home-title {
+  font-size: 3rem;
+  font-weight: 800;
+  color: #00c8ff;
+  text-shadow: 0 0 20px rgba(0, 200, 255, 0.8),
+    0 0 40px rgba(0, 150, 255, 0.6);
+  margin-bottom: 10px;
+}
+
+/* SUBTITLE */
+.home-subtitle {
+  font-size: 1.3rem;
+  color: #ffffff;
+  opacity: 0.9;
+  margin-bottom: 30px;
+}
+
+/* BUTTONS */
+.home-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+/* BUTTON BASE */
+.home-btn {
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 1rem;
+  text-decoration: none;
+  font-weight: 600;
+  transition: 0.25s ease;
+}
+
+/* PRIMARY BUTTON */
+.home-btn.primary {
+  background: #00c8ff;
+  color: #001f3f;
+  box-shadow: 0 0 15px rgba(0, 200, 255, 0.7);
+}
+
+.home-btn.primary:hover {
+  background: #00a4d6;
+  box-shadow: 0 0 25px rgba(0, 200, 255, 1);
+}
+
+/* SECONDARY BUTTON */
+.home-btn.secondary {
+  background: transparent;
+  border: 2px solid #ff7b00;
+  color: #ff7b00;
+  box-shadow: 0 0 15px rgba(255, 123, 0, 0.5);
+}
+
+.home-btn.secondary:hover {
+  background: rgba(255, 123, 0, 0.2);
+  box-shadow: 0 0 25px rgba(255, 123, 0, 0.9);
+}
+
+/* MOBILE */
+@media (max-width: 600px) {
+  .home-title {
+    font-size: 2.2rem;
+  }
+
+  .home-subtitle {
+    font-size: 1.1rem;
+  }
+
+  .home-buttons {
+    flex-direction: column;
+  }
+}
