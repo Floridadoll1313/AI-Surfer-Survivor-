@@ -144,3 +144,16 @@ body {
 .card p {
   opacity: 0.85;
 }
+
+/* NAV LINKS */
+.nav-link {
+  color: var(--text-light);
+  text-decoration: none;
+  font-weight: 500;
+  transition: 0.25s ease;
+}
+
+.nav-link:hover {
+  color: var(--glow-primary);
+  text-shadow: 0 0 10px var(--glow-primary);
+}
