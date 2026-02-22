@@ -1,5 +1,6 @@
 import Layout from "../../components/Layout";
 import Hero from "../../components/Hero";
+import ScrollReveal from "../../components/ScrollReveal";
 import "../../GlobalTheme.css";
 
 function ShannonFounder() {
@@ -14,16 +15,22 @@ function ShannonFounder() {
       <div className="wave-divider"></div>
 
       <section style={{ padding: "40px 20px", maxWidth: "900px", margin: "0 auto" }}>
-        <h2 className="glow-title" style={{ fontSize: "2rem", marginBottom: "20px" }}>
-          The Architect of the Cosmic Tide
-        </h2>
+        <ScrollReveal>
+          <h2 className="glow-title" style={{ fontSize: "2rem", marginBottom: "20px" }}>
+            The Architect of the Cosmic Tide
+          </h2>
+        </ScrollReveal>
 
-        <p style={{ opacity: 0.85, lineHeight: "1.7", marginBottom: "30px" }}>
-          Shannon is the origin point — the spark that ignited the mythic world
-          of Ocean Tide Drop.
-        </p>
+        <ScrollReveal>
+          <p style={{ opacity: 0.85, lineHeight: "1.7", marginBottom: "30px" }}>
+            Shannon is the origin point — the spark that ignited the mythic world
+            of Ocean Tide Drop.
+          </p>
+        </ScrollReveal>
 
-        <a href="/founders" className="btn-glow">Back to Founders</a>
+        <ScrollReveal>
+          <a href="/founders" className="btn-glow">Back to Founders</a>
+        </ScrollReveal>
       </section>
     </Layout>
   );
