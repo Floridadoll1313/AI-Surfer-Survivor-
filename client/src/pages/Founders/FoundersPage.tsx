@@ -1,59 +1,38 @@
-import { Link } from "react-router-dom";
 import Layout from "../components/Layout";
+import Hero from "../components/Hero";
 import "../GlobalTheme.css";
 
 function FoundersPage() {
   return (
     <Layout>
-      {/* HERO SECTION */}
-      <section className="hero">
-        <h1 className="glow-title">The Founders</h1>
-        <p>
-          The legendary spirits who shaped the tides, guarded the storms, and
-          forged the mythic world of Ocean Tide Drop.
-        </p>
-      </section>
+      <Hero
+        title="The Founders"
+        subtitle="The spirits who shaped the tides, storms, and cosmic flow of Ocean Tide Drop."
+        variant="wave"
+      />
 
-      {/* WAVE DIVIDER */}
       <div className="wave-divider"></div>
 
-      {/* FOUNDER CARDS */}
       <div className="card-grid">
-        {/* SAILOR ANN */}
-        <Link to="/founders/sailor-ann" className="card">
+        <a href="/founders/sailor-ann" className="card">
           <h2>Sailor Ann</h2>
-          <p>
-            The fearless navigator of cosmic waters. Her intuition guides the
-            tides themselves.
-          </p>
-        </Link>
+          <p>The Navigator of Infinite Tides.</p>
+        </a>
 
-        {/* STORMY GRAY */}
-        <Link to="/founders/stormy-gray" className="card">
+        <a href="/founders/stormy-gray" className="card">
           <h2>Stormy Gray</h2>
-          <p>
-            The storm‑bringer with a gentle heart. Chaos and calm move at her
-            command.
-          </p>
-        </Link>
+          <p>The Keeper of Tempests.</p>
+        </a>
 
-        {/* SKY MARLIN */}
-        <Link to="/founders/sky-marlin" className="card">
+        <a href="/founders/sky-marlin" className="card">
           <h2>Sky Marlin</h2>
-          <p>
-            Guardian of the celestial waves. His presence bends starlight across
-            the ocean.
-          </p>
-        </Link>
+          <p>The Celestial Guardian.</p>
+        </a>
 
-        {/* SHANNON */}
-        <Link to="/founders/shannon" className="card">
+        <a href="/founders/shannon" className="card">
           <h2>Shannon</h2>
-          <p>
-            The visionary creator. The one who awakened the universe and gave it
-            purpose.
-          </p>
-        </Link>
+          <p>The Architect of the Cosmic Tide.</p>
+        </a>
       </div>
     </Layout>
   );
