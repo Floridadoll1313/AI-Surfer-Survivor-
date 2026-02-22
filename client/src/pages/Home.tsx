@@ -1,33 +1,19 @@
 import { Link } from "react-router-dom";
 import Layout from "../components/Layout";
+import Hero from "../components/Hero";
 import "../GlobalTheme.css";
 
 function Home() {
   return (
     <Layout>
-      {/* HERO SECTION */}
-      <section className="hero">
-        <h1 className="glow-title">Ocean Tide Drop</h1>
-        <p>
-          A cinematic AI surfer universe — where myth, creativity, and cosmic
-          tides shape every experience.
-        </p>
+      <Hero
+        title="Ocean Tide Drop"
+        subtitle="A cinematic AI surfer universe — where myth, creativity, and cosmic tides shape every experience."
+        variant="wave"
+      />
 
-        <div style={{ marginTop: "30px" }}>
-          <Link to="/founders" className="btn-glow" style={{ marginRight: "15px" }}>
-            Meet the Founders
-          </Link>
-
-          <Link to="/lore" className="btn-glow">
-            Explore the Lore
-          </Link>
-        </div>
-      </section>
-
-      {/* WAVE DIVIDER */}
       <div className="wave-divider"></div>
 
-      {/* FEATURE CARDS */}
       <div className="card-grid">
         <div className="card">
           <h2>Cosmic Worldbuilding</h2>
