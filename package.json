@@ -1,28 +1,22 @@
 {
-  "name": "otdaisurfer-portal",
-  "private": true,
+  "name": "ocean-tide-drop",
   "version": "1.0.0",
-  "type": "module",
+  "private": true,
+  "type": "commonjs",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
+    "build": "tsc && vite build",
+    "start": "node dist/server.js"
   },
   "dependencies": {
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-router-dom": "^6.26.2",
-    "lucide-react": "^0.441.0"
+    "express": "^4.19.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5"
   },
   "devDependencies": {
-    "@types/react": "^18.3.5",
-    "@types/react-dom": "^18.3.0",
-    "@vitejs/plugin-react": "^4.3.1",
-    "autoprefixer": "^10.4.20",
-    "postcss": "^8.4.47",
-    "tailwindcss": "^3.4.11",
-    "typescript": "^5.5.3",
-    "vite": "^5.4.2"
+    "@types/node": "^20.11.30",
+    "@types/express": "^4.17.21",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.12"
   }
 }
