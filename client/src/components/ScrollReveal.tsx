@@ -1,40 +1,22 @@
+import React, { useEffect } from "react";
 
-`tsx
-import { useEffect, useRef } from "react";
-import "../animations/ScrollRevealLore.css";
-
-function ScrollReveal({ children }) {
-  const ref = useRef(null);
-
+export default function ScrollReveal({ children }) {
   useEffect(() => {
-    const el = ref.current;
+    const elements = document.querySelectorAll("[data-reveal]");
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          el.classList.add("visible");
-        }
+      entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("revealed");
+          }
+        });
       },
-      { threshold: 0.2 }
+      { threshold: 0.1 }
     );
 
-    observer.observe(el);
+    elements.forEach(el => observer.observe(el));
     return () => observer.disconnect();
   }, []);
 
-  return (
-    <div ref={ref} className="reveal">
-      {children}
-    </div>
-  );
+  return <>{children}</>;
 }
-
-export default ScrollReveal;
-`
-
-Use it in lore pages:
-
-`tsx
-<ScrollReveal>
-  <p>...</p>
-</ScrollReveal>
-`
