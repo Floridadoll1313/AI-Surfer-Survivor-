@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import AppRoutes from "./Routes.jsx";   // <-- This is the critical line
+import AppRoutes from "./Routes.jsx";   // must match EXACT filename
 
 import "./index.css";
 
