@@ -25,73 +25,17 @@ export default function AppRoutes() {
         <AnimatePresence mode="wait">
           <Routes>
 
-            {/* --- Home / Landing --- */}
-            <Route
-              path="/"
-              element={
-                <PageTransition>
-                  <Home />
-                </PageTransition>
-              }
-            />
+            <Route path="/" element={<PageTransition><Home /></PageTransition>} />
 
-            {/* --- Sector Progression --- */}
-            <Route
-              path="/sector-1"
-              element={
-                <PageTransition>
-                  <SectorOne />
-                </PageTransition>
-              }
-            />
+            <Route path="/sector-1" element={<PageTransition><SectorOne /></PageTransition>} />
+            <Route path="/sector-2" element={<PageTransition><SectorTwo /></PageTransition>} />
+            <Route path="/sector-3" element={<PageTransition><SectorThree /></PageTransition>} />
 
-            <Route
-              path="/sector-2"
-              element={
-                <PageTransition>
-                  <SectorTwo />
-                </PageTransition>
-              }
-            />
+            <Route path="/lore" element={<PageTransition><LoreIndex /></PageTransition>} />
 
-            <Route
-              path="/sector-3"
-              element={
-                <PageTransition>
-                  <SectorThree />
-                </PageTransition>
-              }
-            />
+            <Route path="/ceremony/skin-unlock" element={<PageTransition><SkinUnlockCeremony /></PageTransition>} />
 
-            {/* --- Lore Engine --- */}
-            <Route
-              path="/lore"
-              element={
-                <PageTransition>
-                  <LoreIndex />
-                </PageTransition>
-              }
-            />
-
-            {/* --- Ceremonies --- */}
-            <Route
-              path="/ceremony/skin-unlock"
-              element={
-                <PageTransition>
-                  <SkinUnlockCeremony />
-                </PageTransition>
-              }
-            />
-
-            {/* --- 404 Fallback --- */}
-            <Route
-              path="*"
-              element={
-                <PageTransition>
-                  <NotFound />
-                </PageTransition>
-              }
-            />
+            <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
 
           </Routes>
         </AnimatePresence>
