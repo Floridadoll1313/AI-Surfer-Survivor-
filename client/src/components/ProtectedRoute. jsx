@@ -1,0 +1,18 @@
+import React from "react";
+import { Navigate, useParams } from "react-router-dom";
+import { useProgression } from "../source/hooks/ProgressionContext";
+
+export default function ProtectedRoute({ children }) {
+  const { unlockedSectors } = useProgression();
+  const { id } = useParams();
+
+  const sectorId = Number(id);
+
+  const isUnlocked = unlockedSectors.includes(sectorId);
+
+  if (!isUnlocked) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return children;
+}
