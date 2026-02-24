@@ -1,14 +1,13 @@
-import React from 'react';
-import { Navigate } from 'react-router-dom';
+import React from "react";
+import { Navigate } from "react-router-dom";
+import { useProgression } from "../source/hooks/ProgressionContext";
 
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const isMember = localStorage.getItem('membership_active') === 'true';
+export default function ProtectedRoute({ children }) {
+  const { isUnlocked } = useProgression();
 
-  if (!isMember) {
-    return <Navigate to="/members" replace />;
+  if (!isUnlocked) {
+    return <Navigate to="/" replace />;
   }
 
-  return <>{children}</>;
-};
-
-export default ProtectedRoute;
+  return children;
+}
