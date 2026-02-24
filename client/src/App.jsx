@@ -1,41 +1,52 @@
-import React, { useState } from "react";
+import React from "react";
+import { Routes, Route } from "react-router-dom";
 
-const PAGES = {
-  home: "Welcome to Ocean Tide Drop | AI Surfer Survivor.",
-  island: "Island Hub: your sanctuary, storms and all.",
-  challenges: "Challenges: tides to ride, not to fear.",
-  progression: "Progression: track your journey through the sectors.",
-  members: "Members: the ones who walk the realm with you.",
-  founders: "Founders: you, the dogs, and the mythic core.",
-};
+// Layout + Global UI
+import Layout from "./components/Layout";
+import LoadingWrapper from "./components/LoadingWrapper";
+
+// Pages / Sectors
+import Home from "./pages/Home";
+import Sector1 from "./pages/Sector1";
+import Sector2 from "./pages/Sector2";
+import Sector3 from "./pages/Sector3";
+import Dashboard from "./pages/Dashboard";
+import Lore from "./pages/Lore";
+
+// Systems
+import ProtectedRoute from "./components/ProtectedRoute";
+import ScrollReveal from "./components/ScrollReveal";
 
 export default function App() {
-  const [page, setPage] = useState("home");
-
   return (
-    <div className="app">
-      <header className="header">
-        <h1>OTD AI SURFER | Sector 7</h1>
-        <p className="subtitle">A realm for survivors, surfers, and stormwalkers.</p>
-      </header>
+    <LoadingWrapper>
+      <ScrollReveal>
+        <Layout>
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/" element={<Home />} />
+            <Route path="/lore" element={<Lore />} />
 
-      <nav className="nav">
-        <button onClick={() => setPage("home")}>Home</button>
-        <button onClick={() => setPage("island")}>Island</button>
-        <button onClick={() => setPage("challenges")}>Challenges</button>
-        <button onClick={() => setPage("progression")}>Progression</button>
-        <button onClick={() => setPage("members")}>Members</button>
-        <button onClick={() => setPage("founders")}>Founders</button>
-      </nav>
+            {/* Sector Routes */}
+            <Route path="/sector/1" element={<Sector1 />} />
+            <Route path="/sector/2" element={<Sector2 />} />
+            <Route path="/sector/3" element={<Sector3 />} />
 
-      <main className="content">
-        <h2>{page.charAt(0).toUpperCase() + page.slice(1)}</h2>
-        <p>{PAGES[page]}</p>
-      </main>
+            {/* Protected Dashboard */}
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
 
-      <footer className="footer">
-        <span>Ocean Tide Drop • AI Surfer Survivor • Sector 7</span>
-      </footer>
-    </div>
+            {/* Catch-all */}
+            <Route path="*" element={<Home />} />
+          </Routes>
+        </Layout>
+      </ScrollReveal>
+    </LoadingWrapper>
   );
 }
