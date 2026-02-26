@@ -1,10 +1,10 @@
 services:
-  # Frontend (React)
+  # Frontend (React + Vite)
   - type: static
     name: ai-surfer-client
     env: static
     buildCommand: "cd Client && npm install && npm run build"
-    publishDir: "Client/dist" # or "Client/build" depending on your setup
+    publishDir: "Client/dist"
 
   # Backend (Node/Express)
   - type: web
@@ -13,6 +13,3 @@ services:
     plan: free
     buildCommand: "cd server && npm install"
     startCommand: "node server/server.js"
-    envVars:
-      - key: NODE_VERSION
-        value: 18.0.0
