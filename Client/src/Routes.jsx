@@ -29,7 +29,8 @@ function AppRoutes() {
 
         <Route path="/pricing" element={<PricingPage />} />
 
-        <Route path="*" element={<NotFound />} />
+        <Route path="*" element={<NotFound />} /> <Route path="/tools" element={<ThirdPartyTools />} />
+
       </Routes>
     </Router>
   );
