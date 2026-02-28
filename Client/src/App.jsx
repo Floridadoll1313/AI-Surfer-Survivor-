@@ -12,6 +12,8 @@ import Sector2 from "./pages/Sector2";
 import Sector3 from "./pages/Sector3";
 import Dashboard from "./pages/Dashboard";
 import Lore from "./pages/Lore";
+import ThirdPartyTools from "./pages/ThirdPartyTools";
+
 
 // Systems
 import ProtectedRoute from "./components/ProtectedRoute";
