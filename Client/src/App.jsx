@@ -1,54 +1,43 @@
-import React from "react";
 import { Routes, Route } from "react-router-dom";
 
-// Layout + Global UI
+// Layout
 import Layout from "./components/Layout";
-import LoadingWrapper from "./components/LoadingWrapper";
 
-// Pages / Sectors
+// Pages
 import Home from "./pages/Home";
-import Sector1 from "./pages/Sector1";
-import Sector2 from "./pages/Sector2";
-import Sector3 from "./pages/Sector3";
+import Island from "./pages/Island";
+import Challenges from "./pages/Challenges";
+import Progression from "./pages/Progression";
+import Community from "./pages/Community";
+import Members from "./pages/Members";
+import Blog from "./pages/Blog";
+import Free from "./pages/Free";
+import Founders from "./pages/Founders";
+import Campfire from "./pages/Campfire";
+import Arena from "./pages/Arena";
 import Dashboard from "./pages/Dashboard";
-import Lore from "./pages/Lore";
+import Ceremony from "./pages/Ceremony";
 import ThirdPartyTools from "./pages/ThirdPartyTools";
-
-
-// Systems
-import ProtectedRoute from "./components/ProtectedRoute";
-import ScrollReveal from "./components/ScrollReveal";
 
 export default function App() {
   return (
-    <LoadingWrapper>
-      <ScrollReveal>
-        <Layout>
-          <Routes>
-            {/* Public Routes */}
-            <Route path="/" element={<Home />} />
-            <Route path="/lore" element={<Lore />} />
-
-            {/* Sector Routes */}
-            <Route path="/sector/1" element={<Sector1 />} />
-            <Route path="/sector/2" element={<Sector2 />} />
-            <Route path="/sector/3" element={<Sector3 />} />
-
-            {/* Protected Dashboard */}
-            <Route
-              path="/dashboard"
-              element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              }
-            />
-
-            {/* Catch-all */}
-            <Route path="*" element={<Home />} />
-          </Routes>
-        </Layout>
-      </ScrollReveal>
-    </LoadingWrapper>
+    <Layout>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/island" element={<Island />} />
+        <Route path="/challenges" element={<Challenges />} />
+        <Route path="/progression" element={<Progression />} />
+        <Route path="/community" element={<Community />} />
+        <Route path="/members" element={<Members />} />
+        <Route path="/blog" element={<Blog />} />
+        <Route path="/free" element={<Free />} />
+        <Route path="/founders" element={<Founders />} />
+        <Route path="/campfire" element={<Campfire />} />
+        <Route path="/arena" element={<Arena />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/ceremony" element={<Ceremony />} />
+        <Route path="/tools" element={<ThirdPartyTools />} />
+      </Routes>
+    </Layout>
   );
 }
