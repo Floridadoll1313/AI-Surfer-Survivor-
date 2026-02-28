@@ -1,17 +1,12 @@
-import React from "react";
-import NavBar from "./NavBar";
-import SiteFooter from "./SiteFooter";
+import Navigation from "./Navigation";
 
 export default function Layout({ children }) {
   return (
-    <div className="layout-container">
-      <NavBar />
-
-      <main className="content-area">
+    <div className="min-h-screen flex flex-col bg-black text-white">
+      <Navigation />
+      <main className="flex-1 p-6">
         {children}
       </main>
-
-      <SiteFooter />
     </div>
   );
 }
