@@ -49,4 +49,140 @@ h2 {
 
 p {
   font-size: clamp(1rem, 1.4vw, 1.2rem);
-  line-height: 1
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+/* -------------------------------------------------------
+   🌊 NEON GLOW UTILITIES
+------------------------------------------------------- */
+.glow-cyan {
+  box-shadow: 0 0 12px var(--cyan-glow), 0 0 24px var(--cyan-glow);
+}
+
+.glow-gold {
+  box-shadow: 0 0 12px var(--gold-glow), 0 0 24px var(--gold-glow);
+}
+
+.glow-pink {
+  box-shadow: 0 0 12px var(--pink-glow), 0 0 24px var(--pink-glow);
+}
+
+/* -------------------------------------------------------
+   🌊 OCEAN PULSE ANIMATION
+------------------------------------------------------- */
+@keyframes oceanPulse {
+  0% { opacity: 0.7; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.03); }
+  100% { opacity: 0.7; transform: scale(1); }
+}
+
+.ocean-pulse {
+  animation: oceanPulse 6s ease-in-out infinite;
+}
+
+/* -------------------------------------------------------
+   🌊 GRADIENT SHINE EFFECT
+------------------------------------------------------- */
+@keyframes shine {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.shine {
+  background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+  background-size: 200%;
+  animation: shine 3s linear infinite;
+}
+
+/* -------------------------------------------------------
+   🌊 NEURAL TICKER
+------------------------------------------------------- */
+@keyframes ticker {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-50%, 0, 0); }
+}
+
+.ticker-wrapper {
+  display: flex;
+  width: 100%;
+  overflow: hidden;
+}
+
+.ticker-content {
+  display: inline-block;
+  white-space: nowrap;
+  animation: ticker 40s linear infinite;
+  will-change: transform;
+}
+
+/* -------------------------------------------------------
+   🌊 CYBER SCROLLBAR
+------------------------------------------------------- */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background-alt);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 10px;
+  transition: var(--transition);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--cyan);
+  box-shadow: 0 0 10px var(--cyan-glow);
+}
+
+/* -------------------------------------------------------
+   🌊 PANEL SYSTEM
+------------------------------------------------------- */
+.panel {
+  background: var(--background-alt);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  border: 1px solid rgba(255,255,255,0.05);
+  transition: var(--transition);
+}
+
+.panel:hover {
+  border-color: var(--cyan);
+  box-shadow: 0 0 20px var(--cyan-glow);
+}
+
+/* -------------------------------------------------------
+   🌊 BUTTON SYSTEM
+------------------------------------------------------- */
+.btn {
+  padding: 0.6rem 1.2rem;
+  border-radius: var(--radius);
+  font-weight: 600;
+  transition: var(--transition);
+  cursor: pointer;
+}
+
+.btn-cyan {
+  background: var(--cyan);
+  color: #000;
+}
+
+.btn-cyan:hover {
+  box-shadow: 0 0 20px var(--cyan-glow);
+  transform: translateY(-2px);
+}
+
+.btn-outline {
+  border: 2px solid var(--cyan);
+  color: var(--cyan);
+  background: transparent;
+}
+
+.btn-outline:hover {
+  background: var(--cyan);
+  color: #000;
+  box-shadow: 0 0 20px var(--cyan-glow);
+}
