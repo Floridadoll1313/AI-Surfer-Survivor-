@@ -1,68 +1,59 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
+
+// Core Pages (Built Out in previous steps)
 import Island from './pages/Island';
 import Arena from './pages/Arena';
-// Import other pages...
+import ProgressionDashboard from './pages/ProgressionDashboard';
+import Campfire from './pages/Campfire';
+import Ceremony from './pages/Ceremony';
+
+// Additional Survivor Realm Pages (To be built out)
+import Challenges from './pages/Challenges';
+import Store from './pages/Store';
+import Leaderboard from './pages/Leaderboard';
+import Inventory from './pages/Inventory';
+import Profile from './pages/Profile';
+import Settings from './pages/Settings';
+import Tutorial from './pages/Tutorial';
+import Lore from './pages/Lore';
+import Archive from './pages/Archive';
 
 function App() {
   return (
     <Router>
-      <div className="bg-black min-h-screen text-white">
-        {/* The Global Navbar provides the missing navigation */}
+      {/* Global Wrapper for Neon Aesthetics */}
+      <div className="bg-black min-h-screen text-white selection:bg-neon-pink selection:text-black">
+        
+        {/* Navbar remains static to ensure "never-ending" flow */}
         <Navbar />
         
         <Routes>
+          {/* Main Gameplay and Hubs */}
           <Route path="/" element={<Island />} />
           <Route path="/island" element={<Island />} />
           <Route path="/arena" element={<Arena />} />
-          {/* Add all 14 built out routes here */}
+          <Route path="/progression" element={<ProgressionDashboard />} />
+          <Route path="/campfire" element={<Campfire />} />
+          <Route path="/ceremony" element={<Ceremony />} />
+
+          {/* Survivor Utilities and Social */}
+          <Route path="/challenges" element={<Challenges />} />
+          <Route path="/store" element={<Store />} />
+          <Route path="/leaderboard" element={<Leaderboard />} />
+          <Route path="/inventory" element={<Inventory />} />
+          
+          {/* Metadata and Configuration */}
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/tutorial" element={<Tutorial />} />
+          <Route path="/lore" element={<Lore />} />
+          <Route path="/archive" element={<Archive />} />
         </Routes>
       </div>
     </Router>
   );
 }
 
-export default App;import { Routes, Route } from "react-router-dom";
-
-// Layout
-import Layout from "./components/Layout";
-
-// Pages
-import Home from "./pages/Home";
-import Island from "./pages/Island";
-import Challenges from "./pages/Challenges";
-import Progression from "./pages/Progression";
-import Community from "./pages/Community";
-import Members from "./pages/Members";
-import Blog from "./pages/Blog";
-import Free from "./pages/Free";
-import Founders from "./pages/Founders";
-import Campfire from "./pages/Campfire";
-import Arena from "./pages/Arena";
-import Dashboard from "./pages/Dashboard";
-import Ceremony from "./pages/Ceremony";
-import ThirdPartyTools from "./pages/ThirdPartyTools";
-
-export default function App() {
-  return (
-    <Layout>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/island" element={<Island />} />
-        <Route path="/challenges" element={<Challenges />} />
-        <Route path="/progression" element={<Progression />} />
-        <Route path="/community" element={<Community />} />
-        <Route path="/members" element={<Members />} />
-        <Route path="/blog" element={<Blog />} />
-        <Route path="/free" element={<Free />} />
-        <Route path="/founders" element={<Founders />} />
-        <Route path="/campfire" element={<Campfire />} />
-        <Route path="/arena" element={<Arena />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/ceremony" element={<Ceremony />} />
-        <Route path="/tools" element={<ThirdPartyTools />} />
-      </Routes>
-    </Layout>
-  );
-}
+export default App;
