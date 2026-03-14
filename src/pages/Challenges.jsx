@@ -16,15 +16,4 @@ const Challenges = () => (
     ))}
   </motion.div>
 );
-export default Challenges;
-3.4 Progression Page (src/pages/Progression.jsx)
-3.5 Community Page (src/pages/Community.jsx)
-3.6 Members Page (src/pages/Members.jsx)
-3.7 Blog Page (src/pages/Blog.jsx)
-3.8 Free Page (src/pages/Free.jsx)
-3.9 Founders Page (src/pages/Founders.jsx)
-3.10 Campfire Page (src/pages/Campfire.jsx)
-3.11 Arena Page (src/pages/Arena.jsx)
-3.12 Dashboard Page (src/pages/Dashboard.jsx)
-3.13 Ceremony Page (src/pages/Ceremony.jsx)
-3.14 Tools Page (src/pages/Tools.jsx)   
+export default Challenges; 
