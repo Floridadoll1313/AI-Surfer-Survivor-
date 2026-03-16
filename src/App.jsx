@@ -10,7 +10,7 @@ import Blog from './pages/Blog';
 import Free from './pages/Free';
 import Founders from './pages/Founders';
 import Campfire from './pages/Campfire';
-import Arena from './pages/Arena';
+import Surfer from './pages/Arena';
 import Dashboard from './pages/Dashboard';
 import Ceremony from './pages/Ceremony';
 import ThirdPartyTools from './pages/ThirdPartyTools';
