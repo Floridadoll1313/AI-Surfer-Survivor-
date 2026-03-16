@@ -21,3 +21,5 @@ const Surfer = () => {
     </div>
   );
 };
+
+export default Surfer;
