@@ -31,7 +31,7 @@ export default function App() {
           <Route path="free" element={<Free />} />
           <Route path="founders" element={<Founders />} />
           <Route path="campfire" element={<Campfire />} />
-          <Route path="arena" element={<Arena />} />
+          <Route path="arena" element={<Surfer />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="ceremony" element={<Ceremony />} />
           <Route path="/gear" element={<GearEquipment />} />
