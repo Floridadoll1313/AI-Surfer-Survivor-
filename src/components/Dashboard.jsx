@@ -1,6 +1,6 @@
 import React from "react";
 import AchievementBadge from "../components/AchievementBadge";
-import { useProgression } from "../source/hooks/ProgressionContext";
+import { useProgression } from "../hooks/ProgressionContext";
 
 export default function Dashboard() {
   const { xp, level, unlockedSectors } = useProgression();
