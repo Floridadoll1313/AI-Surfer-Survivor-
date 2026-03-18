@@ -11,7 +11,7 @@ import Free from './pages/Free';
 import Founders from './pages/Founders';
 import Campfire from './pages/Campfire';
 import Surfer from './pages/Arena';
-import Dashboard from './pages/Dashboard';
+import Dashboard from './components/Dashboard';
 import Ceremony from './pages/Ceremony';
 import ThirdPartyTools from './pages/ThirdPartyTools';
 import GearEquipment from './pages/GearEquipment';
