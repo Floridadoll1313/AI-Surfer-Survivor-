@@ -1,17 +1,14 @@
-// Simple Navigation Logic for your Surfer Survivor tiers
-const handleTierSelection = (tier) => {
-  console.log(`User selected the ${tier} tier`);
-  import { inject } from '@vercel/analytics';
+const express = require('express');
+const app = express();
+const path = require('path');
 
-// This starts the tracking immediately
-inject();
-  // Logic: Send them to the specific dashboard route
-  if (tier === 'blue') {
-    window.location.href = '/dashboard-blue';
-  } else {
-    window.location.href = '/dashboard-pink';
-  }
-};
+// This tells Node to serve your ocean-themed CSS/Images from a "public" folder
+app.use(express.static('public'));
 
-// Example usage on a button:
-// <button onClick={() => handleTierSelection('blue')}>Go Pro Survivor</button>
+app.get('/', (req, res) => {
+    // Logic: Is the user logged in? Show the Blue Dashboard.
+    // If not, show the Pink (Free) Landing Page.
+    res.sendFile(path.join(__dirname, '/index.html')); 
+});
+
+app.listen(3000, () => console.log('Surfer Survivor site live on port 3000'));
