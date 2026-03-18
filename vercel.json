@@ -1,15 +1,9 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "index.js",
-      "use": "@vercel/node"
-    }
-  ],
-  "routes": [
-    { "src": "/assets/(.*)", "dest": "/dist/assets/$1" },
-    { "src": "/dashboard-pink", "dest": "/index.html" },
-    { "src": "/(.*)", "dest": "index.js" }
+  "rewrites": [
+    { "source": "/dashboard-pink", "destination": "/index.html" },
+    { "source": "/dashboard-blue", "destination": "/index.html" },
+    { "source": "/(.*)", "destination": "/index.js" }
   ],
   "functions": {
     "index.js": {
