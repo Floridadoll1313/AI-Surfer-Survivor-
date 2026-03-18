@@ -5,35 +5,30 @@ import { fileURLToPath } from 'url';
 const app = express();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-// --- 1. SETTINGS ---
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// --- 2. MIDDLEWARE (FIXED) ---
+// Middleware: Parses data and prevents the "hang"
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// This was empty before—now it has next() to prevent 504 timeouts
 app.use((req, res, next) => {
-    console.log(`Survivor Request: ${req.url}`);
+    console.log(`Survivor Path: ${req.url}`);
     next(); 
 });
 
-// Serve the static files Vite generates (CSS/JS/Images)
+// Serve the CSS/JS/Images Vite creates
 app.use(express.static(path.join(__dirname, 'dist')));
 
-// --- 3. ROUTES ---
+// --- ROUTES ---
 
-// The Main Page (EJS)
+// 1. Home Page (EJS)
 app.get('/', (req, res) => {
-    res.render('index', { title: 'Surfer Survivor' });
+    res.render('index', { title: 'Surfer Survivor Home' });
 });
 
-// The Pink Dashboard (React/JSX via Vite)
-app.get('/dashboard-pink', (req, res) => {
-    // Since free.jsx is bundled into index.html by Vite, we send the entry point
+// 2. Dashboards (React)
+// These routes send the main HTML file so React can show your .jsx components
+app.get(['/dashboard-pink', '/dashboard-blue'], (req, res) => {
     res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
-// --- 4. EXPORT FOR VERCEL ---
 export default app;
