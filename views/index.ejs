@@ -4,10 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= pageTitle %></title>
+    <script async src="https://js.stripe.com/v3/buy-button.js"></script>
     <style>
         :root {
-            --deep-blue: <%= deepBlue %>;
-            --bright-teal: <%= brandColor %>;
+            --deep-blue: #003366;
+            --bright-teal: #00ced1;
         }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -32,6 +33,7 @@
             font-style: italic;
             font-size: 1.2rem;
             color: #555;
+            margin-top: 10px;
         }
         main {
             display: flex;
@@ -49,24 +51,20 @@
             text-align: center;
             transition: transform 0.3s ease;
         }
-        .card:hover {
-            transform: translateY(-10px);
-        }
+        .card:hover { transform: translateY(-10px); }
         .pink-card { border-top: 10px solid #ff99cc; }
         .blue-card { border-top: 10px solid var(--bright-teal); }
         
-        .btn {
+        .btn-pink {
             display: inline-block;
             margin-top: 20px;
             padding: 15px 35px;
             border-radius: 50px;
+            background-color: #ff99cc;
+            color: white;
             text-decoration: none;
             font-weight: bold;
-            transition: opacity 0.3s;
         }
-        .btn-pink { background-color: #ff99cc; color: white; }
-        .btn-blue { background-color: var(--bright-teal); color: white; }
-        .btn:hover { opacity: 0.8; }
 
         footer {
             text-align: center;
@@ -87,13 +85,18 @@
         <div class="card pink-card">
             <h2 style="color: #ff66b2;">Pink Tier</h2>
             <p>Start your journey as an AI Survivor. Access our free community and core training modules.</p>
-            <a href="#" class="btn btn-pink">Enter Dashboard</a>
+            <a href="/dashboard" class="btn btn-pink">Enter Dashboard</a>
         </div>
 
         <div class="card blue-card">
             <h2>Blue Tier</h2>
             <p>Unlock advanced full-stack challenges, automation tools, and the pro survival kit.</p>
-            <a href="#" class="btn btn-blue">Level Up & Join</a>
+            
+            <stripe-buy-button
+              buy-button-id="buy_btn_1Sz2KJFXSpOayG0A9oGMNKzp"
+              publishable-key="pk_test_51SRcVjFXSpOayG0AILUwALLW7AWB4eFPHvSKhWmPBxClIcKJPVU69d3weKl8BPQ5UPx0Dbn6GKP17DAd9VHJIsPk00ehvxEgbX"
+            >
+            </stripe-buy-button>
         </div>
     </main>
 
