@@ -12,17 +12,8 @@
     }
   },
   "rewrites": [
-    { 
-      "source": "/dashboard-pink", 
-      "destination": "/index.html" 
-    },
-    { 
-      "source": "/dashboard-blue", 
-      "destination": "/index.html" 
-    },
-    { 
-      "source": "/(.*)", 
-      "destination": "/api/index.js" 
-    }
+    { "source": "/dashboard-pink", "destination": "/index.html" },
+    { "source": "/dashboard-blue", "destination": "/index.html" },
+    { "source": "/(.*)", "destination": "/api/index.js" }
   ]
 }
